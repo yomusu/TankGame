@@ -5,28 +5,52 @@ import 'package:web_ui/web_ui.dart';
 import 'geng.dart';
 
 
+Tank  tank;
+
 void main() {
   
-  Element player = query("#player");
+  geng.topElement = query("#field");
   
-  geng.objlist.add( new Tank() );
+  tank = new Tank();
+  
+  geng.objlist.add( tank );
+  geng.objlist.add( new Button() );
   
   Timer.run( () {
-    player.text = "test";
     new Timer.periodic( const Duration(milliseconds:200), (t) {
       geng.frame_all();
     });
   });
 }
 
+
 class Tank extends GObj {
-  Element p;
-  int y = 0;
+  
+  Sprite p;
+  
   void onInit() {
-    p = query("#player");
+    p = new Sprite( src:"../octocat.png" );
+    p.width = 100;
+    p.height = 100;
+    geng.topElement.append( p.element );
   }
+  
   void onFrame( FrameInfo info ) {
-    y++;
-    p.style.top = "${y}px";
+    p.x += 1;
+    p.y += 1;
   }
+}
+
+class Button extends GObj {
+  
+  Element p;
+  bool  isPress;
+  
+  void onInit() {
+    p = query("#btn_right");
+    p.onMouseDown.listen( (MouseEvent e) {
+      tank.p.x += 2;
+    });
+  }
+  
 }

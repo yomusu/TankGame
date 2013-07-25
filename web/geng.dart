@@ -3,9 +3,10 @@ library geng;
 import 'dart:html';
 import 'dart:async';
 
+part 'sprite.dart';
 
 
-class GObj {
+abstract class GObj {
   
   static const int  ST_INIT = 0;
   static const int  ST_RUN = 1;
@@ -17,7 +18,7 @@ class GObj {
   // オーバーライドすべきメソッド ---
   
   /** 最初に呼ばれる */
-  void onInit() {}
+  void onInit();
   
   /** 毎回呼ばれる */
   void onFrame( FrameInfo frame ) {}
@@ -55,3 +56,5 @@ class FrameInfo {
 }
 
 GEng geng = new GEng();
+
+

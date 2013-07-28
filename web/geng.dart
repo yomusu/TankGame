@@ -6,53 +6,55 @@ import 'dart:async';
 part 'sprite.dart';
 
 
+/**
+ * 物体ひとつ
+ * 定義は…
+ */
 abstract class GObj {
-  
-  static const int  ST_INIT = 0;
-  static const int  ST_RUN = 1;
-  static const int  ST_END = 2;
-  
-  /** staus of this obj */
-  int status = ST_INIT;
   
   // オーバーライドすべきメソッド ---
   
   /** 最初に呼ばれる */
   void onInit();
   
-  /** 毎回呼ばれる */
-  void onFrame( FrameInfo frame ) {}
+  /** 最後に呼ばれる */
+  void onDispose();
   
   // 操作するためのメソッド ---
   
-  /** 自分を終了する */
-  void finish() {
-    status = ST_END;
-  }
+  void init() => onInit();
+  
+  void dispose() => onDispose();
+  
 }
 
 class GEng {
   
   final List<GObj>  objlist = new List();
-  Element  topElement = null;
   
-  FrameInfo frameInfo = new FrameInfo();
+  Element  _element = null;
   
-  void frame_all() {
+  void initField( int w, int h ) {
+    var el = new DivElement();
+    el.style.width = "${w}px";
+    el.style.height= "${h}px";
+    el.style.position="relative";
+    el.style.overflow="hidden";
     
-    for( GObj o in objlist ) {
-      if( o.status==GObj.ST_INIT ) {
-        o.onInit();
-        o.status = GObj.ST_RUN;
-      }
-      if( o.status==GObj.ST_RUN )
-        o.onFrame( frameInfo );
-    }
+    _element = el;
   }
-}
-
-class FrameInfo {
   
+  Element get element => _element;
+  
+  Rect get rect {
+    if( _rect==null ) {
+      var w = _element.clientWidth;
+      var h = _element.clientHeight;
+      _rect = new Rect(0,0,w,h);
+    }
+    return _rect;
+  }
+  Rect  _rect;
 }
 
 GEng geng = new GEng();

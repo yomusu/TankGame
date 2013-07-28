@@ -10,12 +10,14 @@ Tank  tank;
 
 void main() {
   
-  geng.topElement = query("#field");
+  geng.initField( 640, 400 );
+  query("#field").append( geng.element );
   
   tank = new Tank();
+  tank.init();
   
-  geng.objlist.add( tank );
-  geng.objlist.add( new Cursor() );
+  var cursor = new Cursor();
+  cursor.init();
   
   Timer.run( () {
     
@@ -24,15 +26,14 @@ void main() {
       tank.fire( new Point(x,y) );
       print("x=$x, y=$y");
     })
-    ..connect( geng.topElement );
+    ..connect( geng.element );
     
-    new Timer.periodic( const Duration(milliseconds:50), (t) {
-      geng.frame_all();
-    });
   });
 }
 
-
+/**
+ * 照準カーソル
+ */
 class Cursor extends GObj {
   
   Sprite sp;
@@ -42,7 +43,7 @@ class Cursor extends GObj {
     sp.width = 100;
     sp.height = 100;
     sp.offset = new Point(50,50);
-    geng.topElement.append( sp.element );
+    geng.element.append( sp.element );
     
     new MoveHandler( (int x, int y) {
       sp.x = x;
@@ -51,10 +52,17 @@ class Cursor extends GObj {
     },
     onOut : () => sp.hide()
     )
-    ..connect( geng.topElement );
+    ..connect( geng.element );
+  }
+  
+  void onDispose() {
+    geng.element.children.remove( sp.element );
   }
 }
 
+/**
+ * 戦車
+ */
 class Tank extends GObj {
   
   int  delta_x = 1;
@@ -64,7 +72,7 @@ class Tank extends GObj {
     sp = new Sprite( src:"../octocat.png" );
     sp.width = 100;
     sp.height = 100;
-    geng.topElement.append( sp.element );
+    geng.element.append( sp.element );
     
     sp.offset = new Point(50,0);
     sp.x = 320;
@@ -91,16 +99,17 @@ class Tank extends GObj {
     ..set( dir )
     ..mul( 5.0 );
     
-    geng.objlist.add( b );
-    
+    b.init();
   }
   
-  void onFrame( FrameInfo info ) {
-    
+  void onDispose() {
+    geng.element.children.remove( sp.element );
   }
 }
 
-
+/**
+ * 砲弾
+ */
 class Cannonball extends GObj {
   
   /** 位置 */
@@ -112,18 +121,35 @@ class Cannonball extends GObj {
   
   Sprite sp;
   
+  Timer timer;
+  
   void onInit() {
     sp = new Sprite( src:"../octocat.png" );
     sp.width = 50;
     sp.height = 50;
-    geng.topElement.append( sp.element );
+    geng.element.append( sp.element );
     
     sp.offset = new Point(25,25);
+    
+    // 移動ルーチン
+    move();
+    timer = new Timer.periodic( const Duration(milliseconds:50), (t)=>move() );
   }
   
-  void onFrame( FrameInfo info ) {
+  void move() {
+    // 移動しました
     pos.add( speed );
     sp.x = pos.x.toInt();
     sp.y = pos.y.toInt();
+    // 画面外判定
+    var r = sp.rect;
+    if( geng.rect.intersects(r)==false )
+      dispose();
+  }
+  
+  void onDispose() {
+    if( timer!=null )
+      timer.cancel();
+    geng.element.children.remove( sp.element );
   }
 }

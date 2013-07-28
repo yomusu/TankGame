@@ -14,8 +14,6 @@ h1, p {
 #field {
   width: 640px;
   height: 400px;
-  position: relative;
-  overflow: hidden;
   border: 1px solid #ccc;
   background-color: #fff;
 }

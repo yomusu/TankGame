@@ -6,13 +6,13 @@ part of geng;
  */
 class Sprite {
   
-  int _x=0,_y=0;
+  num _x=0,_y=0;
   
   Point offset = new Point(0,0);
   
   ImageElement _el;
   
-  Sprite( { String src:null, int width:10, int height:10 } ) {
+  Sprite( { String src:null, num width:10, num height:10 } ) {
     
     _el = new ImageElement();
     _el.style.position = "absolute";
@@ -28,31 +28,50 @@ class Sprite {
   set src( String url ) => _el.src = url;
   
   /** 横幅 */
-  int get width => _el.width;
-      set width( int w ) => _el.width = w;
+  num get width => _el.width;
+      set width( num w ) {
+        _el.width = w;
+        _rect=null;
+      }
   
   /** 高さ */
-  int get height=> _el.height;
-      set height( int h ) => _el.height = h;
+  num get height=> _el.height;
+      set height( num h ) {
+        _el.height = h;
+        _rect=null;
+      }
   
   
   /** x座標 */
-  int get x => _x;
-      set x( int n ) {
+  num get x => _x;
+      set x( num n ) {
         _x = n;
         _el.style.left = "${n-offset.x}px";
+        _rect=null;
       }
       
   /** y座標 */
-  int get y => _y;
-      set y( int n ) {
+  num get y => _y;
+      set y( num n ) {
         _y = n;
         _el.style.top = "${n-offset.y}px";
+        _rect=null;
       }
   
   /** as Element */
   Element get element => _el;
-
+  
+  /** get as Rect */
+  Rect get rect {
+    if( _rect==null ) {
+      num x = _x - offset.x;
+      num y = _y - offset.y;
+      _rect = new Rect( x,y, width, height );
+    }
+    return _rect;
+  }
+  Rect  _rect = null;
+  
   void show() {
     _el.style.visibility = "visible";
   }

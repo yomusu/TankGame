@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:async';
 import 'package:web_ui/web_ui.dart';
+import 'dart:math' as math;
 
 import 'geng.dart';
 import 'vector.dart';
@@ -21,6 +22,17 @@ void main() {
   
   Timer.run( () {
     
+    // 看板を配置
+    var rand = new math.Random(0);
+    List<Target>  targetList = [];
+    for( int x=600; x<2000; x+=200 ) {
+      var y = (rand.nextDouble() * 300 ).toInt();
+      Target  t = new Target();
+      t.pos = new Point(x,y);
+      t.init();
+      targetList.add(t);
+    }
+    
     // フィールドにマウスリスナー
     new PressHandler( (int x, int y) {
       tank.fire( new Point(x,y) );
@@ -28,6 +40,24 @@ void main() {
     })
     ..connect( geng.element );
     
+    //---------------
+    // ゲーム進行処理
+    int x = 0;
+    new Timer.periodic( const Duration(milliseconds:100), (Timer t) {
+      
+      // スクロール
+      x+=2;
+      
+      // 的を移動
+      targetList.forEach( (target) {
+        target.sp.x = target.pos.x - x;
+      });
+      
+      if( x >= 600 ) {
+        // ステージ終了処理
+        t.cancel();
+      }
+    });
   });
 }
 
@@ -97,7 +127,12 @@ class Tank extends GObj {
     // スピード
     b.speed
     ..set( dir )
-    ..mul( 5.0 );
+    ..mul( 20.0 );
+    
+    // 加速度
+    b.delta
+    ..set( dir )
+    ..mul( 0.0 );
     
     b.init();
   }
@@ -141,6 +176,8 @@ class Cannonball extends GObj {
     pos.add( speed );
     sp.x = pos.x.toInt();
     sp.y = pos.y.toInt();
+    // 加速
+    speed.sub(delta);
     // 画面外判定
     var r = sp.rect;
     if( geng.rect.intersects(r)==false )
@@ -152,4 +189,33 @@ class Cannonball extends GObj {
       timer.cancel();
     geng.element.children.remove( sp.element );
   }
+}
+
+/**
+ * 看板
+ */
+class Target extends GObj {
+
+  Sprite sp;
+  Point pos;
+  
+  void onInit() {
+    sp = new Sprite( src:"../octocat.png" )
+    ..width = 80
+    ..height = 80
+    ..offset = new Point(40,40)
+    ..x = pos.x
+    ..y = pos.y;
+    geng.element.append( sp.element );
+  }
+  
+  void bomb() {
+    
+  }
+  
+  void onDispose() {
+    geng.element.children.remove( sp.element );
+    
+  }
+
 }

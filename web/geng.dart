@@ -17,6 +17,9 @@ abstract class GObj {
   /** 最初に呼ばれる */
   void onInit();
   
+  /** レンダリング */
+  void onRender();
+  
   /** 最後に呼ばれる */
   void onDispose();
   
@@ -24,8 +27,9 @@ abstract class GObj {
   
   void init() => onInit();
   
-  void dispose() => onDispose();
+  void render() => onRender();
   
+  void dispose() => onDispose();
 }
 
 class GEng {

@@ -8,6 +8,9 @@ import 'vector.dart';
 
 
 Tank  tank;
+List<GObj>  targetList = [];
+
+double  offset_x = 0.0;
 
 void main() {
   
@@ -15,6 +18,10 @@ void main() {
   query("#field").append( geng.element );
   
   tank = new Tank();
+  // 戦車の初期位置
+  tank.pos
+    ..x = 320.0
+    ..y = 300.0;
   tank.init();
   
   var cursor = new Cursor();
@@ -24,11 +31,12 @@ void main() {
     
     // 看板を配置
     var rand = new math.Random(0);
-    List<Target>  targetList = [];
     for( int x=600; x<2000; x+=200 ) {
-      var y = (rand.nextDouble() * 300 ).toInt();
+      var y = rand.nextDouble() * 300;
       Target  t = new Target();
-      t.pos = new Point(x,y);
+      t.pos
+        ..x = x.toDouble()
+        ..y = y;
       t.init();
       targetList.add(t);
     }
@@ -42,18 +50,20 @@ void main() {
     
     //---------------
     // ゲーム進行処理
-    int x = 0;
+    offset_x = 0.0;
     new Timer.periodic( const Duration(milliseconds:100), (Timer t) {
       
       // スクロール
-      x+=2;
+      offset_x += 2.0;
       
+      // 戦車を移動
+      tank.render();
+      
+      // 砲弾を移動
       // 的を移動
-      targetList.forEach( (target) {
-        target.sp.x = target.pos.x - x;
-      });
+      targetList.forEach( (target) => target.render() );
       
-      if( x >= 600 ) {
+      if( offset_x >= 600 ) {
         // ステージ終了処理
         t.cancel();
       }
@@ -85,6 +95,10 @@ class Cursor extends GObj {
     ..connect( geng.element );
   }
   
+  void onRender() {
+    
+  }
+  
   void onDispose() {
     geng.element.children.remove( sp.element );
   }
@@ -97,16 +111,18 @@ class Tank extends GObj {
   
   int  delta_x = 1;
   Sprite sp;
+  Vector  pos = new Vector();
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png" );
     sp.width = 100;
     sp.height = 100;
-    geng.element.append( sp.element );
-    
     sp.offset = new Point(50,0);
-    sp.x = 320;
-    sp.y = 350;
+    geng.element.append( sp.element );
+  }
+  
+  void onRender() {
+    sp.x = pos.x - offset_x;
   }
   
   /** 弾を打つ */
@@ -115,8 +131,7 @@ class Tank extends GObj {
     var b = new Cannonball();
     
     // 初期位置
-    b.pos.x = this.sp.x.toDouble();
-    b.pos.y = this.sp.y.toDouble();
+    b.pos.set( this.pos );
     
     // 方向
     Vector  dir = new Vector()
@@ -135,6 +150,7 @@ class Tank extends GObj {
     ..mul( 0.0 );
     
     b.init();
+    targetList.add(b);
   }
   
   void onDispose() {
@@ -171,6 +187,10 @@ class Cannonball extends GObj {
     timer = new Timer.periodic( const Duration(milliseconds:50), (t)=>move() );
   }
   
+  void onRender() {
+    sp.x = pos.x - offset_x;
+  }
+  
   void move() {
     // 移動しました
     pos.add( speed );
@@ -182,6 +202,17 @@ class Cannonball extends GObj {
     var r = sp.rect;
     if( geng.rect.intersects(r)==false )
       dispose();
+    // Targetへの当たり判定
+    try {
+      var t = targetList
+      .where( (Target e)=>e.isAlive )
+      .firstWhere( (Target e) {
+        var r = this.pos.distance( e.pos );
+        return ( r<10.0 );
+      });
+      t.bomb();
+    } on StateError {
+    }
   }
   
   void onDispose() {
@@ -197,7 +228,8 @@ class Cannonball extends GObj {
 class Target extends GObj {
 
   Sprite sp;
-  Point pos;
+  Vector pos = new Vector();
+  bool  isAlive = true;
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png" )
@@ -209,8 +241,13 @@ class Target extends GObj {
     geng.element.append( sp.element );
   }
   
+  void onRender() {
+    sp.x = pos.x - offset_x;
+  }
+  
   void bomb() {
-    
+    isAlive = false;
+    sp.hide();
   }
   
   void onDispose() {

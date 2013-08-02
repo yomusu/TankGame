@@ -52,36 +52,35 @@ class GEng {
   final List<GObj>  objlist = new List();
   
   // フィールド管理は別クラスにすべきかも
-  Element  _element = null;
+  CanvasElement  canvas = null;
   
   void initField( int w, int h ) {
-    var el = new DivElement();
-    el.style.width = "${w}px";
-    el.style.height= "${h}px";
-    el.style.position="relative";
-    el.style.overflow="hidden";
-    
-    _element = el;
+    canvas = new CanvasElement(width: w, height: h);
   }
-  
-  Element get element => _element;
   
   /** フィールドの大きさ */
   Rect get rect {
     if( _rect==null ) {
-      var w = _element.clientWidth;
-      var h = _element.clientHeight;
+      var w = canvas.clientWidth;
+      var h = canvas.clientHeight;
       _rect = new Rect(0,0,w,h);
     }
     return _rect;
   }
   Rect  _rect;
   
+  /**
+   * スプライトをrender
+   */
+  void render( Sprite spr ) {
+    spr.render(canvas);
+  }
   
   /**
    * 全てをrenderする
    */
   void renderAll() {
+    canvas.context2D.clearRect(0,0, rect.width, rect.height);
     objlist
     .where( (v) => v.isDisposed==false )
     .forEach( (GObj v)=> v.render() );

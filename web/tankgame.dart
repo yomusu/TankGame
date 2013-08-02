@@ -14,7 +14,7 @@ double  offset_x = 0.0;
 void main() {
   
   geng.initField( 640, 400 );
-  query("#field").append( geng.element );
+  query("#field").append( geng.canvas );
   
   tank = new Tank();
   // 戦車の初期位置
@@ -45,12 +45,12 @@ void main() {
       tank.fire( new Point(x,sy) );
       print("x=$x, y=$sy, offset_x=$offset_x, sx=$sx");
     })
-    ..connectTo( geng.element );
+    ..connectTo( geng.canvas );
     
     //---------------
     // ゲーム進行処理
     offset_x = 0.0;
-    new Timer.periodic( const Duration(milliseconds:100), (Timer t) {
+    new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
       
       // スクロール
       offset_x += 2.0;
@@ -81,7 +81,6 @@ class Cursor extends GObj {
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
     sp.offset = new Point(50,50);
-    geng.element.append( sp.element );
     
     new MoveHandler( (int x, int y) {
       sp.x = x;
@@ -90,15 +89,14 @@ class Cursor extends GObj {
     },
     onOut : () => sp.hide()
     )
-    ..connect( geng.element );
+    ..connect( geng.canvas );
   }
   
   void onRender() {
-    
+    sp.render(geng.canvas);
   }
   
   void onDispose() {
-    geng.element.children.remove( sp.element );
   }
 }
 
@@ -114,12 +112,12 @@ class Tank extends GObj {
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
     sp.offset = new Point(50,0);
-    geng.element.append( sp.element );
   }
   
   void onRender() {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
+    geng.render( sp );
   }
   
   /** 弾を打つ */
@@ -148,7 +146,6 @@ class Tank extends GObj {
   }
   
   void onDispose() {
-    geng.element.children.remove( sp.element );
   }
 }
 
@@ -170,7 +167,6 @@ class Cannonball extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:50, height:50 );
-    geng.element.append( sp.element );
     
     sp.offset = new Point(25,25);
     
@@ -180,9 +176,7 @@ class Cannonball extends GObj {
   }
   
   void onRender() {
-    sp.x = pos.x - offset_x;
-    sp.y = pos.y;
-    
+    geng.render( sp );
   }
   
   void _move() {
@@ -190,7 +184,8 @@ class Cannonball extends GObj {
     pos.add( speed );
     speed.sub(delta);
     // 
-    onRender();
+    sp.x = pos.x - offset_x;
+    sp.y = pos.y;
     // 画面外判定
     var r = sp.rect;
     if( geng.rect.intersects(r)==false )
@@ -218,7 +213,6 @@ class Cannonball extends GObj {
   void onDispose() {
     if( timer!=null )
       timer.cancel();
-    geng.element.children.remove( sp.element );
   }
 }
 
@@ -233,12 +227,12 @@ class Target extends GObj {
   void onInit() {
     sp = new Sprite( src:"../octocat.png" , width:80, height:80 )
     ..offset = new Point(40,40);
-    geng.element.append( sp.element );
   }
   
   void onRender() {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
+    geng.render( sp );
   }
   
   void bomb() {
@@ -246,7 +240,6 @@ class Target extends GObj {
   }
   
   void onDispose() {
-    geng.element.children.remove( sp.element );
   }
 
 }

@@ -7,37 +7,38 @@ part of geng;
 class Sprite {
   
   num _x=0,_y=0;
+  num _w=0,_h=0;
   
   Point offset = new Point(0,0);
   
-  ImageElement _el;
+  ImageElement _img;
   
   Sprite( { String src:null, num width:10, num height:10 } ) {
-    
-    _el = new ImageElement();
-    _el.style.position = "absolute";
-    
+    _img = new ImageElement();
     if( src !=null )
-      _el.src = src;
-    
-    _el.width = width;
-    _el.height= height;
+      _img.src = src;
+    _w = width;
+    _h = height;
   }
   
-  /** 画像のsrcを設定 */
-  set src( String url ) => _el.src = url;
+  void render( CanvasElement canvas ) {
+    var c = canvas.context2D;
+    var x = _x - offset.x;
+    var y = _y - offset.y;
+    c.drawImageScaled(_img, x, y, _w, _h);
+  }
   
   /** 横幅 */
-  num get width => _el.width;
+  num get width => _w;
       set width( num w ) {
-        _el.width = w;
+        _w = w;
         _rect=null;
       }
   
   /** 高さ */
-  num get height=> _el.height;
+  num get height=> _h;
       set height( num h ) {
-        _el.height = h;
+        _h = h;
         _rect=null;
       }
   
@@ -46,7 +47,6 @@ class Sprite {
   num get x => _x;
       set x( num n ) {
         _x = n;
-        _el.style.left = "${n-offset.x}px";
         _rect=null;
       }
       
@@ -54,12 +54,8 @@ class Sprite {
   num get y => _y;
       set y( num n ) {
         _y = n;
-        _el.style.top = "${n-offset.y}px";
         _rect=null;
       }
-  
-  /** as Element */
-  Element get element => _el;
   
   /** get as Rect */
   Rect get rect {
@@ -72,12 +68,14 @@ class Sprite {
   }
   Rect  _rect = null;
   
+  bool  isShow = true;
+  
   void show() {
-    _el.style.visibility = "visible";
+    isShow = true;
   }
   
   void hide() {
-    _el.style.visibility = "hidden";
+    isShow = false;
   }
 }
 

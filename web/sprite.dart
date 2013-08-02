@@ -4,40 +4,27 @@ part of geng;
  * いわゆるスプライト
  * Mouseイベントもやる必要あるかもねー
  */
-class Sprite {
+abstract class BaseSprite {
   
   num _x=0,_y=0;
+  num _w=0,_h=0;
+  num _offx=0,_offy=0;
   
-  Point offset = new Point(0,0);
-  
-  ImageElement _el;
-  
-  Sprite( { String src:null, num width:10, num height:10 } ) {
-    
-    _el = new ImageElement();
-    _el.style.position = "absolute";
-    
-    if( src !=null )
-      _el.src = src;
-    
-    _el.width = width;
-    _el.height= height;
-  }
-  
-  /** 画像のsrcを設定 */
-  set src( String url ) => _el.src = url;
+  Element _el;
   
   /** 横幅 */
-  num get width => _el.width;
+  num get width => _w;
       set width( num w ) {
-        _el.width = w;
+        _w = w;
+        _el.style.width = "${w}px";
         _rect=null;
       }
   
   /** 高さ */
-  num get height=> _el.height;
+  num get height=> _h;
       set height( num h ) {
-        _el.height = h;
+        _h = h;
+        _el.style.height = "${h}px";
         _rect=null;
       }
   
@@ -46,7 +33,7 @@ class Sprite {
   num get x => _x;
       set x( num n ) {
         _x = n;
-        _el.style.left = "${n-offset.x}px";
+        _el.style.left = "${n-_offx}px";
         _rect=null;
       }
       
@@ -54,7 +41,7 @@ class Sprite {
   num get y => _y;
       set y( num n ) {
         _y = n;
-        _el.style.top = "${n-offset.y}px";
+        _el.style.top = "${n-_offy}px";
         _rect=null;
       }
   
@@ -64,8 +51,8 @@ class Sprite {
   /** get as Rect */
   Rect get rect {
     if( _rect==null ) {
-      num x = _x - offset.x;
-      num y = _y - offset.y;
+      num x = _x - _offx;
+      num y = _y - _offy;
       _rect = new Rect( x,y, width, height );
     }
     return _rect;
@@ -78,6 +65,53 @@ class Sprite {
   
   void hide() {
     _el.style.visibility = "hidden";
+  }
+}
+
+/**
+ * いわゆるスプライト
+ * Mouseイベントもやる必要あるかもねー
+ */
+class Sprite extends BaseSprite {
+  
+  Sprite( { String src:null, num width:10, num height:10 } ) {
+    
+    _el = new ImageElement();
+    _el.style.position = "absolute";
+    
+    this.width = width;
+    this.height = height;
+    
+    // オフセット
+    _offx = (width / 2).toInt();
+    _offy = (height / 2).toInt();
+
+    if( src !=null )
+      _imgel.src = src;
+  }
+  
+  ImageElement get _imgel => _el as ImageElement;
+  
+  /** 画像のsrcを設定 */
+  set src( String url ) => _imgel.src = url;
+  
+}
+
+class TextSprite extends BaseSprite {
+  
+  TextSprite() {
+    _el = new DivElement();
+    _el.style.position = "absolute";
+    _el.style.color = "RED";
+  }
+  
+  set text( String text ) {
+    _el.text = text;
+    Timer.run( () {
+      _rect = null;
+      _offx = _el.clientWidth / 2;
+      _offy = _el.clientHeight / 2;
+    });
   }
 }
 
@@ -103,7 +137,6 @@ class PressHandler {
       var x = e.client.x - el.offsetLeft;
       var y = e.client.y - el.offsetTop;
       _onPress( x, y );
-      print("offsetLeft=${el.offsetLeft} e.client=${e.client}");
     });
     el.onDrag.listen((e) {
       print("drag??");

@@ -80,7 +80,6 @@ class Cursor extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
-    sp.offset = new Point(50,50);
     geng.element.append( sp.element );
     
     new MoveHandler( (int x, int y) {
@@ -110,20 +109,27 @@ class Tank extends GObj {
   int  delta_x = 1;
   Sprite sp;
   Vector  pos = new Vector();
-  
+  TextSprite  n;
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
-    sp.offset = new Point(50,0);
     geng.element.append( sp.element );
+    
+    n = new TextSprite();
+    n.text = "test";
+    geng.element.append( n.element );
   }
   
   void onRender() {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
+    n.x = pos.x - offset_x;
+    n.y = pos.y;
   }
   
   /** 弾を打つ */
   void fire( Point target ) {
+    
+    n.text = "fire";
     
     var b = new Cannonball();
     
@@ -171,8 +177,6 @@ class Cannonball extends GObj {
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:50, height:50 );
     geng.element.append( sp.element );
-    
-    sp.offset = new Point(25,25);
     
     // 移動ルーチン
     _move();
@@ -231,8 +235,7 @@ class Target extends GObj {
   Vector pos = new Vector();
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png" , width:80, height:80 )
-    ..offset = new Point(40,40);
+    sp = new Sprite( src:"../octocat.png" , width:80, height:80 );
     geng.element.append( sp.element );
   }
   

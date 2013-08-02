@@ -99,6 +99,7 @@ class PressHandler {
     
     // マウスイベント
     _onMouseDown = el.onMouseDown.listen( (MouseEvent e) {
+      e.preventDefault();
       var x = e.client.x - el.offsetLeft;
       var y = e.client.y - el.offsetTop;
       _onPress( x, y );

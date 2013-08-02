@@ -85,8 +85,6 @@ class GEng {
     objlist
     .where( (v) => v.isDisposed==false )
     .forEach( (GObj v)=> v.render() );
-    
-    print( "objlist.length=${objlist.length}" );
   }
   
   /**

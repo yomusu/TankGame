@@ -22,10 +22,12 @@ class Sprite {
   }
   
   void render( CanvasElement canvas ) {
-    var c = canvas.context2D;
-    var x = _x - offset.x;
-    var y = _y - offset.y;
-    c.drawImageScaled(_img, x, y, _w, _h);
+    if( isShow ) {
+      var c = canvas.context2D;
+      var x = _x - offset.x;
+      var y = _y - offset.y;
+      c.drawImageScaled(_img, x, y, _w, _h);
+    }
   }
   
   /** 横幅 */

@@ -12,26 +12,46 @@ part 'sprite.dart';
  */
 abstract class GObj {
   
+  /** 廃棄済みフラグ */
+  bool  _isDisposed = false;
+  
+  /** Disposeされたかどうか */
+  bool get isDisposed => _isDisposed;
+  
   // オーバーライドすべきメソッド ---
   
   /** 最初に呼ばれる */
   void onInit();
+  
+  /** レンダリング */
+  void onRender();
   
   /** 最後に呼ばれる */
   void onDispose();
   
   // 操作するためのメソッド ---
   
-  void init() => onInit();
+  /** 初期化する */
+  void init() {
+    geng.objlist.add(this);
+    onInit();
+  }
   
-  void dispose() => onDispose();
+  void render() => onRender();
   
+  /** 廃棄する */
+  void dispose() {
+    onDispose();
+    // 次回のrenderで削除
+    _isDisposed = true;
+  }
 }
 
 class GEng {
   
   final List<GObj>  objlist = new List();
   
+  // フィールド管理は別クラスにすべきかも
   Element  _element = null;
   
   void initField( int w, int h ) {
@@ -46,6 +66,7 @@ class GEng {
   
   Element get element => _element;
   
+  /** フィールドの大きさ */
   Rect get rect {
     if( _rect==null ) {
       var w = _element.clientWidth;
@@ -55,6 +76,25 @@ class GEng {
     return _rect;
   }
   Rect  _rect;
+  
+  
+  /**
+   * 全てをrenderする
+   */
+  void renderAll() {
+    objlist
+    .where( (v) => v.isDisposed==false )
+    .forEach( (GObj v)=> v.render() );
+    
+    print( "objlist.length=${objlist.length}" );
+  }
+  
+  /**
+   * DisposeされたGObjを廃棄する
+   */
+  void gcObj() {
+    objlist.removeWhere( (v) => v.isDisposed );
+  }
 }
 
 GEng geng = new GEng();

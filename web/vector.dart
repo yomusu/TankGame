@@ -13,6 +13,11 @@ class Vector {
     this.y = 0.0;
   }
   
+  Vector.fromPos( num x, num y ) {
+    this.x = x.toDouble();
+    this.y = y.toDouble();
+  }
+  
   void add( Vector v) {
     x += v.x;
     y += v.y;
@@ -47,5 +52,15 @@ class Vector {
     var f = scalar();
     x /= f;
     y /= f;
+  }
+  
+  double distance( Vector v ) {
+    var xx = this.x - v.x;
+    var yy = this.y - v.y;
+    return math.sqrt((xx*xx) + (yy*yy));
+  }
+  
+  String toString() {
+    return "Vector[$x,$y]";
   }
 }

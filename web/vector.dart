@@ -59,4 +59,8 @@ class Vector {
     var yy = this.y - v.y;
     return math.sqrt((xx*xx) + (yy*yy));
   }
+  
+  String toString() {
+    return "Vector[$x,$y]";
+  }
 }

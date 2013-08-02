@@ -93,7 +93,7 @@ class PressHandler {
   }
   
   /** Elementに接続する */
-  void connect( Element el ) {
+  void connectTo( Element el ) {
     
     disconnect();
     

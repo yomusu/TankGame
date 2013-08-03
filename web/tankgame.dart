@@ -40,12 +40,12 @@ void main() {
     
     //---------------------
     // フィールドのクリック処理
-    new PressHandler( (int sx, int sy) {
-      var x = offset_x + sx;
-      tank.fire( new Point(x,sy) );
-      print("x=$x, y=$sy, offset_x=$offset_x, sx=$sx");
-    })
-    ..connectTo( geng.canvas );
+    geng.onPress.listen( (e) {
+      var x = offset_x + e.x;
+      var y = e.y;
+      tank.fire( new Point(x,e.y) );
+      print("x=$x, y=$y, offset_x=$offset_x, sx=${e.x}");
+    });
     
     //---------------
     // ゲーム進行処理

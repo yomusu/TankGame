@@ -82,41 +82,6 @@ class Sprite {
 }
 
 
-class PressHandler {
-  
-  var _onMouseDown = null;
-  var _onPress;
-  
-  
-  PressHandler( void onPress(int x, int y) ) {
-    _onPress = onPress;
-  }
-  
-  /** Elementに接続する */
-  void connectTo( Element el ) {
-    
-    disconnect();
-    
-    // マウスイベント
-    _onMouseDown = el.onMouseDown.listen( (MouseEvent e) {
-      e.preventDefault();
-      var x = e.client.x - el.offsetLeft;
-      var y = e.client.y - el.offsetTop;
-      _onPress( x, y );
-      print("offsetLeft=${el.offsetLeft} e.client=${e.client}");
-    });
-    el.onDrag.listen((e) {
-      print("drag??");
-    });
-  }
-  
-  /** Elementから切断する */
-  void disconnect() {
-    if( _onMouseDown!=null )
-      _onMouseDown.cancel();
-  }
-  
-}
 
 class MoveHandler {
   

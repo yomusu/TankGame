@@ -47,15 +47,48 @@ abstract class GObj {
   }
 }
 
+/**
+ * フィールドのPressイベント
+ */
+class PressEvent {
+  MouseEvent  event;
+  int x,y;
+}
+
 class GEng {
   
+  /** ClickもしくはTouchのイベント */
+  Stream<PressEvent>  onPress;
+
   final List<GObj>  objlist = new List();
   
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
   
+  // 
+  StreamController<PressEvent> _onPressCont = new StreamController();
+  
+  GEng() {
+    onPress = _onPressCont.stream.asBroadcastStream();
+  }
+  
+  /**
+   * フィールドを初期化する
+   */
   void initField( int w, int h ) {
+    
     canvas = new CanvasElement(width: w, height: h);
+    
+    // MouseDownからPressイベントを転送
+    canvas.onMouseDown.listen( (MouseEvent e) {
+      e.preventDefault();
+      var event = new PressEvent()
+      ..event = e
+      ..x = e.client.x - canvas.offsetLeft
+      ..y = e.client.y - canvas.offsetTop;
+      _onPressCont.add(event);
+//      print("offsetLeft=${el.offsetLeft} e.client=${e.client}");
+    });
   }
   
   /** フィールドの大きさ */

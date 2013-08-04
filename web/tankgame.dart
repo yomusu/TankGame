@@ -8,7 +8,7 @@ import 'vector.dart';
 
 
 Tank  tank;
-
+int score;
 double  offset_x = 0.0;
 
 void main() {
@@ -28,6 +28,9 @@ void main() {
   
   Timer.run( () {
     
+    // スコアをクリア
+    score = 0;
+    
     // 看板を配置
     var rand = new math.Random(0);
     for( int x=600; x<2000; x+=200 ) {
@@ -40,7 +43,7 @@ void main() {
     
     //---------------------
     // フィールドのクリック処理
-    geng.onPress.listen( (e) {
+    var clickStream = geng.onPress.listen( (e) {
       var x = offset_x + e.x;
       var y = e.y;
       tank.fire( new Point(x,e.y) );
@@ -49,26 +52,45 @@ void main() {
     
     //---------------
     // ゲーム進行処理
+    tank.speed.x = 2.0;
     offset_x = 0.0;
     new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
       
       // スクロール
-      offset_x += 2.0;
+      offset_x += tank.speed.x;
       
       // 戦車移動
-      tank.pos.x += 2.0;
+      tank.pos.add( tank.speed );
       
       // 戦車  砲弾  的を移動
       geng.renderAll();
-      
+      drawScore();
       geng.gcObj();
       
-      if( offset_x >= 600 ) {
+      if( offset_x >= 1000 ) {
         // ステージ終了処理
         t.cancel();
+        clickStream.cancel();
+        
+        var c = geng.canvas.context2D;
+        c.lineWidth = 1.0;
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.setStrokeColorRgb(0, 0, 0, 1);
+        c.strokeText("GAME OVER", 320, 200);
+        c.strokeText("SCORE: ${score}", 320, 230);
       }
     });
   });
+}
+
+void drawScore() {
+  var c = geng.canvas.context2D;
+  c.lineWidth = 1.0;
+  c.textAlign = "left";
+  c.textBaseline = "top";
+  c.setStrokeColorRgb(0, 0, 0, 1);
+  c.strokeText("SCORE: ${score}", 0, 0, 100);
 }
 
 /**
@@ -107,6 +129,7 @@ class Tank extends GObj {
   
   int  delta_x = 1;
   Sprite sp;
+  Vector  speed = new Vector();
   Vector  pos = new Vector();
   
   void onInit() {
@@ -134,6 +157,7 @@ class Tank extends GObj {
     ..sub( b.pos )
     ..normalize()
     ..mul( 20.0 );
+    b.speed.add( this.speed );
     
     // 加速度
     b.delta
@@ -196,12 +220,13 @@ class Cannonball extends GObj {
     try {
       // 探す
       var t = geng.objlist
-          .where( (e) => e.isDisposed==false && e is Target )
+          .where( (e) => e.isDisposed==false && e is Target && e.isBombed==false )
           .firstWhere( (Target e) {
             var r = this.pos.distance( e.pos );
             return ( r<10.0 );
           });
       // あたった処理
+      score += 100;
       t.bomb();
       dispose();
       
@@ -224,6 +249,8 @@ class Target extends GObj {
   Sprite sp;
   Vector pos = new Vector();
   
+  bool  isBombed = false;
+  
   void onInit() {
     sp = new Sprite( src:"../octocat.png" , width:80, height:80 )
     ..offset = new Point(40,40);
@@ -237,6 +264,7 @@ class Target extends GObj {
   
   void bomb() {
     sp.hide();
+    isBombed = true;
   }
   
   void onDispose() {

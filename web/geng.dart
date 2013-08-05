@@ -55,40 +55,43 @@ class PressEvent {
   int x,y;
 }
 
+
 class GEng {
   
-  /** ClickもしくはTouchのイベント */
-  Stream<PressEvent>  onPress;
-
+  
+  var _onPress = null;
+  
   final List<GObj>  objlist = new List();
   
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
   
-  // 
-  StreamController<PressEvent> _onPressCont = new StreamController();
-  
-  GEng() {
-    onPress = _onPressCont.stream.asBroadcastStream();
+  /** ClickもしくはTouchのイベント */
+  void onPress( void callback(PressEvent e) ) {
+    _onPress = callback;
   }
   
   /**
    * フィールドを初期化する
    */
-  void initField( int w, int h ) {
+  void initField( { int width:200, int height:200, CanvasElement canvas:null }) {
     
-    canvas = new CanvasElement(width: w, height: h);
+    if( canvas==null )
+      canvas = new CanvasElement(width:width, height:height);
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
       e.preventDefault();
-      var event = new PressEvent()
-      ..event = e
-      ..x = e.client.x - canvas.offsetLeft
-      ..y = e.client.y - canvas.offsetTop;
-      _onPressCont.add(event);
-//      print("offsetLeft=${el.offsetLeft} e.client=${e.client}");
+      if( _onPress!=null ) {
+        var event = new PressEvent()
+        ..event = e
+        ..x = e.client.x - canvas.offsetLeft
+        ..y = e.client.y - canvas.offsetTop;
+        _onPress(event);
+      }
     });
+    
+    geng.canvas = canvas;
   }
   
   /** フィールドの大きさ */

@@ -11,9 +11,7 @@ h1, p {
   color: #333;
 }
 
-#field {
-  width: 640px;
-  height: 400px;
+.field {
   border: 1px solid #ccc;
   background-color: #fff;
 }

@@ -103,7 +103,6 @@ class Cursor extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
-    sp.offset = new Point(50,50);
     
     new MoveHandler( (int x, int y) {
       sp.x = x;
@@ -135,7 +134,7 @@ class Tank extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
-    sp.offset = new Point(50,0);
+    sp.offsety = 0;
   }
   
   void onRender() {
@@ -192,8 +191,6 @@ class Cannonball extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:50, height:50 );
-    
-    sp.offset = new Point(25,25);
     
     // 移動ルーチン
     _move();
@@ -253,8 +250,7 @@ class Target extends GObj {
   bool  isBombed = false;
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png" , width:80, height:80 )
-    ..offset = new Point(40,40);
+    sp = new Sprite( src:"../octocat.png" , width:80, height:80 );
   }
   
   void onRender() {

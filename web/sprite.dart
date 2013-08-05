@@ -9,7 +9,8 @@ class Sprite {
   num _x=0,_y=0;
   num _w=0,_h=0;
   
-  Point offset = new Point(0,0);
+  num offsetx = 0,
+      offsety = 0;
   
   ImageElement _img;
   
@@ -19,13 +20,15 @@ class Sprite {
       _img.src = src;
     _w = width;
     _h = height;
+    offsetx = _w / 2;
+    offsety = _h / 2;
   }
   
   void render( CanvasElement canvas ) {
     if( isShow ) {
       var c = canvas.context2D;
-      var x = _x - offset.x;
-      var y = _y - offset.y;
+      var x = _x - offsetx;
+      var y = _y - offsety;
       c.drawImageScaled(_img, x, y, _w, _h);
     }
   }
@@ -62,8 +65,8 @@ class Sprite {
   /** get as Rect */
   Rect get rect {
     if( _rect==null ) {
-      num x = _x - offset.x;
-      num y = _y - offset.y;
+      num x = _x - offsetx;
+      num y = _y - offsety;
       _rect = new Rect( x,y, width, height );
     }
     return _rect;

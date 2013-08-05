@@ -21,6 +21,8 @@ void main() {
   tank.pos
     ..x = 320.0
     ..y = 300.0;
+  tank.speed
+    ..x = 2.0;
   tank.init();
   
   var cursor = new Cursor();
@@ -52,15 +54,14 @@ void main() {
     
     //---------------
     // ゲーム進行処理
-    tank.speed.x = 2.0;
     offset_x = 0.0;
     new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
       
-      // スクロール
-      offset_x += tank.speed.x;
-      
       // 戦車移動
       tank.pos.add( tank.speed );
+      
+      // 画面表示位置
+      offset_x = math.max( 320.0, tank.pos.x - 320.0 );
       
       // 戦車  砲弾  的を移動
       geng.renderAll();

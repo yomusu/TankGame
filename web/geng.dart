@@ -128,6 +128,16 @@ class GEng {
   void gcObj() {
     objlist.removeWhere( (v) => v.isDisposed );
   }
+  
+  /**
+   * Objを全て破棄する
+   */
+  void disposeAll() {
+    gcObj();
+    objlist.forEach( (o)=>o.dispose() );
+    gcObj();
+    objlist.clear();
+  }
 }
 
 GEng geng = new GEng();

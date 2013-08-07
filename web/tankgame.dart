@@ -18,22 +18,55 @@ void main() {
     var canvas = query("canvas") as CanvasElement;
     geng.initField( canvas:canvas, width:640, height:400 );
     
-    doTankGame();
+    doTitle();
   });
 }
 
 
+/***********
+ * 
+ * タイトル画面の表示
+ * 
+ */
+void doTitle() {
+  
+  geng.disposeAll();
+  
+  // Clickされたらゲーム本体
+  geng.onPress( (PressEvent e) {
+    Timer.run( ()=>doTankGame() );
+  } );
+  
+  geng.renderAll();
+  
+  var c = geng.canvas.context2D;
+  c.lineWidth = 1.0;
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  c.setStrokeColorRgb(0, 0, 0, 1);
+  c.strokeText("Tank Game", 320, 180, 100);
+
+  c.strokeText("click anywhere", 320, 210, 100);
+  
+  // フレームは回していない（とりあえず、動くものがないから）
+}
+
+
+/***********
+ * 
+ * ゲーム本体
+ * 
+ */
 Tank  tank;
 int score;
 double  offset_x = 0.0;
-
 
 void doTankGame() {
   
   tank = new Tank();
   // 戦車の初期位置
   tank.pos
-    ..x = 320.0
+    ..x = 0.0
     ..y = 300.0;
   tank.speed
     ..x = 2.0;
@@ -78,7 +111,7 @@ void doTankGame() {
     tank.pos.add( tank.speed );
     
     // 画面表示位置
-    offset_x = math.max( 320.0, tank.pos.x - 320.0 );
+    offset_x = math.max( 0.0, tank.pos.x - 320.0 );
     
     // 戦車  砲弾  的を移動
     geng.renderAll();
@@ -102,7 +135,11 @@ void doTankGame() {
       });
       
       // Clickされたらタイトルに戻る
-      geng.onPress( (s)=>t2.cancel() );
+      geng.onPress( (s) {
+        t2.cancel();
+        geng.onPress(null);
+        Timer.run( ()=>doTitle() );
+      });
     }
   });
 }

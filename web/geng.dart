@@ -31,12 +31,6 @@ abstract class GObj {
   
   // 操作するためのメソッド ---
   
-  /** 初期化する */
-  void init() {
-    geng.objlist.add(this);
-    onInit();
-  }
-  
   void render() => onRender();
   
   /** 廃棄する */
@@ -127,6 +121,11 @@ class GEng {
    */
   void gcObj() {
     objlist.removeWhere( (v) => v.isDisposed );
+  }
+  
+  void add( GObj obj ) {
+    objlist.add(obj);
+    obj.onInit();
   }
   
   /**

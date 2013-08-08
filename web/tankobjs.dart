@@ -124,7 +124,7 @@ class Tank extends GObj {
     
     print( "speed=${b.speed},  delta=${b.delta}" );
     
-    b.init();
+    geng.add(b);
   }
   
   void onDispose() {

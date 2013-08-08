@@ -137,6 +137,36 @@ class GEng {
     gcObj();
     objlist.clear();
   }
+  
+  
+  var onTimer = null;
+  var onFrontRender = null;
+  
+  Timer _timer;
+  
+  void startTimer() {
+    if( _timer!=null )
+      stopTimer();
+    
+    _timer = new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
+      
+      if( onTimer!=null ) 
+        onTimer();
+      
+      renderAll();
+      gcObj();
+      
+      if( onFrontRender!=null )
+        onFrontRender(canvas);
+    });
+  }
+  
+  void stopTimer() {
+    if( _timer!=null ) {
+      _timer.cancel();
+      _timer = null;
+    }
+  }
 }
 
 GEng geng = new GEng();

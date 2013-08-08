@@ -40,22 +40,19 @@ void doTitle() {
   geng.add( playbtn );
   
   // Clickされたらゲーム本体
-  geng.onPress( (PressEvent e) {
-    Timer.run( ()=> playbtn.handlePressEvent(e) );
-  } );
+  geng.onPress( (PressEvent e) => playbtn.handlePressEvent(e) );
   
-  new Timer.periodic( const Duration(milliseconds:50), (Timer ti) {
+  geng.onFrontRender = (canvas) {
     if( isPress ) {
       isPress = false;
       new Timer( const Duration(seconds:2), () {
-        ti.cancel();
         doTankGame();
       });
+      // ホントはPressイベントでやって、Lockした方が良い
+      geng.onFrontRender = null;
     }
     
-    geng.renderAll();
-    
-    var c = geng.canvas.context2D;
+    var c = canvas.context2D;
     c.lineWidth = 1.0;
     c.textAlign = "center";
     c.textBaseline = "middle";
@@ -63,7 +60,9 @@ void doTitle() {
     c.strokeText("Tank Game", 320, 180, 100);
 
     c.strokeText("click anywhere", 320, 210, 100);
-  });
+  };
+  
+  geng.startTimer();
 }
 
 
@@ -190,7 +189,7 @@ void doTankGame() {
   //---------------
   // ゲーム進行処理
   offset_x = 0.0;
-  new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
+  geng.onTimer = () {
     
     // 戦車移動
     tank.pos.add( tank.speed );
@@ -198,33 +197,28 @@ void doTankGame() {
     // 画面表示位置
     offset_x = math.max( 0.0, tank.pos.x - 320.0 );
     
-    // 戦車  砲弾  的を移動
-    geng.renderAll();
-    drawScore();
-    geng.gcObj();
-    
     if( offset_x >= 1000 ) {
       // ステージ終了処理
-      t.cancel();
-      
       geng.add( new ResultPrint() );
       
-      var t2 = new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
+      geng.onTimer = () {
         // 戦車移動
         tank.pos.add( tank.speed );
         // 戦車  砲弾  的を移動
         geng.renderAll();
         drawScore();
         geng.gcObj();
-      });
+      };
       
       // Clickされたらタイトルに戻る
       geng.onPress( (s) {
-        t2.cancel();
         geng.onPress(null);
         Timer.run( ()=>doTitle() );
       });
     }
-  });
+  };
+  geng.onFrontRender = (canvas) {
+    drawScore();
+  };
 }
 

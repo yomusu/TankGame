@@ -12,6 +12,7 @@ h1, p {
 }
 
 .field {
+  width: 640px;
   border: 1px solid #ccc;
   background-color: #fff;
 }

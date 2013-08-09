@@ -41,6 +41,15 @@ abstract class GObj {
   }
 }
 
+abstract class GScreen {
+  
+  void onStart();
+  void onPress( PressEvent e );
+  void onTimer();
+  void onFrontRender( CanvasElement c );
+  
+}
+
 /**
  * フィールドのPressイベント
  */
@@ -53,17 +62,29 @@ class PressEvent {
 class GEng {
   
   
-  var _onPress = null;
-  
   final List<GObj>  objlist = new List();
+  
+  set screen( GScreen s ) {
+    Timer.run( () {
+      if( s!=null ) {
+        onPress = s.onPress;
+        onTimer = s.onTimer;
+        onFrontRender = s.onFrontRender;
+        s.onStart();
+      } else {
+        onPress = null;
+        onTimer = null;
+        onFrontRender = null;
+      }
+    });
+  }
+  
+  var onPress = null;
+  var onTimer = null;
+  var onFrontRender = null;
   
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
-  
-  /** ClickもしくはTouchのイベント */
-  void onPress( void callback(PressEvent e) ) {
-    _onPress = callback;
-  }
   
   /**
    * フィールドを初期化する
@@ -76,12 +97,12 @@ class GEng {
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
       e.preventDefault();
-      if( _onPress!=null ) {
+      if( onPress!=null ) {
         var event = new PressEvent()
         ..event = e
         ..x = e.client.x - canvas.offsetLeft
         ..y = e.client.y - canvas.offsetTop;
-        _onPress(event);
+        onPress(event);
       }
     });
     
@@ -98,6 +119,7 @@ class GEng {
     return _rect;
   }
   Rect  _rect;
+  
   
   /**
    * スプライトをrender
@@ -137,10 +159,6 @@ class GEng {
     gcObj();
     objlist.clear();
   }
-  
-  
-  var onTimer = null;
-  var onFrontRender = null;
   
   Timer _timer;
   

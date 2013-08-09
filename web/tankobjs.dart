@@ -1,15 +1,6 @@
 part of tankgame;
 
 
-void drawScore() {
-  var c = geng.canvas.context2D;
-  c.lineWidth = 1.0;
-  c.textAlign = "left";
-  c.textBaseline = "top";
-  c.setStrokeColorRgb(0, 0, 0, 1);
-  c.strokeText("SCORE: ${score}", 0, 0, 100);
-}
-
 
 Color textCl = new Color.fromString("#000000");
 

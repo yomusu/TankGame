@@ -18,38 +18,46 @@ void main() {
     var canvas = query("canvas") as CanvasElement;
     geng.initField( canvas:canvas, width:640, height:400 );
     
-    doTitle();
+    geng.screen = new Title();
   });
 }
-
 
 /***********
  * 
  * タイトル画面の表示
  * 
  */
-void doTitle() {
+class Title extends GScreen {
   
-  geng.disposeAll();
+  var playbtn;
+  var isPress;
   
-  var isPress = false;
+  void onStart() {
+    geng.disposeAll();
+    
+    isPress = false;
+    
+    // ボタン配置
+    playbtn = new PlayButton()
+    ..onPress = () => isPress=true;
+    geng.add( playbtn );
+    
+    geng.startTimer();
+  }
   
-  // ボタン配置
-  var playbtn = new PlayButton()
-  ..onPress = () => isPress=true;
-  geng.add( playbtn );
+  void onPress( PressEvent e ) {
+    playbtn.handlePressEvent(e);
+  }
   
-  // Clickされたらゲーム本体
-  geng.onPress( (PressEvent e) => playbtn.handlePressEvent(e) );
+  void onTimer() {}
   
-  geng.onFrontRender = (canvas) {
+  void onFrontRender( CanvasElement canvas ) {
     if( isPress ) {
       isPress = false;
       new Timer( const Duration(seconds:2), () {
-        doTankGame();
+        geng.screen = new TankGame();
       });
       // ホントはPressイベントでやって、Lockした方が良い
-      geng.onFrontRender = null;
     }
     
     var c = canvas.context2D;
@@ -60,10 +68,9 @@ void doTitle() {
     c.strokeText("Tank Game", 320, 180, 100);
 
     c.strokeText("click anywhere", 320, 210, 100);
-  };
-  
-  geng.startTimer();
+  }
 }
+
 
 
 class PlayButton extends GObj {
@@ -136,61 +143,56 @@ class PlayButton extends GObj {
   
 }
 
+Tank  tank;
+int score;
+double  offset_x = 0.0;
+
 /***********
  * 
  * ゲーム本体
  * 
  */
-Tank  tank;
-int score;
-double  offset_x = 0.0;
-
-void doTankGame() {
+class TankGame extends GScreen {
   
-  geng.disposeAll();
-  
-  tank = new Tank();
-  // 戦車の初期位置
-  tank.pos
-    ..x = 0.0
-    ..y = 300.0;
-  tank.speed
-    ..x = 2.0;
-  geng.add( tank );
-  
-  geng.add( new Cursor() );
-  
-  // スコアをクリア
-  score = 0;
-  
-  // 看板を配置
-  var rand = new math.Random(0);
-  for( int x=600; x<2000; x+=200 ) {
-    var y = rand.nextDouble() * 300;
-    Target  t = new Target()
-    ..pos.x = x.toDouble()
-    ..pos.y = y;
-    geng.add( t );
+  void onStart() {
+    geng.disposeAll();
+    
+    // 戦車の初期位置
+    tank = new Tank()
+    ..pos.x = 0.0
+    ..pos.y = 300.0
+    ..speed.x = 2.0;
+    geng.add( tank );
+    
+    geng.add( new Cursor() );
+    
+    // スコアをクリア
+    score = 0;
+    
+    // 看板を配置
+    var rand = new math.Random(0);
+    for( int x=600; x<2000; x+=200 ) {
+      var y = rand.nextDouble() * 300;
+      Target  t = new Target()
+      ..pos.x = x.toDouble()
+      ..pos.y = y;
+      geng.add( t );
+    }
+    
+    // スタート表示
+    geng.add( new GameStartLogo() );
+    
+    offset_x = 0.0;
   }
   
-  //---------------------
-  // フィールドのクリック処理
-  geng.onPress( (PressEvent e) {
+  void onPress( PressEvent e ) {
     var x = offset_x + e.x;
     var y = e.y;
     tank.fire( new Point(x,e.y) );
     print("x=$x, y=$y, offset_x=$offset_x, sx=${e.x}");
-  } );
+  }
   
-  //---------------
-  // ゲーム進行処理
-  geng.add( new GameStartLogo() );
-  
-  //---------------
-  // ゲーム進行処理
-  offset_x = 0.0;
-  geng.onTimer = () {
-    
+  void onTimer() {
     // 戦車移動
     tank.pos.add( tank.speed );
     
@@ -201,24 +203,21 @@ void doTankGame() {
       // ステージ終了処理
       geng.add( new ResultPrint() );
       
-      geng.onTimer = () {
-        // 戦車移動
-        tank.pos.add( tank.speed );
-        // 戦車  砲弾  的を移動
-        geng.renderAll();
-        drawScore();
-        geng.gcObj();
+      geng.onPress = (PressEvent e) {
+        geng.screen = new Title();
       };
-      
-      // Clickされたらタイトルに戻る
-      geng.onPress( (s) {
-        geng.onPress(null);
-        Timer.run( ()=>doTitle() );
-      });
+      geng.onTimer = () {
+        tank.pos.add( tank.speed );
+      };
     }
-  };
-  geng.onFrontRender = (canvas) {
-    drawScore();
-  };
-}
+  }
+  void onFrontRender( CanvasElement c ) {
+    var c = geng.canvas.context2D;
+    c.lineWidth = 1.0;
+    c.textAlign = "left";
+    c.textBaseline = "top";
+    c.setStrokeColorRgb(0, 0, 0, 1);
+    c.strokeText("SCORE: ${score}", 0, 0, 100);
+  }
 
+}

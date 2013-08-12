@@ -164,8 +164,6 @@ class TankGame extends GScreen {
     ..speed.x = 2.0;
     geng.add( tank );
     
-    geng.add( new Cursor() );
-    
     // スコアをクリア
     score = 0;
     
@@ -195,6 +193,17 @@ class TankGame extends GScreen {
       c.strokeText("SCORE: ${score}", 0, 0, 100);
     };
     
+    // カーソル
+    var cursor = new Cursor();
+    geng.add( cursor );
+    onMove = ( int x, int y ) {
+      cursor.sp.show();
+      cursor.sp.x = x;
+      cursor.sp.y = y;
+    };
+    onMoveOut = () => cursor.sp.hide();
+    
+    // マウスボタン処理
     onPress = ( PressEvent e ) {
       var x = offset_x + e.x;
       var y = e.y;

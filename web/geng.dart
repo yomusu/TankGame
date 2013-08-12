@@ -66,10 +66,6 @@ abstract class BtnObj extends GObj {
     return ( inH && inV );
   }
   
-  void handleMoveEvent( var e ) {
-    isOn = isIn( e.x, e.y );
-  }
-
 }
 
 abstract class GScreen {
@@ -82,11 +78,15 @@ abstract class GScreen {
   var onFrontRender = null;
   /** 入力デバイスのプレスイベント */
   var onPress = null;
+  var onMove = null;
+  var onMoveOut = null;
   
   // オーバーライドすべきメソッド ---
 
   /** スタート処理:You can override this method. */
   void onStart();
+  
+  // ボタン処理 -------------------
   
   /** List of Buttons */ 
   List<BtnObj>  btnList = null;
@@ -98,8 +98,10 @@ abstract class GScreen {
     btnList.add(btn);
     // update press handler!!
     onPress = _onPressForBtn;
+    onMove = _onMouseMoveForBtn;
   }
   
+  // entryされたボタンすべてに対しPress処理をする
   void _onPressForBtn(PressEvent e) {
     btnList.where( (b) => b.isPress==false )
     .forEach( (BtnObj b) {
@@ -108,6 +110,13 @@ abstract class GScreen {
         if( b.onPress!=null )
           b.onPress();
       }
+    });
+  }
+  // entryされたボタンすべてに対しMove処理をする
+  void _onMouseMoveForBtn( int x, int y ) {
+    btnList.where( (b) => b.isPress==false )
+    .forEach( (BtnObj b) {
+      b.isOn = b.isIn( x, y );
     });
   }
   
@@ -123,6 +132,19 @@ abstract class GScreen {
       ..y = e.client.y - geng.canvas.offsetTop;
       onPress(event);
     }
+  }
+  
+  void onMouseMove(MouseEvent e) {
+    if( onMove!=null ) {
+      var x = e.client.x - geng.canvas.offsetLeft;
+      var y = e.client.y - geng.canvas.offsetTop;
+      onMove( x, y );
+    }
+  }
+  
+  void onMouseOut( MouseEvent e ) {
+    if( onMoveOut!=null )
+      onMoveOut();
   }
   
   /** フレームのTimerハンドル */
@@ -185,6 +207,15 @@ class GEng {
       if( _screen!=null )
         _screen.onMouseDown(e);
     });
+    canvas.onMouseMove.listen( (MouseEvent e) {
+      if( _screen!=null )
+        _screen.onMouseMove(e);
+    });
+    canvas.onMouseOut.listen( (MouseEvent e) {
+      if( _screen!=null )
+        _screen.onMouseOut(e);
+    });
+
     
     geng.canvas = canvas;
   }

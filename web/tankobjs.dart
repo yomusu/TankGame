@@ -53,15 +53,6 @@ class Cursor extends GObj {
   
   void onInit() {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
-    
-    new MoveHandler( (int x, int y) {
-      sp.x = x;
-      sp.y = y;
-      sp.show();
-    },
-    onOut : () => sp.hide()
-    )
-    ..connect( geng.canvas );
   }
   
   void onRender() {

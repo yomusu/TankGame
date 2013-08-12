@@ -105,37 +105,3 @@ class Color {
   }
 }
 
-class MoveHandler {
-  
-  var _onMouseMove = null;
-  var _onMove;
-  var _onOut;
-  
-  MoveHandler( void onMove(int x, int y),{ void onOut() }) {
-    _onMove = onMove;
-    _onOut = onOut;
-  }
-  
-  /** Elementに接続する */
-  void connect( Element el ) {
-    
-    disconnect();
-    
-    // マウスイベント
-    _onMouseMove = el.onMouseMove.listen( (MouseEvent e) {
-      var x = e.client.x - el.offsetLeft;
-      var y = e.client.y - el.offsetTop;
-      _onMove( x, y );  
-    });
-    el.onMouseOut.listen( (MouseEvent e) {
-      if( _onOut!=null )
-        _onOut();
-    });
-  }
-  
-  /** Elementから切断する */
-  void disconnect() {
-    if( _onMouseMove!=null )
-      _onMouseMove.cancel();
-  }
-}

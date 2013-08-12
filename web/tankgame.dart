@@ -29,29 +29,20 @@ void main() {
  */
 class Title extends GScreen {
   
-  var playbtn;
-  var isPress;
-  
   void onStart() {
     geng.disposeAll();
     
-    isPress = false;
-    
     // ボタン配置
-    playbtn = new PlayButton()
-    ..onPress = () => isPress=true;
+    var playbtn = new PlayButton( (){
+      new Timer( const Duration(seconds:2), () {
+        geng.screen = new TankGame();
+      });
+    });
     geng.add( playbtn );
     
     geng.startTimer();
     
     onFrontRender = ( CanvasElement canvas ) {
-      if( isPress ) {
-        isPress = false;
-        new Timer( const Duration(seconds:2), () {
-          geng.screen = new TankGame();
-        });
-        // ホントはPressイベントでやって、Lockした方が良い
-      }
       
       var c = canvas.context2D;
       c.lineWidth = 1.0;
@@ -66,7 +57,6 @@ class Title extends GScreen {
     entryButton( playbtn );
   }
   
-  
 }
 
 
@@ -76,6 +66,10 @@ class PlayButton extends BtnObj {
   Color bgCl_normal = new Color.fromString("#eeeeee");
   Color bgCl_on     = new Color.fromString("#00ee00");
   Color bgCl_press  = new Color.fromString("#ee0000");
+  
+  PlayButton( void onPress() ) {
+    this.onPress = onPress;
+  }
   
   void onInit() {
     

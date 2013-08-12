@@ -101,7 +101,8 @@ abstract class GScreen {
   }
   
   void _onPressForBtn(PressEvent e) {
-    btnList.forEach( (BtnObj b) {
+    btnList.where( (b) => b.isPress==false )
+    .forEach( (BtnObj b) {
       if( b.isIn( e.x, e.y ) ) {
         b.isPress = true;
         if( b.onPress!=null )

@@ -43,75 +43,39 @@ class Title extends GScreen {
     geng.add( playbtn );
     
     geng.startTimer();
-  }
-  
-  void onPress( PressEvent e ) {
-    playbtn.handlePressEvent(e);
-  }
-  
-  void onTimer() {}
-  
-  void onFrontRender( CanvasElement canvas ) {
-    if( isPress ) {
-      isPress = false;
-      new Timer( const Duration(seconds:2), () {
-        geng.screen = new TankGame();
-      });
-      // ホントはPressイベントでやって、Lockした方が良い
-    }
     
-    var c = canvas.context2D;
-    c.lineWidth = 1.0;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.setStrokeColorRgb(0, 0, 0, 1);
-    c.strokeText("Tank Game", 320, 180, 100);
+    onFrontRender = ( CanvasElement canvas ) {
+      if( isPress ) {
+        isPress = false;
+        new Timer( const Duration(seconds:2), () {
+          geng.screen = new TankGame();
+        });
+        // ホントはPressイベントでやって、Lockした方が良い
+      }
+      
+      var c = canvas.context2D;
+      c.lineWidth = 1.0;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.setStrokeColorRgb(0, 0, 0, 1);
+      c.strokeText("Tank Game", 320, 180, 100);
 
-    c.strokeText("click anywhere", 320, 210, 100);
+      c.strokeText("click anywhere", 320, 210, 100);
+    };
+    
+    entryButton( playbtn );
   }
+  
+  
 }
 
 
 
-class PlayButton extends GObj {
-  
-  var onPress = null;
-  
-  bool  isOn = false;
-  bool  isPress = false;
-  
-  num x = 320;
-  num y = 180;
-  num width = 100;
-  num height= 50;
-  
-  num get left => x - (width/2);
-  num get top  => y - (height/2);
+class PlayButton extends BtnObj {
   
   Color bgCl_normal = new Color.fromString("#eeeeee");
   Color bgCl_on     = new Color.fromString("#00ee00");
   Color bgCl_press  = new Color.fromString("#ee0000");
-  
-  void handlePressEvent( PressEvent e ) {
-    if( isIn( e.x, e.y ) ) {
-      isPress = true;
-      if( onPress!=null )
-        onPress();
-    }
-  }
-  
-  bool isIn( num mx, num my ) {
-    var xx = mx - left;
-    var yy = my - top;
-    bool  inH = ( xx>=0 && xx<width );
-    bool  inV = ( yy>=0 && yy<height);
-    
-    return ( inH && inV );
-  }
-  
-  void handleMoveEvent( var e ) {
-    isOn = isIn( e.x, e.y );
-  }
   
   void onInit() {
     
@@ -183,16 +147,27 @@ class TankGame extends GScreen {
     geng.add( new GameStartLogo() );
     
     offset_x = 0.0;
+    
+    onProcess = onProcess1;
+    
+    onFrontRender = ( CanvasElement c ) {
+      var c = geng.canvas.context2D;
+      c.lineWidth = 1.0;
+      c.textAlign = "left";
+      c.textBaseline = "top";
+      c.setStrokeColorRgb(0, 0, 0, 1);
+      c.strokeText("SCORE: ${score}", 0, 0, 100);
+    };
+    
+    onPress = ( PressEvent e ) {
+      var x = offset_x + e.x;
+      var y = e.y;
+      tank.fire( new Point(x,e.y) );
+      print("x=$x, y=$y, offset_x=$offset_x, sx=${e.x}");
+    };
   }
   
-  void onPress( PressEvent e ) {
-    var x = offset_x + e.x;
-    var y = e.y;
-    tank.fire( new Point(x,e.y) );
-    print("x=$x, y=$y, offset_x=$offset_x, sx=${e.x}");
-  }
-  
-  void onTimer() {
+  void onProcess1() {
     // 戦車移動
     tank.pos.add( tank.speed );
     
@@ -203,21 +178,14 @@ class TankGame extends GScreen {
       // ステージ終了処理
       geng.add( new ResultPrint() );
       
-      geng.onPress = (PressEvent e) {
-        geng.screen = new Title();
-      };
-      geng.onTimer = () {
-        tank.pos.add( tank.speed );
-      };
+      onPress = (PressEvent e) => geng.screen = new Title();
+      
+      onProcess = onProcess2; 
     }
   }
-  void onFrontRender( CanvasElement c ) {
-    var c = geng.canvas.context2D;
-    c.lineWidth = 1.0;
-    c.textAlign = "left";
-    c.textBaseline = "top";
-    c.setStrokeColorRgb(0, 0, 0, 1);
-    c.strokeText("SCORE: ${score}", 0, 0, 100);
+  
+  void onProcess2() {
+    tank.pos.add( tank.speed );
   }
 
 }

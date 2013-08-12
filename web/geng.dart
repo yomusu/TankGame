@@ -41,12 +41,101 @@ abstract class GObj {
   }
 }
 
+abstract class BtnObj extends GObj {
+  
+  num x = 320;
+  num y = 180;
+  num width = 100;
+  num height= 50;
+  
+  num get left => x - (width/2);
+  num get top  => y - (height/2);
+  
+  var onPress = null;
+  
+  bool  isOn = false;
+  bool  isPress = false;
+  
+
+  bool isIn( num mx, num my ) {
+    var xx = mx - left;
+    var yy = my - top;
+    bool  inH = ( xx>=0 && xx<width );
+    bool  inV = ( yy>=0 && yy<height);
+    
+    return ( inH && inV );
+  }
+  
+  void handleMoveEvent( var e ) {
+    isOn = isIn( e.x, e.y );
+  }
+
+}
+
 abstract class GScreen {
   
+  // メンバ変数 ---
+  
+  /** 毎フレームの処理 */
+  var onProcess = null;
+  /** 最前面描画 */
+  var onFrontRender = null;
+  /** 入力デバイスのプレスイベント */
+  var onPress = null;
+  
+  // オーバーライドすべきメソッド ---
+
+  /** スタート処理:You can override this method. */
   void onStart();
-  void onPress( PressEvent e );
-  void onTimer();
-  void onFrontRender( CanvasElement c );
+  
+  /** List of Buttons */ 
+  List<BtnObj>  btnList = null;
+  
+  /** entry button to list */ 
+  void entryButton( BtnObj btn ) {
+    if( btnList==null )
+      btnList = new List();
+    btnList.add(btn);
+    // update press handler!!
+    onPress = _onPressForBtn;
+  }
+  
+  void _onPressForBtn(PressEvent e) {
+    btnList.forEach( (BtnObj b) {
+      if( b.isIn( e.x, e.y ) ) {
+        b.isPress = true;
+        if( b.onPress!=null )
+          b.onPress();
+      }
+    });
+  }
+  
+  // Gengとのやりとり ---
+
+  /** マウスボタンのハンドル */
+  void onMouseDown(MouseEvent e) {
+    e.preventDefault();
+    if( onPress!=null ) {
+      var event = new PressEvent()
+      ..event = e
+      ..x = e.client.x - geng.canvas.offsetLeft
+      ..y = e.client.y - geng.canvas.offsetTop;
+      onPress(event);
+    }
+  }
+  
+  /** フレームのTimerハンドル */
+  void onTimer() {
+    // 毎フレームの処理
+    if( onProcess!=null )
+      onProcess();
+    // 全てレンダー
+    geng.renderAll();
+    geng.gcObj();
+    // 最前面の描画
+    if( onFrontRender!=null )
+      onFrontRender(geng.canvas);
+  }
   
 }
 
@@ -59,29 +148,25 @@ class PressEvent {
 }
 
 
+/**************
+ * 
+ * Game Engine
+ * 
+ */
 class GEng {
   
   
   final List<GObj>  objlist = new List();
+  GScreen _screen = null;
   
+  /** 使用するScreenのセット */
   set screen( GScreen s ) {
     Timer.run( () {
-      if( s!=null ) {
-        onPress = s.onPress;
-        onTimer = s.onTimer;
-        onFrontRender = s.onFrontRender;
+      _screen = s;
+      if( s!=null )
         s.onStart();
-      } else {
-        onPress = null;
-        onTimer = null;
-        onFrontRender = null;
-      }
     });
   }
-  
-  var onPress = null;
-  var onTimer = null;
-  var onFrontRender = null;
   
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
@@ -96,14 +181,8 @@ class GEng {
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
-      e.preventDefault();
-      if( onPress!=null ) {
-        var event = new PressEvent()
-        ..event = e
-        ..x = e.client.x - canvas.offsetLeft
-        ..y = e.client.y - canvas.offsetTop;
-        onPress(event);
-      }
+      if( _screen!=null )
+        _screen.onMouseDown(e);
     });
     
     geng.canvas = canvas;
@@ -145,6 +224,9 @@ class GEng {
     objlist.removeWhere( (v) => v.isDisposed );
   }
   
+  /**
+   * Objの追加
+   */
   void add( GObj obj ) {
     objlist.add(obj);
     obj.onInit();
@@ -162,23 +244,23 @@ class GEng {
   
   Timer _timer;
   
+  /**
+   * フレームタイマーをスタートする
+   */
   void startTimer() {
+    
     if( _timer!=null )
       stopTimer();
     
     _timer = new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
-      
-      if( onTimer!=null ) 
-        onTimer();
-      
-      renderAll();
-      gcObj();
-      
-      if( onFrontRender!=null )
-        onFrontRender(canvas);
+      if( _screen!=null ) 
+        _screen.onTimer();
     });
   }
   
+  /**
+   * フレームタイマーを停止する
+   */
   void stopTimer() {
     if( _timer!=null ) {
       _timer.cancel();

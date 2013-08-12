@@ -2,7 +2,6 @@ library tankgame;
 
 import 'dart:html';
 import 'dart:async';
-import 'package:web_ui/web_ui.dart';
 import 'dart:math' as math;
 
 import 'vector.dart';
@@ -19,6 +18,7 @@ void main() {
     geng.initField( canvas:canvas, width:640, height:400 );
     
     geng.screen = new Title();
+    geng.startTimer();
   });
 }
 
@@ -32,16 +32,32 @@ class Title extends GScreen {
   void onStart() {
     geng.disposeAll();
     
-    // ボタン配置
+    //---------------------
+    // StartGameボタン配置
     var playbtn = new PlayButton( (){
       new Timer( const Duration(seconds:2), () {
         geng.screen = new TankGame();
       });
-    });
+    })
+    ..text = "game start"
+    ..x = 320
+    ..y = 220;
     geng.add( playbtn );
+    entryButton( playbtn );
     
-    geng.startTimer();
+    //---------------------
+    // How to Playボタンの配置
+    var howtobtn = new PlayButton( (){
+      geng.screen = new HowToPlay();
+    })
+    ..text = "How to play"
+    ..x = 450
+    ..y = 220;
+    geng.add( howtobtn );
+    entryButton( howtobtn );
     
+    //---------------------
+    // 最前面描画処理
     onFrontRender = ( CanvasElement canvas ) {
       
       var c = canvas.context2D;
@@ -50,18 +66,42 @@ class Title extends GScreen {
       c.textBaseline = "middle";
       c.setStrokeColorRgb(0, 0, 0, 1);
       c.strokeText("Tank Game", 320, 180, 100);
-
-      c.strokeText("click anywhere", 320, 210, 100);
     };
-    
-    entryButton( playbtn );
   }
-  
 }
 
 
+class HowToPlay extends GScreen {
+  String  text = """
+Hello Everybody!
+You are in hell.
+""";
+  void onStart() {
+    geng.disposeAll();
+    onFrontRender = draw;
+    
+    // 戻るボタン配置
+    var retbtn = new PlayButton( ()=>geng.screen = new Title() )
+    ..text = "戻る"
+    ..x = 320
+    ..y = 220;
+    geng.add( retbtn );
+    entryButton( retbtn );
+  }
+  
+  void draw(CanvasElement canvas) {
+    var c = canvas.context2D;
+    c.lineWidth = 1.0;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.setStrokeColorRgb(0, 0, 0, 1);
+    c.strokeText(text, 320, 180, 300);
+  }
+}
 
 class PlayButton extends BtnObj {
+  
+  String  text;
   
   Color bgCl_normal = new Color.fromString("#eeeeee");
   Color bgCl_on     = new Color.fromString("#00ee00");
@@ -90,11 +130,13 @@ class PlayButton extends BtnObj {
     c.rect(left, top, width, height);
     c.fill();
     
-    c.lineWidth = 1.0;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.setStrokeColorRgb(0, 0, 0, 1);
-    c.strokeText("Tank Game", x, y, width);
+    if( text!=null ) {
+      c.lineWidth = 1.0;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.setStrokeColorRgb(0, 0, 0, 1);
+      c.strokeText(text, x, y, width);
+    }
   }
   
   void onDispose() { }

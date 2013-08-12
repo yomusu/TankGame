@@ -10,11 +10,13 @@ import 'geng.dart';
 
 part 'tankobjs.dart';
 
+final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
 
 void main() {
   
   Timer.run( () {
     var canvas = query("canvas") as CanvasElement;
+    canvas.context2D.scale(2.0, 2.0); // for Retina対応
     geng.initField( canvas:canvas, width:640, height:400 );
     
     geng.screen = new Title();
@@ -34,12 +36,15 @@ class Title extends GScreen {
     
     //---------------------
     // StartGameボタン配置
-    var playbtn = new PlayButton( (){
+    var playbtn = new PlayButton()
+    ..onPress = (){
       new Timer( const Duration(seconds:2), () {
         geng.screen = new TankGame();
       });
-    })
-    ..text = "game start"
+    }
+    ..text = "ゲームスタート"
+    ..width = 150
+    ..height= 50
     ..x = 320
     ..y = 220;
     geng.add( playbtn );
@@ -47,12 +52,13 @@ class Title extends GScreen {
     
     //---------------------
     // How to Playボタンの配置
-    var howtobtn = new PlayButton( (){
-      geng.screen = new HowToPlay();
-    })
-    ..text = "How to play"
-    ..x = 450
-    ..y = 220;
+    var howtobtn = new PlayButton()
+    ..onPress = (){ geng.screen = new HowToPlay(); }
+    ..text = "あそびかた"
+    ..width = 150
+    ..height= 50
+    ..x = 320
+    ..y = 280;
     geng.add( howtobtn );
     entryButton( howtobtn );
     
@@ -61,11 +67,14 @@ class Title extends GScreen {
     onFrontRender = ( CanvasElement canvas ) {
       
       var c = canvas.context2D;
-      c.lineWidth = 1.0;
+      c.font = '24pt/2 $fontFamily';
+      c.lineWidth = 3.0;
       c.textAlign = "center";
       c.textBaseline = "middle";
       c.setStrokeColorRgb(0, 0, 0, 1);
-      c.strokeText("Tank Game", 320, 180, 100);
+      c.strokeText("Tank Game", 320.5, 100, 300);
+      c.setFillColorRgb(0, 0, 0, 1);
+      c.fillText("Tank Game", 320.5, 100, 300);
     };
   }
 }
@@ -81,7 +90,8 @@ You are in hell.
     onFrontRender = draw;
     
     // 戻るボタン配置
-    var retbtn = new PlayButton( ()=>geng.screen = new Title() )
+    var retbtn = new PlayButton()
+    ..onPress = () { geng.screen = new Title(); }
     ..text = "戻る"
     ..x = 320
     ..y = 220;
@@ -91,11 +101,11 @@ You are in hell.
   
   void draw(CanvasElement canvas) {
     var c = canvas.context2D;
-    c.lineWidth = 1.0;
+    c.font = '14pt/2 $fontFamily';
     c.textAlign = "center";
     c.textBaseline = "middle";
-    c.setStrokeColorRgb(0, 0, 0, 1);
-    c.strokeText(text, 320, 180, 300);
+    c.setFillColorRgb(0, 0, 0, 1);
+    c.fillText(text, 320, 180, 300);
   }
 }
 
@@ -107,13 +117,7 @@ class PlayButton extends BtnObj {
   Color bgCl_on     = new Color.fromString("#00ee00");
   Color bgCl_press  = new Color.fromString("#ee0000");
   
-  PlayButton( void onPress() ) {
-    this.onPress = onPress;
-  }
-  
-  void onInit() {
-    
-  }
+  void onInit() { }
   
   void onRender() {
     var c = geng.canvas.context2D;
@@ -132,10 +136,11 @@ class PlayButton extends BtnObj {
     
     if( text!=null ) {
       c.lineWidth = 1.0;
+      c.font = '14pt/2 $fontFamily';
       c.textAlign = "center";
       c.textBaseline = "middle";
-      c.setStrokeColorRgb(0, 0, 0, 1);
-      c.strokeText(text, x, y, width);
+      c.setFillColorRgb(0, 0, 0, 1);
+      c.fillText(text, x, y, width);
     }
   }
   

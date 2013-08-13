@@ -1,9 +1,14 @@
 part of tankgame;
 
 
-
-Color textCl = new Color.fromString("#000000");
-
+/** 共通で使用するテキストレンダー:通常の文字表示 */
+var tren = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "12pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = Color.Black
+..strokeColor = null;
 
 /**
  * GameStartの表示
@@ -16,12 +21,9 @@ class GameStartLogo extends GObj {
   }
   
   void onRender() {
-    var c = geng.canvas.context2D;
-    c.lineWidth = 1.0;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.setStrokeColorRgb(textCl.r, textCl.g, textCl.b, 1);
-    c.strokeText("GAME START", 320, 200, 100);
+    tren.canvas = geng.canvas;
+    tren.drawTexts(["GAME START"], 320, 200);
+    tren.canvas = null;
   }
   
   void onDispose() {}
@@ -32,13 +34,10 @@ class ResultPrint extends GObj {
   void onInit() {}
   
   void onRender() {
-    var c = geng.canvas.context2D;
-    c.lineWidth = 1.0;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.setStrokeColorRgb(textCl.r, textCl.g, textCl.b, 1);
-    c.strokeText("GAME OVER", 320, 200);
-    c.strokeText("SCORE: ${score}", 320, 230);
+    tren.canvas = geng.canvas;
+    tren.drawTexts(["GAME OVER"], 320, 200);
+    tren.drawTexts(["SCORE: ${score}"], 320, 230);
+    tren.canvas = null;
   }
   
   void onDispose() {}

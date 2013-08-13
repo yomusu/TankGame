@@ -84,24 +84,3 @@ class Sprite {
   }
 }
 
-class Color {
-  
-  num red,green,blue;
-  
-  int get r => red;
-  int get g => green;
-  int get b => blue;
-  
-  Color.fromString( String rgb ) {
-    if( rgb.startsWith("#") ) {
-      switch( rgb.length ) {
-        case 7:
-          red  = int.parse( rgb.substring(1,3), radix:16 );
-          green= int.parse( rgb.substring(3,5), radix:16 );
-          blue = int.parse( rgb.substring(5,7), radix:16 );
-          break;
-      }
-    }
-  }
-}
-

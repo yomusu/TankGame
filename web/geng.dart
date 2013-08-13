@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 
 part 'sprite.dart';
+part 'canvasutil.dart';
 
 
 /**

@@ -10,6 +10,8 @@ import 'geng.dart';
 
 part 'tankobjs.dart';
 
+
+
 final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
 
 void main() {
@@ -30,6 +32,8 @@ void main() {
  * 
  */
 class Title extends GScreen {
+  
+  TextRender  tren = new TextRender();
   
   void onStart() {
     geng.disposeAll();
@@ -65,47 +69,56 @@ class Title extends GScreen {
     //---------------------
     // 最前面描画処理
     onFrontRender = ( CanvasElement canvas ) {
-      
-      var c = canvas.context2D;
-      c.font = '24pt/2 $fontFamily';
-      c.lineWidth = 3.0;
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      c.setStrokeColorRgb(0, 0, 0, 1);
-      c.strokeText("Tank Game", 320.5, 100, 300);
-      c.setFillColorRgb(0, 0, 0, 1);
-      c.fillText("Tank Game", 320.5, 100, 300);
+      tren.canvas = canvas;
+      tren.drawTexts(["Tank Game"], 320, 100 );
+      tren.canvas = null;
     };
+    
+    tren.fontFamily = fontFamily;
+    tren.fontSize = "24pt";
+    tren.textAlign = "center";
+    tren.textBaseline = "middle";
   }
 }
 
 
 class HowToPlay extends GScreen {
-  String  text = """
-Hello Everybody!
-You are in hell.
-""";
+  
+  List  text = """遊び方
+
+マウスをクリックするとたまをうつよ！
+つぎつぎと あらわれる まとに あてよう！
+れんぞくして あてると こうとくてんだ！
+""".split("\n");
+  
+  TextRender  tren = new TextRender();
+  
   void onStart() {
     geng.disposeAll();
-    onFrontRender = draw;
     
     // 戻るボタン配置
     var retbtn = new PlayButton()
     ..onPress = () { geng.screen = new Title(); }
     ..text = "戻る"
     ..x = 320
-    ..y = 220;
+    ..y = 300;
     geng.add( retbtn );
     entryButton( retbtn );
-  }
-  
-  void draw(CanvasElement canvas) {
-    var c = canvas.context2D;
-    c.font = '14pt/2 $fontFamily';
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.setFillColorRgb(0, 0, 0, 1);
-    c.fillText(text, 320, 180, 300);
+    
+    tren.fontFamily = fontFamily;
+    tren.fontSize = "14pt";
+    tren.textAlign = "left";
+    tren.textBaseline = "ideographic";
+    tren.lineHeight = 32;
+    tren.fillColor = Color.Black;
+    tren.strokeColor = null;
+    
+    // 描画処理
+    onFrontRender = (CanvasElement canvas) {
+      tren.canvas = canvas;
+      tren.drawTexts(text, 50, 50 );
+      tren.canvas = null;
+    };
   }
 }
 
@@ -117,7 +130,17 @@ class PlayButton extends BtnObj {
   Color bgCl_on     = new Color.fromString("#00ee00");
   Color bgCl_press  = new Color.fromString("#ee0000");
   
-  void onInit() { }
+  var tren = new TextRender();
+  
+  void onInit() {
+    tren = new TextRender()
+    ..fontFamily = fontFamily
+    ..fontSize = "14pt"
+    ..textAlign = "center"
+    ..textBaseline = "middle"
+    ..fillColor = Color.Black
+    ..strokeColor = null;
+  }
   
   void onRender() {
     var c = geng.canvas.context2D;
@@ -135,12 +158,9 @@ class PlayButton extends BtnObj {
     c.fill();
     
     if( text!=null ) {
-      c.lineWidth = 1.0;
-      c.font = '14pt/2 $fontFamily';
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      c.setFillColorRgb(0, 0, 0, 1);
-      c.fillText(text, x, y, width);
+      tren.canvas = geng.canvas;
+      tren.drawTexts([text], x, y);
+      tren.canvas = null;
     }
   }
   
@@ -189,13 +209,19 @@ class TankGame extends GScreen {
     
     onProcess = onProcess1;
     
+    // スコア表示
+    var tren = new TextRender()
+    ..fontFamily = fontFamily
+    ..fontSize = "12pt"
+    ..textAlign = "left"
+    ..textBaseline = "top"
+    ..fillColor = Color.Black
+    ..strokeColor = null;
+    
     onFrontRender = ( CanvasElement c ) {
-      var c = geng.canvas.context2D;
-      c.lineWidth = 1.0;
-      c.textAlign = "left";
-      c.textBaseline = "top";
-      c.setStrokeColorRgb(0, 0, 0, 1);
-      c.strokeText("SCORE: ${score}", 0, 0, 100);
+      tren.canvas = c;
+      tren.drawTexts(["SCORE: ${score}"], 5, 5 );
+      tren.canvas = null;
     };
     
     // カーソル

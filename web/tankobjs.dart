@@ -20,10 +20,12 @@ class GameStartLogo extends GObj {
     new Timer( const Duration(seconds:2), ()=>dispose() );
   }
   
-  void onRender() {
-    tren.canvas = geng.canvas;
-    tren.drawTexts(["GAME START"], 320, 200);
-    tren.canvas = null;
+  void onProcess(RenderList renderList) {
+    renderList.add( 100, (canvas) {
+      tren.canvas = canvas;
+      tren.drawTexts(["GAME START"], 320, 200);
+      tren.canvas = null;
+    });
   }
   
   void onDispose() {}
@@ -33,11 +35,13 @@ class ResultPrint extends GObj {
   
   void onInit() {}
   
-  void onRender() {
-    tren.canvas = geng.canvas;
-    tren.drawTexts(["GAME OVER"], 320, 200);
-    tren.drawTexts(["SCORE: ${score}"], 320, 230);
-    tren.canvas = null;
+  void onProcess(RenderList renderList) {
+    renderList.add( 100, (canvas) {
+      tren.canvas = canvas;
+      tren.drawTexts(["GAME OVER"], 320, 200);
+      tren.drawTexts(["SCORE: ${score}"], 320, 230);
+      tren.canvas = null;
+    });
   }
   
   void onDispose() {}
@@ -54,8 +58,8 @@ class Cursor extends GObj {
     sp = new Sprite( src:"../octocat.png", width:100, height:100 );
   }
   
-  void onRender() {
-    sp.render(geng.canvas);
+  void onProcess(RenderList renderList) {
+    renderList.add( 1000, sp.render );
   }
   
   void onDispose() {}
@@ -76,10 +80,10 @@ class Tank extends GObj {
     sp.offsety = 0;
   }
   
-  void onRender() {
+  void onProcess(RenderList renderList) {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
-    geng.render( sp );
+    renderList.add( 0, sp.render );
   }
   
   /** 弾を打つ */
@@ -136,8 +140,8 @@ class Cannonball extends GObj {
     timer = new Timer.periodic( const Duration(milliseconds:50), (t)=>_move() );
   }
   
-  void onRender() {
-    geng.render( sp );
+  void onProcess( RenderList renderList ) {
+    renderList.add( 10, sp.render );
   }
   
   void _move() {
@@ -192,10 +196,10 @@ class Target extends GObj {
     sp = new Sprite( src:"../octocat.png" , width:80, height:80 );
   }
   
-  void onRender() {
+  void onProcess( RenderList renderList ) {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
-    geng.render( sp );
+    renderList.add( 5, sp.render );
   }
   
   void bomb() {

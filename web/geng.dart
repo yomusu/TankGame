@@ -2,6 +2,7 @@ library geng;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:collection';
 
 part 'sprite.dart';
 part 'canvasutil.dart';
@@ -25,14 +26,14 @@ abstract class GObj {
   void onInit();
   
   /** レンダリング */
-  void onRender();
+  void onProcess( RenderList renderList );
   
   /** 最後に呼ばれる */
   void onDispose();
   
   // 操作するためのメソッド ---
   
-  void render() => onRender();
+  void process( RenderList renderList ) => onProcess( renderList );
   
   /** 廃棄する */
   void dispose() {
@@ -69,6 +70,9 @@ abstract class BtnObj extends GObj {
   
 }
 
+/**
+ * 画面の基本クラス
+ */
 abstract class GScreen {
   
   // メンバ変数 ---
@@ -154,7 +158,7 @@ abstract class GScreen {
     if( onProcess!=null )
       onProcess();
     // 全てレンダー
-    geng.renderAll();
+    geng.processAll();
     geng.gcObj();
     // 最前面の描画
     if( onFrontRender!=null )
@@ -171,6 +175,33 @@ class PressEvent {
   int x,y;
 }
 
+/** 最終的にレンダリングするFunction */
+typedef void Render( CanvasElement canvas );
+
+/**
+ * レンダリングのオーダリングリスト
+ */
+class RenderList {
+  
+  final SplayTreeMap<num,Render>  _list;
+  
+  RenderList() :
+    _list = new SplayTreeMap( (k1,k2) {
+      var r = k1.compareTo(k2);
+      return ( r==0 ) ? 1 : r;
+    });
+  
+  void clear() {
+    _list.clear();
+  }
+  void add( num z, Render r ) {
+    _list[z] = r;
+  }
+  
+  void renderAll( CanvasElement canvas ) {
+    _list.values.forEach( (r)=> r(canvas) );
+  }
+}
 
 /**************
  * 
@@ -179,9 +210,18 @@ class PressEvent {
  */
 class GEng {
   
+  // Private Member --------
   
-  final List<GObj>  objlist = new List();
   GScreen _screen = null;
+  
+  // Property --------
+  
+  /** オブジェクトのリスト */
+  final List<GObj>  objlist = new List();
+  // フィールド管理は別クラスにすべきかも
+  CanvasElement  canvas = null;
+  
+  // setter/getter --------
   
   /** 使用するScreenのセット */
   set screen( GScreen s ) {
@@ -191,9 +231,6 @@ class GEng {
         s.onStart();
     });
   }
-  
-  // フィールド管理は別クラスにすべきかも
-  CanvasElement  canvas = null;
   
   /**
    * フィールドを初期化する
@@ -216,7 +253,6 @@ class GEng {
       if( _screen!=null )
         _screen.onMouseOut(e);
     });
-
     
     geng.canvas = canvas;
   }
@@ -232,22 +268,22 @@ class GEng {
   }
   Rect  _rect;
   
+  final RenderList  _renderList = new RenderList();
   
   /**
-   * スプライトをrender
+   * 全てのオブジェクトをProcessしてrenderする
    */
-  void render( Sprite spr ) {
-    spr.render(canvas);
-  }
-  
-  /**
-   * 全てをrenderする
-   */
-  void renderAll() {
+  void processAll() {
+    
+    // Do Processing every object
+    objlist.where( (v) => v.isDisposed==false )
+    .forEach( (GObj v)=> v.process(_renderList) );
+    
+    // Do Rendering
     canvas.context2D.clearRect(0,0, rect.width, rect.height);
-    objlist
-    .where( (v) => v.isDisposed==false )
-    .forEach( (GObj v)=> v.render() );
+    _renderList.renderAll( canvas );
+    // 終わったら削除
+    _renderList.clear();
   }
   
   /**

@@ -33,7 +33,11 @@ void main() {
  */
 class Title extends GScreen {
   
-  TextRender  tren = new TextRender();
+  TextRender  tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "24pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle";
   
   void onStart() {
     geng.disposeAll();
@@ -74,10 +78,6 @@ class Title extends GScreen {
       tren.canvas = null;
     };
     
-    tren.fontFamily = fontFamily;
-    tren.fontSize = "24pt";
-    tren.textAlign = "center";
-    tren.textBaseline = "middle";
   }
 }
 
@@ -91,7 +91,14 @@ class HowToPlay extends GScreen {
 れんぞくして あてると こうとくてんだ！
 """.split("\n");
   
-  TextRender  tren = new TextRender();
+  TextRender  tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "left"
+  ..textBaseline = "ideographic"
+  ..lineHeight = 32
+  ..fillColor = Color.Black
+  ..strokeColor = null;
   
   void onStart() {
     geng.disposeAll();
@@ -104,14 +111,6 @@ class HowToPlay extends GScreen {
     ..y = 300;
     geng.add( retbtn );
     entryButton( retbtn );
-    
-    tren.fontFamily = fontFamily;
-    tren.fontSize = "14pt";
-    tren.textAlign = "left";
-    tren.textBaseline = "ideographic";
-    tren.lineHeight = 32;
-    tren.fillColor = Color.Black;
-    tren.strokeColor = null;
     
     // 描画処理
     onFrontRender = (CanvasElement canvas) {
@@ -130,38 +129,38 @@ class PlayButton extends BtnObj {
   Color bgCl_on     = new Color.fromString("#00ee00");
   Color bgCl_press  = new Color.fromString("#ee0000");
   
-  var tren = new TextRender();
+  var tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle"
+  ..fillColor = Color.Black
+  ..strokeColor = null;
   
-  void onInit() {
-    tren = new TextRender()
-    ..fontFamily = fontFamily
-    ..fontSize = "14pt"
-    ..textAlign = "center"
-    ..textBaseline = "middle"
-    ..fillColor = Color.Black
-    ..strokeColor = null;
-  }
+  void onInit() { }
   
-  void onRender() {
-    var c = geng.canvas.context2D;
-    
-    var bgcl = bgCl_normal;
-    if( isPress ) {
-      bgcl = bgCl_press;
-    } else if( isOn ) {
-      bgcl = bgCl_on;
-    }
-    
-    c.beginPath();
-    c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
-    c.rect(left, top, width, height);
-    c.fill();
-    
-    if( text!=null ) {
-      tren.canvas = geng.canvas;
-      tren.drawTexts([text], x, y);
-      tren.canvas = null;
-    }
+  void onProcess( RenderList renderList ) {
+    renderList.add( 100, (canvas) {
+      var c = canvas.context2D;
+      
+      var bgcl = bgCl_normal;
+      if( isPress ) {
+        bgcl = bgCl_press;
+      } else if( isOn ) {
+        bgcl = bgCl_on;
+      }
+      
+      c.beginPath();
+      c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
+      c.rect(left, top, width, height);
+      c.fill();
+      
+      if( text!=null ) {
+        tren.canvas = canvas;
+        tren.drawTexts([text], x, y);
+        tren.canvas = null;
+      }
+    });
   }
   
   void onDispose() { }
@@ -255,7 +254,6 @@ class TankGame extends GScreen {
       geng.add( new ResultPrint() );
       
       onPress = (PressEvent e) => geng.screen = new Title();
-      
       onProcess = onProcess2; 
     }
   }

@@ -14,10 +14,8 @@ class Sprite {
   
   ImageElement _img;
   
-  Sprite( { String src:null, num width:10, num height:10 } ) {
-    _img = new ImageElement();
-    if( src !=null )
-      _img.src = src;
+  Sprite( String imgKey, { num width:10, num height:10 } ) {
+    _img = geng.imageMap[imgKey];
     _w = width;
     _h = height;
     offsetx = _w / 2;

@@ -203,6 +203,34 @@ class RenderList {
   }
 }
 
+/****
+ * 
+ * Imageを読み込み、格納する
+ * 
+ */
+class ImageMap {
+  
+  final Map<String,ImageElement>  map = new Map();
+  
+  void put( String key, String src ) {
+    var img = new ImageElement()
+    ..src = src;
+    
+    map[key] = img;
+    
+    // onLoadは効くのか？読み込み完了を待つ必要があるかどうか
+    img.onLoad.listen( (v)=>print("loaded image : $key") ); 
+  }
+  
+  ImageElement operator [](Object key) => map[key];
+  
+  void operator []=(String k, ImageElement v) {
+    map[k] = v;
+  }
+  
+}
+
+
 /**************
  * 
  * Game Engine
@@ -220,6 +248,8 @@ class GEng {
   final List<GObj>  objlist = new List();
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
+  
+  final ImageMap  imageMap = new ImageMap();
   
   // setter/getter --------
   

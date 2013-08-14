@@ -55,7 +55,7 @@ class Cursor extends GObj {
   Sprite sp;
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png", width:100, height:100 );
+    sp = new Sprite( "tank", width:100, height:100 );
   }
   
   void onProcess(RenderList renderList) {
@@ -76,7 +76,7 @@ class Tank extends GObj {
   Vector  pos = new Vector();
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png", width:100, height:100 );
+    sp = new Sprite( "tank", width:100, height:100 );
     sp.offsety = 0;
   }
   
@@ -133,7 +133,7 @@ class Cannonball extends GObj {
   Timer timer;
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png", width:50, height:50 );
+    sp = new Sprite( "cannon", width:50, height:50 );
     
     // 移動ルーチン
     _move();
@@ -193,7 +193,7 @@ class Target extends GObj {
   bool  isBombed = false;
   
   void onInit() {
-    sp = new Sprite( src:"../octocat.png" , width:80, height:80 );
+    sp = new Sprite( "target", width:80, height:80 );
   }
   
   void onProcess( RenderList renderList ) {

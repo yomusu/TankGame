@@ -21,6 +21,7 @@ void main() {
     geng.imageMap.put("tank", "../octocat.png");
     geng.imageMap.put("cannon", "../octocat.png");
     geng.imageMap.put("target", "../octocat.png");
+    geng.imageMap.put("kusa", "../kusa.png");
     
     var canvas = query("canvas") as CanvasElement;
     canvas.context2D.scale(2.0, 2.0); // for Retina対応
@@ -205,6 +206,9 @@ class TankGame extends GScreen {
       ..pos.y = y;
       geng.add( t );
     }
+    
+    // 地面
+    geng.add( new Ground() );
     
     // スタート表示
     geng.add( new GameStartLogo() );

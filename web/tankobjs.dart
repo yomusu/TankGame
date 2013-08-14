@@ -1,6 +1,7 @@
 part of tankgame;
 
 
+
 /** 共通で使用するテキストレンダー:通常の文字表示 */
 var tren = new TextRender()
 ..fontFamily = fontFamily
@@ -210,4 +211,43 @@ class Target extends GObj {
   void onDispose() {
   }
 
+}
+
+/**
+ * 地面
+ */
+class Ground extends GObj {
+  
+  List<Point>  points = new List();
+
+  void onInit() {
+    var rand = new math.Random(0);
+    for( int y=0; y<400; y+=200 ) {
+      for( int x=0; x<1600; x+=200 ) {
+        var _x = x + rand.nextInt(200) - 100;
+        var _y = y + rand.nextInt(200) - 100;
+        points.add( new Point(_x,_y) );
+      }
+    }
+  }
+  
+  void onProcess( RenderList renderList ) {
+    var z = 0;
+    renderList.add( z, draw );
+  }
+  
+  void draw( CanvasElement canvas ) {
+    var img = geng.imageMap["kusa"];
+    var c = canvas.context2D;
+    points.forEach( (p) {
+      var x = p.x - offset_x;
+      var y = p.y;
+      c.drawImageScaled(img, x, y, 50, 50);
+    });
+  }
+  
+  void onDispose() {
+    points.clear();
+  }
+  
 }

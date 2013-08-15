@@ -16,10 +16,7 @@ var tren = new TextRender()
  */
 class GameStartLogo extends GObj {
   
-  void onInit() {
-    // 2秒後に死す
-    new Timer( const Duration(seconds:2), ()=>dispose() );
-  }
+  void onInit() {}
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {

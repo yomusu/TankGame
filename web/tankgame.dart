@@ -145,28 +145,36 @@ class PlayButton extends BtnObj {
   
   void onInit() { }
   
-  void onProcess( RenderList renderList ) {
-    renderList.add( 100, (canvas) {
-      var c = canvas.context2D;
-      
-      var bgcl = bgCl_normal;
-      if( isPress ) {
+  void render( CanvasElement canvas, int status ) {
+    var c = canvas.context2D;
+    
+    var textCl = Color.Black;
+    var bgcl = bgCl_normal;
+    switch( status ) {
+      case BtnObj.DISABLE:
+        textCl = Color.Gray;
+        break;
+      case BtnObj.ACTIVE:
+        break;
+      case BtnObj.PRESSED:
         bgcl = bgCl_press;
-      } else if( isOn ) {
+        break;
+      case BtnObj.ROLLON:
         bgcl = bgCl_on;
-      }
-      
-      c.beginPath();
-      c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
-      c.rect(left, top, width, height);
-      c.fill();
-      
-      if( text!=null ) {
-        tren.canvas = canvas;
-        tren.drawTexts([text], x, y);
-        tren.canvas = null;
-      }
-    });
+        break;
+    }
+    
+    c.beginPath();
+    c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
+    c.rect(left, top, width, height);
+    c.fill();
+    
+    if( text!=null ) {
+      tren.canvas = canvas;
+      tren.fillColor = textCl;
+      tren.drawTexts([text], x, y);
+      tren.canvas = null;
+    }
   }
   
   void onDispose() { }
@@ -189,7 +197,7 @@ class TankGame extends GScreen {
     
     // 戦車の初期位置
     tank = new Tank()
-    ..pos.x = 0.0
+    ..pos.x = 320.0
     ..pos.y = 300.0
     ..speed.x = 2.0;
     geng.add( tank );
@@ -210,12 +218,7 @@ class TankGame extends GScreen {
     // 地面
     geng.add( new Ground() );
     
-    // スタート表示
-    geng.add( new GameStartLogo() );
-    
     offset_x = 0.0;
-    
-    onProcess = onProcess1;
     
     // スコア表示
     var tren = new TextRender()
@@ -232,43 +235,60 @@ class TankGame extends GScreen {
       tren.canvas = null;
     };
     
-    // カーソル
-    var cursor = new Cursor();
-    geng.add( cursor );
-    onMove = ( int x, int y ) {
-      cursor.sp.show();
-      cursor.sp.x = x;
-      cursor.sp.y = y;
+    //-------
+    // Fireボタン配置
+    var firebtn = new PlayButton()
+    ..onPress = () { geng.screen = new Title(); }
+    ..text = "うつ!"
+    ..x = 100
+    ..y = 350
+    ..width = 90
+    ..height= 40
+    ..isEnable = false;
+    firebtn.onPress = () {
+      tank.fire( new Point(tank.pos.x,0) );
+      new Timer( const Duration(seconds:1), () { firebtn.isPress = false; });
     };
-    onMoveOut = () => cursor.sp.hide();
+    geng.add( firebtn );
+    entryButton(firebtn);
     
-    // マウスボタン処理
-    onPress = ( PressEvent e ) {
-      var x = offset_x + e.x;
-      var y = e.y;
-      tank.fire( new Point(x,e.y) );
-      print("x=$x, y=$y, offset_x=$offset_x, sx=${e.x}");
-    };
-  }
-  
-  void onProcess1() {
-    // 戦車移動
-    tank.pos.add( tank.speed );
+    // スタート表示
+    var startLogo = new GameStartLogo();
+    geng.add( startLogo );
     
-    // 画面表示位置
-    offset_x = math.max( 0.0, tank.pos.x - 320.0 );
-    
-    if( offset_x >= 1000 ) {
-      // ステージ終了処理
-      geng.add( new ResultPrint() );
+    //-----------
+    // 最初の処理
+    onProcess = () {
       
-      onPress = (PressEvent e) => geng.screen = new Title();
-      onProcess = onProcess2; 
-    }
-  }
-  
-  void onProcess2() {
-    tank.pos.add( tank.speed );
+      // 戦車移動
+      tank.pos.add( tank.speed );
+      
+      // 画面表示位置
+      offset_x = math.max( 0.0, tank.pos.x - 320.0 );
+      
+      // ステージ終了判定
+      if( offset_x >= 1000 ) {
+        
+        // 発射ボタン等消す
+        firebtn.dispose();
+        
+        // 結果表示
+        geng.add( new ResultPrint() );
+        
+        onPress = (PressEvent e) => geng.screen = new Title();
+        onProcess = () {
+          tank.pos.add( tank.speed );
+        };
+      }
+    };
+    
+    // 2秒後にオープニング終了
+    new Timer( const Duration(seconds:2), () {
+      // スタートロゴを消す
+      startLogo.dispose();
+      // Fireボタンを押せるように
+      firebtn.isEnable = true;
+    });
   }
 
 }

@@ -45,6 +45,12 @@ abstract class GObj {
 
 abstract class BtnObj extends GObj {
   
+  static const int  HIDDEN = -1;
+  static const int  DISABLE= 0;
+  static const int  ACTIVE = 1;
+  static const int  ROLLON = 3;
+  static const int  PRESSED= 7;
+  
   num x = 320;
   num y = 180;
   num width = 100;
@@ -53,13 +59,22 @@ abstract class BtnObj extends GObj {
   num get left => x - (width/2);
   num get top  => y - (height/2);
   
+  num z = 0;
+  
   var onPress = null;
   
   bool  isOn = false;
   bool  isPress = false;
-  
+  bool  isVisible = true;
+  bool  isEnable = true;
 
   bool isIn( num mx, num my ) {
+    
+    if( isVisible==false )
+      return false;
+    if( isEnable==false )
+      return false;
+    
     var xx = mx - left;
     var yy = my - top;
     bool  inH = ( xx>=0 && xx<width );
@@ -68,6 +83,29 @@ abstract class BtnObj extends GObj {
     return ( inH && inV );
   }
   
+  void onProcess( RenderList renderList ) {
+    var s = status;
+    if( s!=HIDDEN )
+      renderList.add(z, (c)=>render(c,s) );
+  }
+  
+  int get status {
+    
+    if( isVisible==false )
+      return HIDDEN;
+    if( isEnable==false )
+      return DISABLE;
+    
+    if( isPress )
+      return PRESSED;
+    if( isOn )
+      return ROLLON;
+    
+    return ACTIVE;
+  }
+  
+  void render( CanvasElement canvas, int status ) {
+  }
 }
 
 /**

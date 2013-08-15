@@ -80,6 +80,8 @@ class Color {
   static Color  Red   = new Color.fromString("#FF0000");
   static Color  Black = new Color.fromString("#000000");
   static Color  Yellow= new Color.fromString("#FFFF00");
+  static Color  Blue  = new Color.fromString("#0000FF");
+  static Color  Gray  = new Color.fromString("#808080");
   
   num red,green,blue;
   

@@ -208,10 +208,10 @@ class TankGame extends GScreen {
     // 看板を配置
     var rand = new math.Random(0);
     for( int x=600; x<2000; x+=200 ) {
-      var y = rand.nextDouble() * 300;
-      Target  t = new Target()
+      var y = rand.nextInt(250) + 20;
+      Target  t = new Target.large()
       ..pos.x = x.toDouble()
-      ..pos.y = y;
+      ..pos.y = y.toDouble();
       geng.add( t );
     }
     

@@ -46,24 +46,6 @@ class ResultPrint extends GObj {
 }
 
 /**
- * 照準カーソル
- */
-class Cursor extends GObj {
-  
-  Sprite sp;
-  
-  void onInit() {
-    sp = new Sprite( "tank", width:100, height:100 );
-  }
-  
-  void onProcess(RenderList renderList) {
-    renderList.add( 1000, sp.render );
-  }
-  
-  void onDispose() {}
-}
-
-/**
  * 戦車
  */
 class Tank extends GObj {
@@ -120,6 +102,7 @@ class Tank extends GObj {
 class Cannonball extends GObj {
   
   /** 位置 */
+  Vector  oldpos = new Vector();
   Vector  pos = new Vector();
   /** 速度 */
   Vector  speed = new Vector();
@@ -132,6 +115,7 @@ class Cannonball extends GObj {
   
   void onInit() {
     sp = new Sprite( "cannon", width:50, height:50 );
+    sp.offsety = 0;
     
     // 移動ルーチン
     _move();
@@ -144,6 +128,7 @@ class Cannonball extends GObj {
   
   void _move() {
     // 移動&加速
+    oldpos.set( pos );
     pos.add( speed );
     speed.sub(delta);
     // 
@@ -161,12 +146,9 @@ class Cannonball extends GObj {
       var t = geng.objlist
           .where( (e) => e.isDisposed==false && e is Target && e.isBombed==false )
           .firstWhere( (Target e) {
-            var r = this.pos.distance( e.pos );
-            return ( r<10.0 );
+            return e.bomb(this);
           });
       // あたった処理
-      score += 100;
-      t.bomb();
       dispose();
       
     } on StateError {
@@ -180,6 +162,22 @@ class Cannonball extends GObj {
   }
 }
 
+num getDeltaXonH( Vector pos, Vector from, Vector to ) {
+  if( from.y < pos.y )
+    return null;
+  if( to.y > pos.y )
+    return null;
+  
+  var dy1 = from.y - pos.y;
+  var dy2 = from.y - to.y;
+  
+  var dx2 = to.x - from.x;
+  
+  var dx1 = (dy1 / dy2) * dx2;
+  
+  return (from.x + dx1) - pos.x;
+}
+
 /**
  * 看板
  */
@@ -187,22 +185,64 @@ class Target extends GObj {
 
   Sprite sp;
   Vector pos = new Vector();
+  num   _width = 80;
+  num   _hitdx = null;
   
-  bool  isBombed = false;
+  bool  get isBombed => _hitdx!=null;
+  
+  var _getScore;
+  
+  Target.normal() {
+    _width = 80;
+    _getScore = (dx) => 100;
+  }
+  Target.large() {
+    _width = 150;
+    _getScore = (dx) {
+      var d = dx.abs();
+      if( d < 5 )
+        return 100;
+      if( d < 20 )
+        return 50;
+      return 10;
+    };
+  }
   
   void onInit() {
-    sp = new Sprite( "target", width:80, height:80 );
+    sp = new Sprite( "target", width:_width, height:80 );
   }
   
   void onProcess( RenderList renderList ) {
-    sp.x = pos.x - offset_x;
-    sp.y = pos.y;
-    renderList.add( 5, sp.render );
+    var x = pos.x - offset_x;
+    var y = pos.y;
+    renderList.add( 5, (canvas) {
+      sp.x = x;
+      sp.y = y;
+      sp.render(canvas);
+      // Hit mark
+      if( _hitdx!=null ) {
+        var hx = x + _hitdx;
+        var c = canvas.context2D;
+        c.setFillColorRgb(255, 0, 0,1);
+        c.fillRect(hx-5, y-5, 10, 10);
+      }
+    } );
   }
   
-  void bomb() {
-    sp.hide();
-    isBombed = true;
+  bool bomb( Cannonball ball ) {
+    num dx = getDeltaXonH( pos, ball.oldpos, ball.pos );
+    // 交差すらしていない
+    if( dx==null )
+      return false;
+    // 交差した
+    if( dx.abs() < (_width/2) ) {
+      _hitdx = dx;
+      print( dx );
+      score += _getScore(dx);
+      return true;
+    } else {
+      return false;
+    }
   }
   
   void onDispose() {

@@ -238,7 +238,17 @@ class Target extends GObj {
     if( dx.abs() < (_width/2) ) {
       _hitdx = dx;
       print( dx );
-      score += _getScore(dx);
+      
+      // 得点を加算
+      num s = _getScore(dx);
+      score += s;
+      // ポップアップ
+      var pop = new ScorePopup()
+      ..pos.x = pos.x + _hitdx
+      ..pos.y = pos.y
+      ..texts[0] = s.toString();
+      geng.add( pop );
+      
       return true;
     } else {
       return false;
@@ -287,4 +297,64 @@ class Ground extends GObj {
     points.clear();
   }
   
+}
+
+/** スコアポップアップ用TextRender */
+final TextRender trenForScore = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "10pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = Color.Black
+..shadowColor = Color.White
+..shadowOffset = 2
+..shadowBlur = 0;
+
+class ScorePopup extends GObj {
+  
+  Vector pos = new Vector();
+  Vector speed = new Vector();
+  Vector delta = new Vector();
+  
+  /** Zはこちら */
+  num z = 60;
+  
+  /** テキストは複数セットできる */
+  List<String>  texts = [""];
+  
+  /** テキストを1行だけセットするとき用 */
+  set text( String str ) => texts[0] = str;
+  
+  void onInit() {
+    
+    speed..y = -5.0;
+    delta..y = 0.2;
+    
+    // 1秒で消えます
+    new Timer( const Duration(seconds:1), ()=>dispose() );
+  }
+  
+  void onProcess( RenderList renderList ) {
+    
+    // 動き
+    pos.add( speed );
+    speed.add( delta );
+    
+    // 終了判定
+    
+    // 座標変換
+    var x = pos.x - offset_x;
+    var y = pos.y;
+    
+    renderList.add( z, (canvas) {
+      var c = canvas.context2D;
+      
+//      print( "pop=$x,$y ${texts[0]}");
+      trenForScore.canvas = canvas;
+      trenForScore.drawTexts( texts, x, y);
+      trenForScore.canvas = null;
+    });
+  }
+  
+  void onDispose() {}
 }

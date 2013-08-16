@@ -43,7 +43,13 @@ class Title extends GScreen {
   ..fontFamily = fontFamily
   ..fontSize = "24pt"
   ..textAlign = "center"
-  ..textBaseline = "middle";
+  ..textBaseline = "middle"
+  ..lineWidth = 1.0
+  ..strokeColor = Color.Black
+  ..fillColor = Color.Yellow
+  ..shadowColor = new Color.fromAlpha(0.5)
+  ..shadowOffset = 5
+  ..shadowBlur = 10;
   
   void onStart() {
     geng.disposeAll();

@@ -19,6 +19,13 @@ class TextRender {
   Color strokeColor = Color.Black;
   /** color of fill. nullの場合、描画しない */
   Color fillColor = Color.Yellow;
+  
+  /** About shadow */
+  Color shadowColor = null;
+  num shadowOffsetX = 2;
+  num shadowOffsetY = 2;
+  num shadowBlur = 2;
+  
   /** strokeの線の太さ */
   num   lineWidth = 1.0;
   /** 行の高さ(px) */
@@ -28,6 +35,11 @@ class TextRender {
   String  textBaseline = "ideographic";
   
   // Property with setter -------------
+  
+  set shadowOffset( num offset ) {
+    shadowOffsetX = offset;
+    shadowOffsetY = offset;
+  }
   
   set canvas( CanvasElement c ) {
     _canvas = c;
@@ -51,7 +63,7 @@ class TextRender {
   /**
    * 複数行のテキストを描画する
    */
-  void drawTexts( List strs, num x, num y ) {
+  void drawTexts( List<String> strs, num x, num y ) {
     
     _con.lineWidth = lineWidth;
     
@@ -59,24 +71,41 @@ class TextRender {
     _con.textAlign = textAlign;
     _con.textBaseline = textBaseline;
     
-    if( strokeColor!=null )
-      _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, 1);
-    if( fillColor!=null )
-      _con.setFillColorRgb(fillColor.r, fillColor.g, fillColor.b, 1);
-    
-    strs.forEach( (s) {
-      if( fillColor!=null )
-        _con.fillText( s, x, y );
-      if( strokeColor!=null )
-        _con.strokeText( s, x, y );
+    if( fillColor!=null ) {
       
-      y += lineHeight;
-    });
+      _con.save();
+      
+      if( shadowColor!=null ) {
+        _con.shadowColor = shadowColor.rgba;
+        _con.shadowOffsetX = shadowOffsetX;
+        _con.shadowOffsetY = shadowOffsetY;
+        _con.shadowBlur = shadowBlur;
+      }
+      
+      _con.setFillColorRgb(fillColor.r, fillColor.g, fillColor.b, 1);
+      var _y = y;
+      strs.forEach( (s) {
+        _con.fillText( s, x, y );
+        _y += lineHeight;
+      });
+      
+      _con.restore();
+    }
+    
+    if( strokeColor!=null ) {
+      _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, 1);
+      var _y = y;
+      strs.forEach( (s) {
+        _con.strokeText( s, x, y );
+        _y += lineHeight;
+      });
+    }
   }
 }
 
 class Color {
   
+  static Color  White = new Color.fromString("#FFFFFF");
   static Color  Red   = new Color.fromString("#FF0000");
   static Color  Black = new Color.fromString("#000000");
   static Color  Yellow= new Color.fromString("#FFFF00");
@@ -84,10 +113,12 @@ class Color {
   static Color  Gray  = new Color.fromString("#808080");
   
   num red,green,blue;
+  num alpha=1.0;
   
   int get r => red;
   int get g => green;
   int get b => blue;
+  int get a => alpha;
   
   Color.fromString( String rgb ) {
     if( rgb.startsWith("#") ) {
@@ -100,5 +131,14 @@ class Color {
       }
     }
   }
+  
+  Color.fromAlpha(num a ) {
+    red = 0;
+    green = 0;
+    blue = 0;
+    alpha = a;
+  }
+  
+  String get rgba => "rgba($red,$green,$blue,$alpha)";
 }
 

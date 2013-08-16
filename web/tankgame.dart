@@ -222,7 +222,7 @@ class TankGame extends GScreen {
     
     // スコア表示
     var tren = new TextRender()
-    ..fontFamily = fontFamily
+    ..fontFamily = "'Press Start 2P', cursive"
     ..fontSize = "12pt"
     ..textAlign = "left"
     ..textBaseline = "top"

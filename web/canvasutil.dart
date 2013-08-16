@@ -16,9 +16,9 @@ class TextRender {
   // Property -------------
   
   /** color of stroke. nullの場合、描画しない */
-  Color strokeColor = Color.Black;
+  Color strokeColor = null;
   /** color of fill. nullの場合、描画しない */
-  Color fillColor = Color.Yellow;
+  Color fillColor = Color.Black;
   
   /** About shadow */
   Color shadowColor = null;
@@ -85,7 +85,7 @@ class TextRender {
       _con.setFillColorRgb(fillColor.r, fillColor.g, fillColor.b, 1);
       var _y = y;
       strs.forEach( (s) {
-        _con.fillText( s, x, y );
+        _con.fillText( s, x, _y );
         _y += lineHeight;
       });
       
@@ -96,7 +96,7 @@ class TextRender {
       _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, 1);
       var _y = y;
       strs.forEach( (s) {
-        _con.strokeText( s, x, y );
+        _con.strokeText( s, x, _y );
         _y += lineHeight;
       });
     }

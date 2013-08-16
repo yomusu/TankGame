@@ -3,13 +3,17 @@ part of tankgame;
 
 
 /** 共通で使用するテキストレンダー:通常の文字表示 */
-var tren = new TextRender()
-..fontFamily = fontFamily
+var trenScore = new TextRender()
+..fontFamily = scoreFont
 ..fontSize = "12pt"
 ..textAlign = "center"
 ..textBaseline = "middle"
 ..fillColor = Color.Black
-..strokeColor = null;
+..strokeColor = null
+..shadowColor = Color.White
+..shadowOffset = 2
+..shadowBlur = 0;
+
 
 /**
  * GameStartの表示
@@ -20,9 +24,9 @@ class GameStartLogo extends GObj {
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      tren.canvas = canvas;
-      tren.drawTexts(["GAME START"], 320, 200);
-      tren.canvas = null;
+      trenScore.canvas = canvas;
+      trenScore.drawTexts(["GAME START"], 320, 200);
+      trenScore.canvas = null;
     });
   }
   
@@ -35,10 +39,10 @@ class ResultPrint extends GObj {
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      tren.canvas = canvas;
-      tren.drawTexts(["GAME OVER"], 320, 200);
-      tren.drawTexts(["SCORE: ${score}"], 320, 230);
-      tren.canvas = null;
+      trenScore.canvas = canvas;
+      trenScore.drawTexts(["GAME OVER"], 320, 200);
+      trenScore.drawTexts(["SCORE: ${score}"], 320, 230);
+      trenScore.canvas = null;
     });
   }
   
@@ -185,6 +189,7 @@ class Target extends GObj {
 
   Sprite sp;
   Vector pos = new Vector();
+  
   num   _width = 80;
   num   _hitdx = null;
   
@@ -213,18 +218,17 @@ class Target extends GObj {
   }
   
   void onProcess( RenderList renderList ) {
-    var x = pos.x - offset_x;
-    var y = pos.y;
+    sp.x = pos.x - offset_x;
+    sp.y = pos.y;
+    // スプライト登録
     renderList.add( 5, (canvas) {
-      sp.x = x;
-      sp.y = y;
       sp.render(canvas);
       // Hit mark
       if( _hitdx!=null ) {
-        var hx = x + _hitdx;
+        var hx = sp.x + _hitdx;
         var c = canvas.context2D;
         c.setFillColorRgb(255, 0, 0,1);
-        c.fillRect(hx-5, y-5, 10, 10);
+        c.fillRect(hx-5, sp.y-5, 10, 10);
       }
     } );
   }
@@ -237,7 +241,6 @@ class Target extends GObj {
     // 交差した
     if( dx.abs() < (_width/2) ) {
       _hitdx = dx;
-      print( dx );
       
       // 得点を加算
       num s = _getScore(dx);
@@ -249,15 +252,58 @@ class Target extends GObj {
       ..texts[0] = s.toString();
       geng.add( pop );
       
+      // 自分飛んでく
+      var ft = new FlyingTarget();
+      ft.width = _width;
+      ft.pos.set(pos);
+      
+      ft.speed
+        ..x = _hitdx * -1.0
+        ..y = _width.toDouble() * -1.0
+        ..normalize()
+        ..mul( 10.0 );
+      geng.add(ft);
+      
+      dispose();
+      
       return true;
     } else {
       return false;
     }
   }
   
-  void onDispose() {
-  }
+  void onDispose() {}
+}
 
+/**
+ * 看板
+ */
+class FlyingTarget extends GObj {
+
+  Sprite sp;
+  Vector pos = new Vector();
+  Vector speed = new Vector();
+  
+  num   dRotate = math.PI/180.0 * 24;
+  num   width = 80;
+  
+  void onInit() {
+    sp = new Sprite( "target", width:width, height:80 );
+    sp.rotate = 0.0;
+    
+    new Timer( const Duration(seconds:2), ()=>dispose() );
+  }
+  
+  void onProcess( RenderList renderList ) {
+    pos.add( speed );
+    sp.rotate += dRotate;
+    sp.x = pos.x - offset_x;
+    sp.y = pos.y;
+    // スプライト登録
+    renderList.add( 5, sp.render );
+  }
+  
+  void onDispose() {}
 }
 
 /**
@@ -299,17 +345,6 @@ class Ground extends GObj {
   
 }
 
-/** スコアポップアップ用TextRender */
-final TextRender trenForScore = new TextRender()
-..fontFamily = fontFamily
-..fontSize = "10pt"
-..textAlign = "center"
-..textBaseline = "middle"
-..fillColor = Color.Black
-..shadowColor = Color.White
-..shadowOffset = 2
-..shadowBlur = 0;
-
 class ScorePopup extends GObj {
   
   Vector pos = new Vector();
@@ -340,19 +375,15 @@ class ScorePopup extends GObj {
     pos.add( speed );
     speed.add( delta );
     
-    // 終了判定
-    
     // 座標変換
     var x = pos.x - offset_x;
     var y = pos.y;
     
     renderList.add( z, (canvas) {
       var c = canvas.context2D;
-      
-//      print( "pop=$x,$y ${texts[0]}");
-      trenForScore.canvas = canvas;
-      trenForScore.drawTexts( texts, x, y);
-      trenForScore.canvas = null;
+      trenScore.canvas = canvas;
+      trenScore.drawTexts( texts, x, y);
+      trenScore.canvas = null;
     });
   }
   

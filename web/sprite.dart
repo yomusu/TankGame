@@ -8,11 +8,13 @@ class Sprite {
   
   num _x=0,_y=0;
   num _w=0,_h=0;
+  Rect  _rect = null;
+  ImageElement _img;
   
   num offsetx = 0,
       offsety = 0;
-  
-  ImageElement _img;
+  num rotate = null;
+  bool  isShow = true;
   
   Sprite( String imgKey, { num width:10, num height:10 } ) {
     _img = geng.imageMap[imgKey];
@@ -25,9 +27,18 @@ class Sprite {
   void render( CanvasElement canvas ) {
     if( isShow ) {
       var c = canvas.context2D;
-      var x = _x - offsetx;
-      var y = _y - offsety;
-      c.drawImageScaled(_img, x, y, _w, _h);
+      if( rotate!=null ) {
+        c.save();
+        c.translate(_x,_y);
+        c.rotate( rotate );
+        c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
+        c.restore();
+      } else {
+        c.save();
+        c.translate(_x,_y);
+        c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
+        c.restore();
+      }
     }
   }
   
@@ -69,9 +80,6 @@ class Sprite {
     }
     return _rect;
   }
-  Rect  _rect = null;
-  
-  bool  isShow = true;
   
   void show() {
     isShow = true;

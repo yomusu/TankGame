@@ -3,6 +3,7 @@ library geng;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math' as math;
 
 part 'sprite.dart';
 part 'canvasutil.dart';

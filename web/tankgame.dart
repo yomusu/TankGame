@@ -13,6 +13,8 @@ part 'tankobjs.dart';
 
 
 final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
+final String  scoreFont = "'Press Start 2P', cursive";
+
 
 void main() {
   
@@ -228,7 +230,7 @@ class TankGame extends GScreen {
     
     // スコア表示
     var tren = new TextRender()
-    ..fontFamily = "'Press Start 2P', cursive"
+    ..fontFamily = scoreFont
     ..fontSize = "12pt"
     ..textAlign = "left"
     ..textBaseline = "top"

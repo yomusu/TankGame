@@ -9,12 +9,10 @@ import 'vector.dart';
 import 'geng.dart';
 
 part 'tankobjs.dart';
+part 'stage.dart';
 
 
-
-final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
 final String  scoreFont = "'Press Start 2P', cursive";
-
 
 void main() {
   
@@ -33,6 +31,12 @@ void main() {
     geng.startTimer();
   });
 }
+
+Map   stageData;
+Tank  tank;
+int score;
+double  offset_x = 0.0;
+
 
 /***********
  * 
@@ -60,8 +64,8 @@ class Title extends GScreen {
     // StartGameボタン配置
     var playbtn = new PlayButton()
     ..onPress = (){
-      new Timer( const Duration(seconds:2), () {
-        geng.screen = new TankGame();
+      new Timer( const Duration(seconds:1), () {
+        geng.screen = new StageSelect();
       });
     }
     ..text = "ゲームスタート"
@@ -95,6 +99,42 @@ class Title extends GScreen {
   }
 }
 
+/***********
+ * 
+ * タイトル画面の表示
+ * 
+ */
+class StageSelect extends GScreen {
+  
+  void onStart() {
+    geng.disposeAll();
+    
+    // StartGameボタン配置
+    var y = 100;
+    for( var stage in stageList ) {
+      
+      var btn = new PlayButton()
+      ..onPress = ( ()=>goToStage( stage ) )
+      ..text = stage['name']
+      ..width = 150
+      ..height= 50
+      ..x = 320
+      ..y = y
+      ..isEnable = stage['enable'];
+      geng.add( btn );
+      entryButton( btn );
+      
+      y += 70;
+    }
+  }
+  
+  void goToStage( var stage ) {
+    new Timer( const Duration(milliseconds:500), () {
+      stageData = stage;
+      geng.screen = new TankGame();
+    });
+  }
+}
 
 class HowToPlay extends GScreen {
   
@@ -135,63 +175,17 @@ class HowToPlay extends GScreen {
   }
 }
 
-class PlayButton extends BtnObj {
-  
-  String  text;
-  
-  Color bgCl_normal = new Color.fromString("#eeeeee");
-  Color bgCl_on     = new Color.fromString("#00ee00");
-  Color bgCl_press  = new Color.fromString("#ee0000");
-  
-  var tren = new TextRender()
-  ..fontFamily = fontFamily
-  ..fontSize = "14pt"
-  ..textAlign = "center"
-  ..textBaseline = "middle"
-  ..fillColor = Color.Black
-  ..strokeColor = null;
-  
-  void onInit() { }
-  
-  void render( CanvasElement canvas, int status ) {
-    var c = canvas.context2D;
-    
-    var textCl = Color.Black;
-    var bgcl = bgCl_normal;
-    switch( status ) {
-      case BtnObj.DISABLE:
-        textCl = Color.Gray;
-        break;
-      case BtnObj.ACTIVE:
-        break;
-      case BtnObj.PRESSED:
-        bgcl = bgCl_press;
-        break;
-      case BtnObj.ROLLON:
-        bgcl = bgCl_on;
-        break;
-    }
-    
-    c.beginPath();
-    c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
-    c.rect(left, top, width, height);
-    c.fill();
-    
-    if( text!=null ) {
-      tren.canvas = canvas;
-      tren.fillColor = textCl;
-      tren.drawTexts([text], x, y);
-      tren.canvas = null;
-    }
+/* 未使用 */
+void _createMap() {
+  var rand = new math.Random(0);
+  for( int x=600; x<2000; x+=200 ) {
+    var y = rand.nextInt(250) + 20;
+    Target  t = new Target.fromType('large')
+    ..pos.x = x.toDouble()
+    ..pos.y = y.toDouble();
+    geng.add( t );
   }
-  
-  void onDispose() { }
-  
 }
-
-Tank  tank;
-int score;
-double  offset_x = 0.0;
 
 /***********
  * 
@@ -207,22 +201,22 @@ class TankGame extends GScreen {
     tank = new Tank()
     ..pos.x = 320.0
     ..pos.y = 300.0
-    ..speed.x = 2.0;
+    ..speed.x = stageData['speed'];
     geng.add( tank );
     
     // スコアをクリア
     score = 0;
     
-    // 看板を配置
-    var rand = new math.Random(0);
-    for( int x=600; x<2000; x+=200 ) {
-      var y = rand.nextInt(250) + 20;
-      Target  t = new Target.large()
-      ..pos.x = x.toDouble()
-      ..pos.y = y.toDouble();
+    //---------------
+    // Targetを配置
+    stageData['map'].forEach( (d) {
+      Target  t = new Target.fromType(d[2])
+      ..pos.x = d[0].toDouble()
+      ..pos.y = d[1].toDouble();
+      
       geng.add( t );
-    }
-    
+    });
+
     // 地面
     geng.add( new Ground() );
     
@@ -275,7 +269,7 @@ class TankGame extends GScreen {
       offset_x = math.max( 0.0, tank.pos.x - 320.0 );
       
       // ステージ終了判定
-      if( offset_x >= 1000 ) {
+      if( offset_x >= stageData['length'] ) {
         
         // 発射ボタン等消す
         firebtn.dispose();

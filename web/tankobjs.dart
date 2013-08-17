@@ -197,20 +197,24 @@ class Target extends GObj {
   
   var _getScore;
   
-  Target.normal() {
-    _width = 80;
-    _getScore = (dx) => 100;
-  }
-  Target.large() {
-    _width = 150;
-    _getScore = (dx) {
-      var d = dx.abs();
-      if( d < 5 )
-        return 100;
-      if( d < 20 )
-        return 50;
-      return 10;
-    };
+  Target.fromType( String type ) {
+    switch( type ) {
+      case 'small':
+        _width = 80;
+        _getScore = (dx) => 100;
+        break;
+      case 'large':
+        _width = 150;
+        _getScore = (dx) {
+          var d = dx.abs();
+          if( d < 5 )
+            return 100;
+          if( d < 20 )
+            return 50;
+          return 10;
+        };
+        break;
+    }
   }
   
   void onInit() {

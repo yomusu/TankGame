@@ -3,11 +3,11 @@ library geng;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math' as math;
 
 part 'sprite.dart';
 part 'canvasutil.dart';
 
+final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
 
 /**
  * 物体ひとつ
@@ -107,6 +107,60 @@ abstract class BtnObj extends GObj {
   
   void render( CanvasElement canvas, int status ) {
   }
+}
+
+class PlayButton extends BtnObj {
+  
+  String  text;
+  
+  Color bgCl_normal = new Color.fromString("#eeeeee");
+  Color bgCl_on     = new Color.fromString("#00ee00");
+  Color bgCl_press  = new Color.fromString("#ee0000");
+  
+  var tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle"
+  ..fillColor = Color.Black
+  ..strokeColor = null;
+  
+  void onInit() { }
+  
+  void render( CanvasElement canvas, int status ) {
+    var c = canvas.context2D;
+    
+    var textCl = Color.Black;
+    var bgcl = bgCl_normal;
+    switch( status ) {
+      case BtnObj.DISABLE:
+        textCl = Color.Gray;
+        break;
+      case BtnObj.ACTIVE:
+        break;
+      case BtnObj.PRESSED:
+        bgcl = bgCl_press;
+        break;
+      case BtnObj.ROLLON:
+        bgcl = bgCl_on;
+        break;
+    }
+    
+    c.beginPath();
+    c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
+    c.rect(left, top, width, height);
+    c.fill();
+    
+    if( text!=null ) {
+      tren.canvas = canvas;
+      tren.fillColor = textCl;
+      tren.drawTexts([text], x, y);
+      tren.canvas = null;
+    }
+  }
+  
+  void onDispose() { }
+  
 }
 
 /**

@@ -218,7 +218,8 @@ class TankGame extends GScreen {
     });
 
     // 地面
-    geng.add( new Ground() );
+    var ground = new Ground();
+    geng.add( ground );
     
     offset_x = 0.0;
     
@@ -267,6 +268,9 @@ class TankGame extends GScreen {
       
       // 画面表示位置
       offset_x = math.max( 0.0, tank.pos.x - 320.0 );
+      
+      // 地面スクロール
+      ground.translateX = offset_x;
       
       // ステージ終了判定
       if( offset_x >= stageData['length'] ) {

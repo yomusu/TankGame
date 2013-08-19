@@ -315,31 +315,49 @@ class FlyingTarget extends GObj {
  */
 class Ground extends GObj {
   
-  List<Point>  points = new List();
-
+  List  points = new List();
+  
+  num z = 0;
+  num translateX = 0;
+  
+  num marginH = 50;
+  num marginV = 0;
+  
+  num width = 640 + 100;
+  num height= 400 + 0;
+  
+  num get left => -marginH;
+  num get top => -marginV;
+  
   void onInit() {
-    var rand = new math.Random(0);
-    for( int y=0; y<400; y+=200 ) {
-      for( int x=0; x<1600; x+=200 ) {
-        var _x = x + rand.nextInt(200) - 100;
-        var _y = y + rand.nextInt(200) - 100;
-        points.add( new Point(_x,_y) );
-      }
-    }
+    points = [
+      [79,10],   [193,50],   [477,30],   [607,60],
+      [150,200], [292,162],  [427,239],  [559,110],
+      [18,306],  [252,252],  [384,290],  [635,325],
+    ];
   }
   
   void onProcess( RenderList renderList ) {
-    var z = 0;
-    renderList.add( z, draw );
-  }
-  
-  void draw( CanvasElement canvas ) {
-    var img = geng.imageMap["kusa"];
-    var c = canvas.context2D;
-    points.forEach( (p) {
-      var x = p.x - offset_x;
-      var y = p.y;
-      c.drawImageScaled(img, x, y, 50, 50);
+    renderList.add( z, (CanvasElement canvas ) {
+      
+      var img = geng.imageMap["kusa"];
+      var c = canvas.context2D;
+      
+      c.save();
+      c.translate( left, 0 );
+      
+      points.forEach( (p) {
+        
+        var x = p[0] - translateX;
+        var y = p[1];
+        
+        x = x % width;
+        y = y % height;
+        
+        c.drawImageScaled(img, x, y, 50, 50);
+      });
+      
+      c.restore();
     });
   }
   

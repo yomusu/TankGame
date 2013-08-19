@@ -60,7 +60,8 @@ abstract class BtnObj extends GObj {
   num get left => x - (width/2);
   num get top  => y - (height/2);
   
-  num z = 0;
+  /** Z値 */
+  num z = 1000;
   
   var onPress = null;
   

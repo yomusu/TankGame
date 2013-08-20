@@ -18,10 +18,10 @@ void main() {
   
   Timer.run( () {
     
-    geng.imageMap.put("tank", "../octocat.png");
-    geng.imageMap.put("cannon", "../octocat.png");
-    geng.imageMap.put("target", "../octocat.png");
-    geng.imageMap.put("kusa", "../kusa.png");
+    geng.imageMap.put("tank", "./octocat.png");
+    geng.imageMap.put("cannon", "./octocat.png");
+    geng.imageMap.put("target", "./octocat.png");
+    geng.imageMap.put("kusa", "./kusa.png");
     
     var canvas = query("canvas") as CanvasElement;
     canvas.context2D.scale(2.0, 2.0); // for Retina対応

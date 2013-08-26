@@ -54,6 +54,14 @@ class Vector {
     y /= f;
   }
   
+  /** th角度だけ回転する 未検査 */
+  void rotate( num th ) {
+    var xx = (x * math.cos(th)) - (y * math.sin(th));
+    var yy = (x * math.sin(th)) + (y * math.cos(th));
+    x = xx;
+    y = yy;
+  }
+  
   double distance( Vector v ) {
     var xx = this.x - v.x;
     var yy = this.y - v.y;

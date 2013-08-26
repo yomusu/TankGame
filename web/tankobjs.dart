@@ -58,6 +58,7 @@ class Tank extends GObj {
   Sprite sp;
   Vector  speed = new Vector();
   Vector  pos = new Vector();
+  int count = 0;
   
   void onInit() {
     sp = new Sprite( "tank", width:100, height:100 );
@@ -68,6 +69,16 @@ class Tank extends GObj {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
     renderList.add( 0, sp.render );
+    
+    if( ++count==7 ) {
+      count = 0;
+      Smoke smk = new Smoke.slower()
+      ..pos.x = pos.x
+      ..pos.y = pos.y + 90
+      ..z = 10
+      ..wobble(0.5);
+      geng.add( smk );
+    }
   }
   
   /** 弾を打つ */
@@ -115,22 +126,13 @@ class Cannonball extends GObj {
   
   Sprite sp;
   
-  Timer timer;
-  
   void onInit() {
     sp = new Sprite( "cannon", width:50, height:50 );
     sp.offsety = 0;
-    
-    // 移動ルーチン
-    _move();
-    timer = new Timer.periodic( const Duration(milliseconds:50), (t)=>_move() );
   }
   
   void onProcess( RenderList renderList ) {
-    renderList.add( 10, sp.render );
-  }
-  
-  void _move() {
+    
     // 移動&加速
     oldpos.set( pos );
     pos.add( speed );
@@ -158,12 +160,25 @@ class Cannonball extends GObj {
     } on StateError {
       // あたってねえし
     }
+    
+    renderList.add( 10, sp.render );
+    
+    // 煙を出す
+    if( ++count==2 ) {
+      count = 0;
+      
+      var smk = new Smoke.faster()
+      ..pos.x = pos.x
+      ..pos.y = pos.y
+      ..wobble(0.5);
+      
+      geng.add(smk);
+    }
   }
   
-  void onDispose() {
-    if( timer!=null )
-      timer.cancel();
-  }
+  int count = 0;
+  
+  void onDispose() {}
 }
 
 num getDeltaXonH( Vector pos, Vector from, Vector to ) {
@@ -200,11 +215,11 @@ class Target extends GObj {
   Target.fromType( String type ) {
     switch( type ) {
       case 'small':
-        _width = 80;
+        _width = 50;
         _getScore = (dx) => 100;
         break;
       case 'large':
-        _width = 150;
+        _width = 100;
         _getScore = (dx) {
           var d = dx.abs();
           if( d < 5 )

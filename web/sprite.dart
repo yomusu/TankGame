@@ -11,10 +11,16 @@ class Sprite {
   Rect  _rect = null;
   ImageElement _img;
   
+  num _alpha = null;
+  num _scale = null;
+  
   num offsetx = 0,
       offsety = 0;
   num rotate = null;
+  
   bool  isShow = true;
+  
+  
   
   Sprite( String imgKey, { num width:10, num height:10 } ) {
     _img = geng.imageMap[imgKey];
@@ -27,20 +33,41 @@ class Sprite {
   void render( CanvasElement canvas ) {
     if( isShow ) {
       var c = canvas.context2D;
+      c.save();
+      
       if( rotate!=null ) {
-        c.save();
         c.translate(_x,_y);
         c.rotate( rotate );
-        c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
-        c.restore();
       } else {
-        c.save();
         c.translate(_x,_y);
-        c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
-        c.restore();
       }
+      
+      if( _alpha!=null ) {
+        var a = _alpha;
+        a = math.max( a, 0.0 );
+        a = math.min( a, 1.0 );
+        c.globalAlpha = a;
+      }
+      
+      if( _scale!=null )
+        c.scale( _scale, _scale );
+      
+      c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
+      c.restore();
     }
   }
+  
+  /** スケール */
+  num get scale => (_scale!=null) ? _scale : 1.0 ;
+      set scale( num sc ) {
+        _scale = (sc==1.0) ? null : sc;
+      }
+  
+  /** 透明度 */
+  num get opacity => (_alpha!=null) ? _alpha : 1.0;
+      set opacity( num op ) {
+        _alpha = (op==1.0) ? null : op;
+      }
   
   /** 横幅 */
   num get width => _w;

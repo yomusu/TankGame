@@ -3,6 +3,7 @@ library geng;
 import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math' as math;
 
 part 'sprite.dart';
 part 'canvasutil.dart';
@@ -335,6 +336,8 @@ class GEng {
   // Private Member --------
   
   GScreen _screen = null;
+  /** 追加オブジェクトのバッファ */
+  final List<GObj>  _addObjlist = new List();
   
   // Property --------
   
@@ -399,6 +402,10 @@ class GEng {
    */
   void processAll() {
     
+    // 追加オブジェクトリストを本物のリストに追加
+    objlist.addAll( _addObjlist );
+    _addObjlist.clear();
+    
     // Do Processing every object
     objlist.where( (v) => v.isDisposed==false )
     .forEach( (GObj v)=> v.process(_renderList) );
@@ -421,7 +428,7 @@ class GEng {
    * Objの追加
    */
   void add( GObj obj ) {
-    objlist.add(obj);
+    _addObjlist.add(obj);
     obj.onInit();
   }
   

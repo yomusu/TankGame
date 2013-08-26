@@ -3,17 +3,24 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Sample app</title>
+    
+    <meta name="viewport" content="initial-scale=1.0, minimum-scale=0.5, maximum-scale=1.0, width=device-width">
+
+    <title>TankGame3</title>
     <link rel="stylesheet" href="tankgame.css">
     <link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+    
+<style type="text/css">
+* {
+-webkit-user-select: none;
+-webkit-touch-callout: none;
+}
+</style>
+
   </head>
   <body>
-    <h1>TankGame</h1>
-    
-    <div class="field">
       <!-- Retina 対応のためSizeを変えている -->
       <canvas width="1280" height="800" style="width:640px; height:400px"></canvas>
-    </div>
     
     <script type="application/dart" src="tankgame.dart"></script>
     <script src="packages/browser/dart.js"></script>

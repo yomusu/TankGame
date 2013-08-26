@@ -222,31 +222,6 @@ abstract class GScreen {
   
   // Gengとのやりとり ---
 
-  /** マウスボタンのハンドル */
-  void onMouseDown(MouseEvent e) {
-    e.preventDefault();
-    if( onPress!=null ) {
-      var event = new PressEvent()
-      ..event = e
-      ..x = e.client.x - geng.canvas.offsetLeft
-      ..y = e.client.y - geng.canvas.offsetTop;
-      onPress(event);
-    }
-  }
-  
-  void onMouseMove(MouseEvent e) {
-    if( onMove!=null ) {
-      var x = e.client.x - geng.canvas.offsetLeft;
-      var y = e.client.y - geng.canvas.offsetTop;
-      onMove( x, y );
-    }
-  }
-  
-  void onMouseOut( MouseEvent e ) {
-    if( onMoveOut!=null )
-      onMoveOut();
-  }
-  
   /** フレームのTimerハンドル */
   void onTimer() {
     // 毎フレームの処理
@@ -266,7 +241,6 @@ abstract class GScreen {
  * フィールドのPressイベント
  */
 class PressEvent {
-  MouseEvent  event;
   int x,y;
 }
 
@@ -369,16 +343,33 @@ class GEng {
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
-      if( _screen!=null )
-        _screen.onMouseDown(e);
+      if( _screen!=null && _screen.onPress!=null ) {
+        e.preventDefault();
+        var event = new PressEvent()
+        ..x = e.client.x - geng.canvas.offsetLeft
+        ..y = e.client.y - geng.canvas.offsetTop;
+        _screen.onPress(event);
+      }
     });
     canvas.onMouseMove.listen( (MouseEvent e) {
-      if( _screen!=null )
-        _screen.onMouseMove(e);
+      if( _screen!=null && _screen.onMove!=null ) {
+        var x = e.client.x - geng.canvas.offsetLeft;
+        var y = e.client.y - geng.canvas.offsetTop;
+        _screen.onMove( x, y );
+      }
     });
     canvas.onMouseOut.listen( (MouseEvent e) {
-      if( _screen!=null )
-        _screen.onMouseOut(e);
+      if( _screen!=null && _screen.onMoveOut!=null )
+        _screen.onMoveOut();
+    });
+    canvas.onTouchStart.listen( (TouchEvent e) {
+      if( _screen!=null && _screen.onPress!=null ) {
+        e.preventDefault();
+        var event = new PressEvent()
+        ..x = e.touches[0].client.x - geng.canvas.offsetLeft
+        ..y = e.touches[0].client.y - geng.canvas.offsetTop;
+        _screen.onPress(event);
+      }
     });
     
     geng.canvas = canvas;

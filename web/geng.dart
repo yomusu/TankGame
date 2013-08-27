@@ -235,20 +235,20 @@ abstract class GScreen {
     geng.objlist.processAll(_renderList);
       
     // Do Rendering
-    geng.backcanvas.context2D.clearRect(0,0, geng.rect.width, geng.rect.height);
+    geng.backcanvas.context2D.setFillColorRgb(255, 255, 255, 1.0);
+    geng.backcanvas.context2D.fillRect(0,0, geng.rect.width, geng.rect.height);
     _renderList.renderAll( geng.backcanvas );
-    
-    geng.canvas.context2D.clearRect(0,0, geng.rect.width, geng.rect.height);
-    geng.canvas.context2D.drawImage( geng.backcanvas, 0, 0);
     
     // 終わったら削除
     _renderList.clear();
-
     geng.objlist.gcObj();
     
     // 最前面の描画
     if( onFrontRender!=null )
-      onFrontRender(geng.canvas);
+      onFrontRender(geng.backcanvas);
+    
+    // ダブルバッファのフリップ
+    geng.flipBuffer();
   }
   
 }
@@ -433,11 +433,7 @@ class GEng {
         ..height= "${height}px";
       canvas.context2D.scale(2.0, 2.0);
       
-      backcanvas = new CanvasElement( width:width*2, height:height*2 );
-      backcanvas.style
-        ..width = "${width}px"
-        ..height= "${height}px";
-      backcanvas.context2D.scale(2.0, 2.0);
+      backcanvas = canvas;
       
     } else {
       canvas = new CanvasElement( width:width, height:height );
@@ -479,6 +475,10 @@ class GEng {
     geng.canvas = canvas;
   }
   
+  void flipBuffer() {
+    if( isRetina()==false )
+      canvas.context2D.drawImage( backcanvas, 0, 0 );
+  }
   
   FrameTimer frameWatch = new FrameTimer();
   var cpucnt = new FPSCounter();

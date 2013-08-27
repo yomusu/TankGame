@@ -235,8 +235,12 @@ abstract class GScreen {
     geng.objlist.processAll(_renderList);
       
     // Do Rendering
+    geng.backcanvas.context2D.clearRect(0,0, geng.rect.width, geng.rect.height);
+    _renderList.renderAll( geng.backcanvas );
+    
     geng.canvas.context2D.clearRect(0,0, geng.rect.width, geng.rect.height);
-    _renderList.renderAll( geng.canvas );
+    geng.canvas.context2D.drawImage( geng.backcanvas, 0, 0);
+    
     // 終わったら削除
     _renderList.clear();
 
@@ -386,6 +390,7 @@ class GEng {
   
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
+  CanvasElement  backcanvas = null;
   
   final ImageMap  imageMap = new ImageMap();
   
@@ -417,7 +422,28 @@ class GEng {
   /**
    * フィールドを初期化する
    */
-  void initField( { CanvasElement canvas:null }) {
+  void initField( { int width, int height }) {
+    
+    if( isRetina() ) {
+      
+      // for Retina対応
+      canvas = new CanvasElement( width:width*2, height:height*2 );
+      canvas.style
+        ..width = "${width}px"
+        ..height= "${height}px";
+      canvas.context2D.scale(2.0, 2.0);
+      
+      backcanvas = new CanvasElement( width:width*2, height:height*2 );
+      backcanvas.style
+        ..width = "${width}px"
+        ..height= "${height}px";
+      backcanvas.context2D.scale(2.0, 2.0);
+      
+    } else {
+      canvas = new CanvasElement( width:width, height:height );
+      backcanvas = new CanvasElement( width:width, height:height );
+    }
+    
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
@@ -492,14 +518,16 @@ class FrameTimer {
   Stopwatch _watch = new Stopwatch();
   var callback;
   
-  int _time;
+  var targetTime;
+  
+  int _duration;
 
   void start( Duration time, void callback() ) {
-    _time = time.inMicroseconds;
+    _duration = time.inMicroseconds;
     this.callback = callback;
     
     _watch.start();
-    
+    targetTime = _watch.elapsedMicroseconds;
     Timer.run( ()=>next() );
   }
   
@@ -510,11 +538,11 @@ class FrameTimer {
     
     callback();
     
-    // 次のフレームまで待機
-    var actualTime = math.max( _watch.elapsedMicroseconds, _time );
-    _watch.reset();
-    var wait = _time - (actualTime - _time);
-    //print("actualTime=$actualTime  wait=$wait");
+    // 次のフレーム実行時刻
+    targetTime += _duration;
+    var now = _watch.elapsedMicroseconds;
+    var wait = targetTime - now;
+//    print("wait=$wait  on ${_watch.elapsedMicroseconds}");
     new Timer( new Duration(microseconds:wait) , ()=>next() );
   }
   
@@ -537,6 +565,8 @@ class FPSCounter {
   var _total = 0;
   var _fcount = 0;
   var _startTime = 0;
+  
+  var _lastTimeForSecond = 0;
   
   /** 最新のFPS */
   int lastFPS = 0;
@@ -561,13 +591,14 @@ class FPSCounter {
     _total += _watch.elapsedMicroseconds - _startTime;
     _fcount++;
     
-    if( _watch.elapsedMilliseconds >= 1000 ) {
-      _watch.reset();
+    if( (_watch.elapsedMilliseconds - _lastTimeForSecond) >= 1000 ) {
+      _lastTimeForSecond += 1000;
       
       lastFPS = _fcount;
       lastAvgFrameDuration = (_total/_fcount).toInt();
       
-      print( "$lastFPS fps ( $lastAvgFrameDuration us/f)" );
+//      print( "$lastFPS fps ( $lastAvgFrameDuration us/f) on ${_watch.elapsedMilliseconds}" );
+      print( "$lastFPS fps ( ${_total/1000}ms on ${_watch.elapsedMilliseconds}" );
       
       _total = 0;
       _fcount = 0;

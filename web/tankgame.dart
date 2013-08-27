@@ -33,21 +33,10 @@ void main() {
     // Canvas
     var width = 640;
     var height= 600;
-    var canvas;
     
-    if( isRetina() ) {
-      // for Retina対応
-      canvas = new CanvasElement( width:width*2, height:height*2 );
-      canvas.style
-        ..width = "${width}px"
-        ..height= "${height}px";
-      canvas.context2D.scale(2.0, 2.0);
-    } else {
-      canvas = new CanvasElement( width:width, height:height );
-    }
-    query("#place").append( canvas );
+    geng.initField( width:width, height:height );
     
-    geng.initField( canvas:canvas );
+    query("#place").append( geng.canvas );
     
     // 開始
     geng.screen = new Title();

@@ -77,7 +77,7 @@ class Tank extends GObj {
       ..pos.y = pos.y + 90
       ..z = 10
       ..wobble(0.5);
-      geng.add( smk );
+      geng.objlist.add( smk );
     }
   }
   
@@ -104,7 +104,7 @@ class Tank extends GObj {
     
     print( "speed=${b.speed},  delta=${b.delta}" );
     
-    geng.add(b);
+    geng.objlist.add(b);
   }
   
   void onDispose() {
@@ -150,7 +150,7 @@ class Cannonball extends GObj {
     try {
       // 探す
       var t = geng.objlist
-          .where( (e) => e.isDisposed==false && e is Target && e.isBombed==false )
+          .where( (e) => e is Target && e.isBombed==false )
           .firstWhere( (Target e) {
             return e.bomb(this);
           });
@@ -172,7 +172,7 @@ class Cannonball extends GObj {
       ..pos.y = pos.y
       ..wobble(0.5);
       
-      geng.add(smk);
+      geng.objlist.add(smk);
     }
   }
   
@@ -269,7 +269,7 @@ class Target extends GObj {
       ..pos.x = pos.x + _hitdx
       ..pos.y = pos.y
       ..texts[0] = s.toString();
-      geng.add( pop );
+      geng.objlist.add( pop );
       
       // 自分飛んでく
       var ft = new FlyingTarget();
@@ -281,7 +281,7 @@ class Target extends GObj {
         ..y = _width.toDouble() * -1.0
         ..normalize()
         ..mul( 10.0 );
-      geng.add(ft);
+      geng.objlist.add(ft);
       
       dispose();
       
@@ -399,8 +399,8 @@ class ScorePopup extends GObj {
   
   void onInit() {
     
-    speed..y = -5.0;
-    delta..y = 0.2;
+    speed..y = -4.0;
+    delta..y = 0.1;
     
     // 1秒で消えます
     new Timer( const Duration(seconds:1), ()=>dispose() );

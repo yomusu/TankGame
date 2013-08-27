@@ -60,7 +60,7 @@ class Title extends GScreen {
   ..shadowBlur = 10;
   
   void onStart() {
-    geng.disposeAll();
+    geng.objlist.disposeAll();
     
     //---------------------
     // StartGameボタン配置
@@ -75,7 +75,7 @@ class Title extends GScreen {
     ..height= 50
     ..x = 320
     ..y = 220;
-    geng.add( playbtn );
+    geng.objlist.add( playbtn );
     entryButton( playbtn );
     
     //---------------------
@@ -87,7 +87,7 @@ class Title extends GScreen {
     ..height= 50
     ..x = 320
     ..y = 280;
-    geng.add( howtobtn );
+    geng.objlist.add( howtobtn );
     entryButton( howtobtn );
     
     //---------------------
@@ -109,7 +109,7 @@ class Title extends GScreen {
 class StageSelect extends GScreen {
   
   void onStart() {
-    geng.disposeAll();
+    geng.objlist.disposeAll();
     
     // StartGameボタン配置
     var y = 100;
@@ -123,7 +123,7 @@ class StageSelect extends GScreen {
       ..x = 320
       ..y = y
       ..isEnable = stage['enable'];
-      geng.add( btn );
+      geng.objlist.add( btn );
       entryButton( btn );
       
       y += 70;
@@ -157,7 +157,7 @@ class HowToPlay extends GScreen {
   ..strokeColor = null;
   
   void onStart() {
-    geng.disposeAll();
+    geng.objlist.disposeAll();
     
     // 戻るボタン配置
     var retbtn = new PlayButton()
@@ -165,7 +165,7 @@ class HowToPlay extends GScreen {
     ..text = "戻る"
     ..x = 320
     ..y = 300;
-    geng.add( retbtn );
+    geng.objlist.add( retbtn );
     entryButton( retbtn );
     
     // 描画処理
@@ -185,7 +185,7 @@ void _createMap() {
     Target  t = new Target.fromType('large')
     ..pos.x = x.toDouble()
     ..pos.y = y.toDouble();
-    geng.add( t );
+    geng.objlist.add( t );
   }
 }
 
@@ -197,14 +197,14 @@ void _createMap() {
 class TankGame extends GScreen {
   
   void onStart() {
-    geng.disposeAll();
+    geng.objlist.disposeAll();
     
     // 戦車の初期位置
     tank = new Tank()
     ..pos.x = 320.0
     ..pos.y = 300.0
     ..speed.x = stageData['speed'];
-    geng.add( tank );
+    geng.objlist.add( tank );
     
     // スコアをクリア
     score = 0;
@@ -216,12 +216,12 @@ class TankGame extends GScreen {
       ..pos.x = d[0].toDouble()
       ..pos.y = d[1].toDouble();
       
-      geng.add( t );
+      geng.objlist.add( t );
     });
 
     // 地面
     var ground = new Ground();
-    geng.add( ground );
+    geng.objlist.add( ground );
     
     offset_x = 0.0;
     
@@ -254,12 +254,12 @@ class TankGame extends GScreen {
       tank.fire( new Point(tank.pos.x,0) );
       new Timer( const Duration(seconds:1), () { firebtn.isPress = false; });
     };
-    geng.add( firebtn );
+    geng.objlist.add( firebtn );
     entryButton(firebtn);
     
     // スタート表示
     var startLogo = new GameStartLogo();
-    geng.add( startLogo );
+    geng.objlist.add( startLogo );
     
     //-----------
     // 最初の処理
@@ -281,7 +281,7 @@ class TankGame extends GScreen {
         firebtn.dispose();
         
         // 結果表示
-        geng.add( new ResultPrint() );
+        geng.objlist.add( new ResultPrint() );
         
         onPress = (PressEvent e) => geng.screen = new Title();
         onProcess = () {

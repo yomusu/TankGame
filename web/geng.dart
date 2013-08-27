@@ -221,15 +221,27 @@ abstract class GScreen {
   }
   
   // Gengとのやりとり ---
+  
+  final RenderList  _renderList = new RenderList();
 
   /** フレームのTimerハンドル */
   void onTimer() {
+    
     // 毎フレームの処理
     if( onProcess!=null )
       onProcess();
-    // 全てレンダー
-    geng.processAll();
-    geng.gcObj();
+    
+    // Do Processing every object
+    geng.objlist.processAll(_renderList);
+      
+    // Do Rendering
+    geng.canvas.context2D.clearRect(0,0, geng.rect.width, geng.rect.height);
+    _renderList.renderAll( geng.canvas );
+    // 終わったら削除
+    _renderList.clear();
+
+    geng.objlist.gcObj();
+    
     // 最前面の描画
     if( onFrontRender!=null )
       onFrontRender(geng.canvas);
@@ -299,6 +311,62 @@ class ImageMap {
   
 }
 
+class GObjList {
+  
+  /** 追加オブジェクトのバッファ */
+  final List<GObj>  _addObjlist = new List();
+  
+  /** オブジェクトのリスト */
+  final List<GObj>  objlist = new List();
+  
+  
+  /**
+   * DisposeされたGObjを廃棄する
+   */
+  void gcObj() {
+    objlist.removeWhere( (v) => v.isDisposed );
+  }
+  
+  /**
+   * Objの追加
+   */
+  void add( GObj obj ) {
+    _addObjlist.add(obj);
+    obj.onInit();
+  }
+  
+  /**
+   * Objを全て破棄する
+   */
+  void disposeAll() {
+    gcObj();
+    objlist.forEach( (o)=>o.dispose() );
+    gcObj();
+    objlist.clear();
+  }
+  
+  /**
+   * 全てのオブジェクトをProcessしてrenderする
+   */
+  void processAll( RenderList renderList ) {
+    
+    // 追加オブジェクトリストを本物のリストに追加
+    objlist.addAll( _addObjlist );
+    _addObjlist.clear();
+    
+    // Do Processing every object
+    where().forEach( (GObj v)=> v.process(renderList) );
+    
+  }
+  
+  Iterable<GObj> where( [bool test(GObj obj)] ) {
+    var r = objlist.where( (e) => e.isDisposed==false );
+    if( test!=null )
+      return r.where( (e)=>test(e) );
+    return r;
+  }
+}
+
 
 /**************
  * 
@@ -310,13 +378,12 @@ class GEng {
   // Private Member --------
   
   GScreen _screen = null;
-  /** 追加オブジェクトのバッファ */
-  final List<GObj>  _addObjlist = new List();
+  Rect  _rect;
   
   // Property --------
   
-  /** オブジェクトのリスト */
-  final List<GObj>  objlist = new List();
+  GObjList  objlist = new GObjList();
+  
   // フィールド管理は別クラスにすべきかも
   CanvasElement  canvas = null;
   
@@ -332,6 +399,20 @@ class GEng {
         s.onStart();
     });
   }
+  
+  /** フィールドの大きさ */
+  Rect get rect {
+    if( _rect==null ) {
+      var w = canvas.clientWidth;
+      var h = canvas.clientHeight;
+      _rect = new Rect(0,0,w,h);
+    }
+    return _rect;
+  }
+  
+  
+  
+  
   
   /**
    * フィールドを初期化する
@@ -375,77 +456,25 @@ class GEng {
     geng.canvas = canvas;
   }
   
-  /** フィールドの大きさ */
-  Rect get rect {
-    if( _rect==null ) {
-      var w = canvas.clientWidth;
-      var h = canvas.clientHeight;
-      _rect = new Rect(0,0,w,h);
-    }
-    return _rect;
-  }
-  Rect  _rect;
   
-  final RenderList  _renderList = new RenderList();
-  
-  /**
-   * 全てのオブジェクトをProcessしてrenderする
-   */
-  void processAll() {
-    
-    // 追加オブジェクトリストを本物のリストに追加
-    objlist.addAll( _addObjlist );
-    _addObjlist.clear();
-    
-    // Do Processing every object
-    objlist.where( (v) => v.isDisposed==false )
-    .forEach( (GObj v)=> v.process(_renderList) );
-    
-    // Do Rendering
-    canvas.context2D.clearRect(0,0, rect.width, rect.height);
-    _renderList.renderAll( canvas );
-    // 終わったら削除
-    _renderList.clear();
-  }
-  
-  /**
-   * DisposeされたGObjを廃棄する
-   */
-  void gcObj() {
-    objlist.removeWhere( (v) => v.isDisposed );
-  }
-  
-  /**
-   * Objの追加
-   */
-  void add( GObj obj ) {
-    _addObjlist.add(obj);
-    obj.onInit();
-  }
-  
-  /**
-   * Objを全て破棄する
-   */
-  void disposeAll() {
-    gcObj();
-    objlist.forEach( (o)=>o.dispose() );
-    gcObj();
-    objlist.clear();
-  }
-  
-  Timer _timer;
+  FrameTimer frameWatch = new FrameTimer();
+  var cpucnt = new FPSCounter();
   
   /**
    * フレームタイマーをスタートする
    */
   void startTimer() {
     
-    if( _timer!=null )
-      stopTimer();
-    
-    _timer = new Timer.periodic( const Duration(milliseconds:50), (Timer t) {
-      if( _screen!=null ) 
+    cpucnt.init();
+    frameWatch.start( const Duration(milliseconds:20), () {
+      // フレームの処理
+      cpucnt.open();
+      
+      if( _screen!=null ) {
         _screen.onTimer();
+      }
+      
+      cpucnt.shut();
     });
   }
   
@@ -453,13 +482,99 @@ class GEng {
    * フレームタイマーを停止する
    */
   void stopTimer() {
-    if( _timer!=null ) {
-      _timer.cancel();
-      _timer = null;
-    }
+    frameWatch.dispose();
+    cpucnt.dispose();
   }
 }
 
 GEng geng = new GEng();
 
 
+class FrameTimer {
+  
+  Stopwatch _watch = new Stopwatch();
+  var callback;
+  
+  int _time;
+
+  void start( Duration time, void callback() ) {
+    _time = time.inMicroseconds;
+    this.callback = callback;
+    
+    _watch.start();
+    
+    Timer.run( ()=>next() );
+  }
+  
+  void next() {
+    
+    if( _watch==null )
+      return;
+    
+    callback();
+    
+    // 次のフレームまで待機
+    var actualTime = math.max( _watch.elapsedMicroseconds, _time );
+    _watch.reset();
+    var wait = _time - (actualTime - _time);
+    //print("actualTime=$actualTime  wait=$wait");
+    new Timer( new Duration(microseconds:wait) , ()=>next() );
+  }
+  
+  void dispose() {
+    if( _watch!=null ) {
+      _watch.stop();
+      _watch = null;
+    }
+  }
+}
+
+
+/**
+ * FPSカウンター
+ */
+class FPSCounter {
+  
+  Stopwatch _watch = new Stopwatch();
+  
+  var _total = 0;
+  var _fcount = 0;
+  var _startTime = 0;
+  
+  /** 最新のFPS */
+  int lastFPS = 0;
+  /** 最新のフレーム処理時間(最後の秒からの平均) */
+  int lastAvgFrameDuration = 0;
+  
+  
+  void init() {
+    _watch.start();
+  }
+  
+  void dispose() {
+    _watch.stop();
+    _watch == null;
+  }
+  
+  void open() {
+    _startTime = _watch.elapsedMicroseconds;
+  }
+  
+  void shut() {
+    _total += _watch.elapsedMicroseconds - _startTime;
+    _fcount++;
+    
+    if( _watch.elapsedMilliseconds >= 1000 ) {
+      _watch.reset();
+      
+      lastFPS = _fcount;
+      lastAvgFrameDuration = (_total/_fcount).toInt();
+      
+      print( "$lastFPS fps ( $lastAvgFrameDuration us/f)" );
+      
+      _total = 0;
+      _fcount = 0;
+    }
+  }
+  
+}

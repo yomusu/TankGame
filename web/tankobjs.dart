@@ -105,6 +105,8 @@ class Tank extends GObj {
     print( "speed=${b.speed},  delta=${b.delta}" );
     
     geng.objlist.add(b);
+    
+    geng.soundManager.play("fire");
   }
   
   void onDispose() {
@@ -284,6 +286,8 @@ class Target extends GObj {
       geng.objlist.add(ft);
       
       dispose();
+      
+      geng.soundManager.play("bomb");
       
       return true;
     } else {

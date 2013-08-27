@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:math' as math;
+import 'dart:web_audio';
 
 part 'sprite.dart';
 part 'canvasutil.dart';
@@ -393,6 +394,7 @@ class GEng {
   CanvasElement  backcanvas = null;
   
   final ImageMap  imageMap = new ImageMap();
+  final SoundManager soundManager = new SoundManager();
   
   // setter/getter --------
   
@@ -616,4 +618,49 @@ bool isRetina() {
   var ratio = window.devicePixelRatio;
   
   return (ratio==2);
+}
+
+class SoundManager {
+  
+  AudioContext audioContext = new AudioContext();
+  GainNode gainNode = null;
+  
+  Map<String,AudioBuffer> map = new Map();
+  
+  SoundManager() {
+    gainNode = audioContext.createGain();
+    gainNode.connectNode(audioContext.destination, 0, 0);
+  }
+  
+  Future<String> put( String key, String filename ) {
+    
+    var comp = new Completer();
+    
+    HttpRequest xhr = new HttpRequest()
+      ..open("GET", filename)
+      ..responseType = "arraybuffer";
+    
+    xhr.onLoad.listen((e) {
+      // 音声データのデコード
+      audioContext.decodeAudioData(xhr.response)
+      .then( (AudioBuffer buffer) {
+          map[key] = buffer;
+          print("loaded ${filename}");
+          comp.complete(key);
+      })
+      .catchError( (error) {
+        comp.completeError(error);
+      });
+    });
+    xhr.onError.listen((e)=> comp.completeError(e));
+    xhr.send();
+    return comp.future;
+  }
+  
+  void play( String key ) {
+    AudioBufferSourceNode source = audioContext.createBufferSource()
+    ..connectNode(gainNode, 0, 0)
+    ..buffer = map[key]
+    ..start(0);
+  }
 }

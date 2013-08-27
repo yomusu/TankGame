@@ -27,6 +27,10 @@ void main() {
       ..put("kusa", "./kusa.png")
       ..put("smoke", "./img/kemuri.png");
     
+    // サウンド読み込み
+    geng.soundManager.put("fire","./sound/bomb.ogg");
+    geng.soundManager.put("bomb","./sound/launch02.ogg");
+    
     // Retina
     query("#devicePixelRatio").text = window.devicePixelRatio.toString();
     
@@ -76,6 +80,7 @@ class Title extends GScreen {
     // StartGameボタン配置
     var playbtn = new PlayButton()
     ..onPress = (){
+      geng.soundManager.play("fire");
       new Timer( const Duration(seconds:1), () {
         geng.screen = new StageSelect();
       });

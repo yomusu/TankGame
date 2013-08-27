@@ -6,24 +6,24 @@ part of tankgame;
 List  stageList = [
    // Stage1
    { 'enable':true, 'name':"stage1",
-     'speed':3.0, 'length':1200,
+     'speed':3.0, 'length':1900,
      'map':[
-         [ 600, 50, "large" ],
-         [ 800, 50, "large" ],
-         [ 1000, 50, "small" ],
+         [ 900, 80, "large" ],
+         [ 1300, 80, "large" ],
+         [ 1700, 80, "small" ],
      ]
    },
    // Stage2
    { 'enable':true, 'name':"stage2",
-     'speed':3.0, 'length':1300,
+     'speed':3.0, 'length':2100,
      'map':[
-         [ 600, 50, "large" ],
-         [ 700, 150, "small" ],
-         [ 800, 180, "small" ],
-         [ 850, 70, "large" ],
-         [ 910, 200, "small" ],
-         [ 1000, 50, "large" ],
-         [ 1100, 70, "large" ],
+         [ 900, 50, "large" ],
+         [ 1100, 150, "small" ],
+         [ 1300, 180, "small" ],
+         [ 1450, 70, "large" ],
+         [ 1610, 200, "small" ],
+         [ 1700, 50, "large" ],
+         [ 1900, 70, "large" ],
      ]
    },
    // Stage3

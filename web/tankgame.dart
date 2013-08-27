@@ -19,16 +19,37 @@ void main() {
   
   Timer.run( () {
     
-    geng.imageMap.put("tank", "./octocat.png");
-    geng.imageMap.put("cannon", "./octocat.png");
-    geng.imageMap.put("target", "./img/doramu.png");
-    geng.imageMap.put("kusa", "./kusa.png");
-    geng.imageMap.put("smoke", "./img/kemuri.png");
+    // 画像読み込み
+    geng.imageMap
+      ..put("tank", "./octocat.png")
+      ..put("cannon", "./octocat.png")
+      ..put("target", "./img/doramu.png")
+      ..put("kusa", "./kusa.png")
+      ..put("smoke", "./img/kemuri.png");
     
-    var canvas = query("canvas") as CanvasElement;
-    canvas.context2D.scale(2.0, 2.0); // for Retina対応
-    geng.initField( canvas:canvas, width:640, height:400 );
+    // Retina
+    query("#devicePixelRatio").text = window.devicePixelRatio.toString();
     
+    // Canvas
+    var width = 640;
+    var height= 600;
+    var canvas;
+    
+    if( isRetina() ) {
+      // for Retina対応
+      canvas = new CanvasElement( width:width*2, height:height*2 );
+      canvas.style
+        ..width = "${width}px"
+        ..height= "${height}px";
+      canvas.context2D.scale(2.0, 2.0);
+    } else {
+      canvas = new CanvasElement( width:width, height:height );
+    }
+    query("#place").append( canvas );
+    
+    geng.initField( canvas:canvas );
+    
+    // 開始
     geng.screen = new Title();
     geng.startTimer();
   });
@@ -202,7 +223,7 @@ class TankGame extends GScreen {
     // 戦車の初期位置
     tank = new Tank()
     ..pos.x = 320.0
-    ..pos.y = 300.0
+    ..pos.y = 500.0
     ..speed.x = stageData['speed'];
     geng.objlist.add( tank );
     

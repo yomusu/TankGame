@@ -338,13 +338,17 @@ class Ground extends GObj {
   num marginH = 50;
   num marginV = 0;
   
-  num width = 640 + 100;
-  num height= 400 + 0;
+  num width;
+  num height;
   
   num get left => -marginH;
   num get top => -marginV;
   
   void onInit() {
+    
+    width = geng.rect.width + (marginH*2);
+    height= geng.rect.height+ (marginV*2);
+    
     points = [
       [79,10],   [193,50],   [477,30],   [607,60],
       [150,200], [292,162],  [427,239],  [559,110],
@@ -364,7 +368,7 @@ class Ground extends GObj {
       points.forEach( (p) {
         
         var x = p[0] - translateX;
-        var y = p[1];
+        var y = p[1] * 1.5;
         
         x = x % width;
         y = y % height;

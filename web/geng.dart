@@ -417,10 +417,7 @@ class GEng {
   /**
    * フィールドを初期化する
    */
-  void initField( { int width:200, int height:200, CanvasElement canvas:null }) {
-    
-    if( canvas==null )
-      canvas = new CanvasElement(width:width, height:height);
+  void initField( { CanvasElement canvas:null }) {
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
@@ -577,4 +574,15 @@ class FPSCounter {
     }
   }
   
+}
+
+
+/**
+ * Retinaディスプレイかどうか
+ */
+bool isRetina() {
+  
+  var ratio = window.devicePixelRatio;
+  
+  return (ratio==2);
 }

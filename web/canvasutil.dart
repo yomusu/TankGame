@@ -93,7 +93,7 @@ class TextRender {
     }
     
     if( strokeColor!=null ) {
-      _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, 1);
+      _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
       var _y = y;
       strs.forEach( (s) {
         _con.strokeText( s, x, _y );
@@ -118,7 +118,7 @@ class Color {
   int get r => red;
   int get g => green;
   int get b => blue;
-  int get a => alpha;
+  num get a => alpha;
   
   Color.fromString( String rgb ) {
     if( rgb.startsWith("#") ) {
@@ -141,4 +141,100 @@ class Color {
   
   String get rgba => "rgba($red,$green,$blue,$alpha)";
 }
+
+const R90 = math.PI * 0.5;
+const R180 = math.PI;
+
+void roundRect( CanvasRenderingContext2D c, num left, num top, num w, num h, num radius) {
+  
+  var l = left + radius;
+  var t = top + radius;
+  var r = left + w - radius;
+  var b = top + h - radius;
+  
+  c.arc( l, t, radius, -R180, -R90 );
+  c.arc( r, t, radius,  -R90,    0 );
+  c.arc( r, b, radius,     0,  R90 );
+  c.arc( l, b, radius,   R90, R180 );
+}  
+
+
+class DefaultButtonRender {
+  
+  Color shadow    = new Color.fromString("#bbbbbb");
+  Color bg_normal = new Color.fromString("#ffffff");
+  Color border_normal = new Color.fromString("#fdba1d");
+  Color border_on = new Color.fromString("#ff0000");
+  Color border_disable = new Color.fromString("#ffeaba");
+  
+  var tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle"
+  ..fillColor = Color.Black
+  ..strokeColor = null;
+  
+  void render( CanvasElement canvas, GButton btn ) {
+    
+    var status = btn.status;
+    var left = btn.left;
+    var top = btn.top;
+    var width = btn.width;
+    var height= btn.height;
+    
+    var c = canvas.context2D;
+    
+    var textCl = Color.Black;
+    var bg     = bg_normal;
+    var border = border_normal;
+    
+    switch( status ) {
+      case GButton.DISABLE:
+        textCl = Color.Gray;
+        border = border_disable;
+        break;
+      case GButton.ROLLON:
+        border = border_on;
+        break;
+    }
+    
+    c.save();
+    
+    // 影
+    c.beginPath();
+    c.setFillColorRgb( shadow.r, shadow.g, shadow.b );
+    roundRect( c, left, top+5, width, height, 20 );
+    c.closePath();
+    c.fill();
+    
+    
+    // 表面
+    if( status==GButton.PRESSED )
+      c.translate(0,4);
+    
+    c.beginPath();
+    // 背景
+    roundRect( c, left+2, top+2, width-4, height-4, 18 );
+    c.closePath();
+    c.setFillColorRgb( bg.r, bg.g, bg.b );
+    c.fill();
+    // ボーダー
+    c.setStrokeColorRgb( border.r, border.g, border.b );
+    c.lineWidth = 4;
+    c.stroke();
+    
+    if( btn.text!=null ) {
+      tren.canvas = canvas;
+      tren.fillColor = textCl;
+      tren.drawTexts([btn.text], btn.x, btn.y);
+      tren.canvas = null;
+    }
+    
+    c.restore();
+  }
+  
+}
+
+
 

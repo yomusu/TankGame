@@ -62,11 +62,11 @@ double  offset_x = 0.0;
 class Title extends GScreen {
   
   TextRender  tren = new TextRender()
-  ..fontFamily = fontFamily
-  ..fontSize = "24pt"
+  ..fontFamily = scoreFont
+  ..fontSize = "28pt"
   ..textAlign = "center"
   ..textBaseline = "middle"
-  ..lineWidth = 1.0
+  ..lineWidth = 2.0
   ..strokeColor = Color.Black
   ..fillColor = Color.Yellow
   ..shadowColor = new Color.fromAlpha(0.5)
@@ -78,7 +78,7 @@ class Title extends GScreen {
     
     //---------------------
     // StartGameボタン配置
-    var playbtn = new PlayButton()
+    var playbtn = new GButton()
     ..onPress = (){
       geng.soundManager.play("fire");
       new Timer( const Duration(seconds:1), () {
@@ -89,27 +89,27 @@ class Title extends GScreen {
     ..width = 150
     ..height= 50
     ..x = 320
-    ..y = 220;
+    ..y = 320;
     geng.objlist.add( playbtn );
-    entryButton( playbtn );
+    btnList.add( playbtn );
     
     //---------------------
     // How to Playボタンの配置
-    var howtobtn = new PlayButton()
+    var howtobtn = new GButton()
     ..onPress = (){ geng.screen = new HowToPlay(); }
     ..text = "あそびかた"
     ..width = 150
     ..height= 50
     ..x = 320
-    ..y = 280;
+    ..y = 380;
     geng.objlist.add( howtobtn );
-    entryButton( howtobtn );
+    btnList.add( howtobtn );
     
     //---------------------
     // 最前面描画処理
     onFrontRender = ( CanvasElement canvas ) {
       tren.canvas = canvas;
-      tren.drawTexts(["Tank Game"], 320, 100 );
+      tren.drawTexts(["Tank Game"], 320, 150 );
       tren.canvas = null;
     };
     
@@ -127,10 +127,10 @@ class StageSelect extends GScreen {
     geng.objlist.disposeAll();
     
     // StartGameボタン配置
-    var y = 100;
+    var y = 200;
     for( var stage in stageList ) {
       
-      var btn = new PlayButton()
+      var btn = new GButton()
       ..onPress = ( ()=>goToStage( stage ) )
       ..text = stage['name']
       ..width = 150
@@ -139,7 +139,7 @@ class StageSelect extends GScreen {
       ..y = y
       ..isEnable = stage['enable'];
       geng.objlist.add( btn );
-      entryButton( btn );
+      btnList.add( btn );
       
       y += 70;
     }
@@ -175,13 +175,13 @@ class HowToPlay extends GScreen {
     geng.objlist.disposeAll();
     
     // 戻るボタン配置
-    var retbtn = new PlayButton()
+    var retbtn = new GButton()
     ..onPress = () { geng.screen = new Title(); }
     ..text = "戻る"
     ..x = 320
     ..y = 300;
     geng.objlist.add( retbtn );
-    entryButton( retbtn );
+    btnList.add( retbtn );
     
     // 描画処理
     onFrontRender = (CanvasElement canvas) {
@@ -257,20 +257,9 @@ class TankGame extends GScreen {
     
     //-------
     // Fireボタン配置
-    var firebtn = new PlayButton()
-    ..onPress = () { geng.screen = new Title(); }
-    ..text = "うつ!"
-    ..x = 100
-    ..y = 350
-    ..width = 90
-    ..height= 40
-    ..isEnable = false;
-    firebtn.onPress = () {
-      tank.fire( new Point(tank.pos.x,0) );
-      new Timer( const Duration(seconds:1), () { firebtn.isPress = false; });
-    };
+    var firebtn = new FireButton();
     geng.objlist.add( firebtn );
-    entryButton(firebtn);
+    btnList.add(firebtn);
     
     // スタート表示
     var startLogo = new GameStartLogo();
@@ -298,7 +287,15 @@ class TankGame extends GScreen {
         // 結果表示
         geng.objlist.add( new ResultPrint() );
         
-        onPress = (PressEvent e) => geng.screen = new Title();
+        // 戻るボタン配置
+        var retBtn = new GButton()
+        ..onPress = () { geng.screen = new Title(); }
+        ..text = "戻る"
+        ..x = 320 ..y = 400
+        ..width = 100 ..height= 40;
+        geng.objlist.add( retBtn );
+        btnList.add( retBtn );
+        
         onProcess = () {
           tank.pos.add( tank.speed );
         };
@@ -309,9 +306,129 @@ class TankGame extends GScreen {
     new Timer( const Duration(seconds:2), () {
       // スタートロゴを消す
       startLogo.dispose();
-      // Fireボタンを押せるように
-      firebtn.isEnable = true;
     });
   }
 
 }
+
+
+class FireButton extends GButton {
+  
+  FireButton() {
+    renderer = render;
+    text = "うつ!";
+    x = 540;
+    y = 530;
+    width = 120;
+    height= 60;
+    
+    onPress = fire;
+  }
+  
+  num power=1.0;
+  
+  void fire() {
+    
+    tank.fire( new Point(tank.pos.x,0) );
+    power = 0.0;
+    
+    new Timer( const Duration(milliseconds:200), () => startCharge() );
+  }
+  
+  void startCharge() {
+    new Timer.periodic( const Duration(milliseconds:50), (t) {
+      power += 0.05;
+      if( power >= 1.0 ) {
+        power = 1.0;
+        t.cancel();
+        new Timer( const Duration(milliseconds:100), () => isPress = false );
+      }
+    });
+  }
+  
+  static Color shadow    = new Color.fromString("#c20000");
+  static Color bg_normal = new Color.fromString("#ff3030");
+  static Color border_normal = new Color.fromString("#d9000b");
+  
+  static var tren = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle"
+  ..fillColor = new Color.fromString("#FFFFFF")
+  ..strokeColor = new Color.fromString("#FFFFFF")
+  ..lineWidth = 1;
+  
+  static var trenOff = new TextRender()
+  ..fontFamily = fontFamily
+  ..fontSize = "14pt"
+  ..textAlign = "center"
+  ..textBaseline = "middle"
+  ..fillColor = new Color.fromString("#a64040")
+  ..strokeColor = null;
+  
+
+  void render( CanvasElement canvas, GButton btn ) {
+    
+    var status = btn.status;
+    var left = btn.left;
+    var top = btn.top;
+    var width = btn.width;
+    var height= btn.height;
+    
+    var c = canvas.context2D;
+    
+    var bg     = bg_normal;
+    var border = border_normal;
+    
+    c.save();
+    
+    // 影
+    c.beginPath();
+    c.setFillColorRgb( shadow.r, shadow.g, shadow.b );
+    roundRect( c, left, top+10, width, height, 30 );
+    c.closePath();
+    c.fill();
+    
+    
+    // 表面
+    if( status==GButton.PRESSED )
+      c.translate(0,4);
+    
+    c.beginPath();
+    // 背景
+    roundRect( c, left+2, top+2, width-4, height-4, 28 );
+    c.closePath();
+    c.setFillColorRgb( bg.r, bg.g, bg.b );
+    c.fill();
+    // ボーダー
+    c.setStrokeColorRgb( border.r, border.g, border.b );
+    c.lineWidth = 4;
+    c.stroke();
+    
+    //---------
+    // テキスト
+    var tr = trenOff;
+    if( status==GButton.ROLLON || status==GButton.ACTIVE )
+      tr = tren;
+      
+    tr.canvas = canvas;
+    tr.drawTexts([btn.text], btn.x+5, btn.y);
+    tr.canvas = null;
+    
+    // チャージサイン
+    var cx = left + 30;
+    var cy = btn.y;
+      
+    c.beginPath();
+    c.moveTo(cx,cy);
+    c.arc( cx, cy, 8, -R90, (2*math.PI * power)-R90 );
+    c.moveTo(cx,cy);
+    c.setFillColorRgb( tr.fillColor.r, tr.fillColor.g, tr.fillColor.b );
+    c.fill();
+    
+    c.restore();
+  }
+  
+}
+

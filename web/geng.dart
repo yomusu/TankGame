@@ -46,7 +46,12 @@ abstract class GObj {
   }
 }
 
-abstract class BtnObj extends GObj {
+
+DefaultButtonRender  defaultButtonRenderer = new DefaultButtonRender();
+
+typedef void ButtonRenderer( CanvasElement canvas, GButton btn );
+
+class GButton extends GObj {
   
   static const int  HIDDEN = -1;
   static const int  DISABLE= 0;
@@ -54,44 +59,20 @@ abstract class BtnObj extends GObj {
   static const int  ROLLON = 3;
   static const int  PRESSED= 7;
   
+  // member properties ----
+  
   num x = 320;
   num y = 180;
   num width = 100;
   num height= 50;
   
-  num get left => x - (width/2);
-  num get top  => y - (height/2);
-  
   /** Z値 */
   num z = 1000;
   
-  var onPress = null;
+  // getter properties ----
   
-  bool  isOn = false;
-  bool  isPress = false;
-  bool  isVisible = true;
-  bool  isEnable = true;
-
-  bool isIn( num mx, num my ) {
-    
-    if( isVisible==false )
-      return false;
-    if( isEnable==false )
-      return false;
-    
-    var xx = mx - left;
-    var yy = my - top;
-    bool  inH = ( xx>=0 && xx<width );
-    bool  inV = ( yy>=0 && yy<height);
-    
-    return ( inH && inV );
-  }
-  
-  void onProcess( RenderList renderList ) {
-    var s = status;
-    if( s!=HIDDEN )
-      renderList.add(z, (c)=>render(c,s) );
-  }
+  num get left => x - (width/2);
+  num get top  => y - (height/2);
   
   int get status {
     
@@ -108,61 +89,83 @@ abstract class BtnObj extends GObj {
     return ACTIVE;
   }
   
-  void render( CanvasElement canvas, int status ) {
-  }
-}
-
-class PlayButton extends BtnObj {
+  
+  var onPress = null;
+  
+  bool  isOn = false;
+  bool  isPress = false;
+  bool  isVisible = true;
+  bool  isEnable = true;
   
   String  text;
   
-  Color bgCl_normal = new Color.fromString("#eeeeee");
-  Color bgCl_on     = new Color.fromString("#00ee00");
-  Color bgCl_press  = new Color.fromString("#ee0000");
+  /** ボタンレンダラ:差し替え可能 */
+  ButtonRenderer renderer = defaultButtonRenderer.render;
   
-  var tren = new TextRender()
-  ..fontFamily = fontFamily
-  ..fontSize = "14pt"
-  ..textAlign = "center"
-  ..textBaseline = "middle"
-  ..fillColor = Color.Black
-  ..strokeColor = null;
+  bool isIn( num mx, num my ) {
+    
+    if( isVisible==false )
+      return false;
+    if( isEnable==false )
+      return false;
+    
+    var xx = mx - left;
+    var yy = my - top;
+    bool  inH = ( xx>=0 && xx<width );
+    bool  inV = ( yy>=0 && yy<height);
+    
+    return ( inH && inV );
+  }
   
-  void onInit() { }
+  void onInit(){}
   
-  void render( CanvasElement canvas, int status ) {
-    var c = canvas.context2D;
-    
-    var textCl = Color.Black;
-    var bgcl = bgCl_normal;
-    switch( status ) {
-      case BtnObj.DISABLE:
-        textCl = Color.Gray;
-        break;
-      case BtnObj.ACTIVE:
-        break;
-      case BtnObj.PRESSED:
-        bgcl = bgCl_press;
-        break;
-      case BtnObj.ROLLON:
-        bgcl = bgCl_on;
-        break;
-    }
-    
-    c.beginPath();
-    c.setFillColorRgb( bgcl.r, bgcl.g, bgcl.b );
-    c.rect(left, top, width, height);
-    c.fill();
-    
-    if( text!=null ) {
-      tren.canvas = canvas;
-      tren.fillColor = textCl;
-      tren.drawTexts([text], x, y);
-      tren.canvas = null;
+  void onProcess( RenderList renderList ) {
+    var s = status;
+    if( s!=HIDDEN )
+      renderList.add(z, (c)=>renderer(c,this) );
+  }
+  
+  void onDispose(){}
+}
+
+/**
+ * ボタンリスト
+ * ボタンっていうか入力デバイスをハンドルするオブジェクト
+ */
+class ButtonList {
+  
+  /** List of Buttons */ 
+  List<GButton>  _btnList = null;
+
+  void add( GButton btn ) {
+    if( _btnList==null )
+      _btnList = new List();
+    _btnList.add( btn );
+  }
+  
+  /** entryされたボタンすべてに対しPress処理をする */
+  void onPress(PressEvent e) {
+    if( _btnList!=null ) {
+      _btnList.where( (b) => b.isPress==false )
+        .forEach( (GButton b) {
+          if( b.isIn( e.x, e.y ) ) {
+            b.isPress = true;
+            if( b.onPress!=null )
+              b.onPress();
+          }
+        });
     }
   }
   
-  void onDispose() { }
+  /** entryされたボタンすべてに対しMove処理をする */
+  void onMouseMove( int x, int y ) {
+    if( _btnList!=null ) {
+      _btnList.where( (b) => b.isPress==false )
+        .forEach( (GButton b) {
+          b.isOn = b.isIn( x, y );
+        });
+    }
+  }
   
 }
 
@@ -171,60 +174,33 @@ class PlayButton extends BtnObj {
  */
 abstract class GScreen {
   
+  /** レンダリングリスト */
+  final RenderList  _renderList = new RenderList();
+
   // メンバ変数 ---
+  
+  /** List of Buttons */ 
+  ButtonList  btnList = new ButtonList();
   
   /** 毎フレームの処理 */
   var onProcess = null;
   /** 最前面描画 */
   var onFrontRender = null;
+  
   /** 入力デバイスのプレスイベント */
-  var onPress = null;
-  var onMove = null;
+  void onPress( PressEvent e ) => btnList.onPress(e);
+  void onMove( int x, int y ) => btnList.onMouseMove(x, y);
   var onMoveOut = null;
+  
   
   // オーバーライドすべきメソッド ---
 
   /** スタート処理:You can override this method. */
   void onStart();
   
-  // ボタン処理 -------------------
   
-  /** List of Buttons */ 
-  List<BtnObj>  btnList = null;
+  // オーバーライドしなくてよいメソッド ---
   
-  /** entry button to list */ 
-  void entryButton( BtnObj btn ) {
-    if( btnList==null )
-      btnList = new List();
-    btnList.add(btn);
-    // update press handler!!
-    onPress = _onPressForBtn;
-    onMove = _onMouseMoveForBtn;
-  }
-  
-  // entryされたボタンすべてに対しPress処理をする
-  void _onPressForBtn(PressEvent e) {
-    btnList.where( (b) => b.isPress==false )
-    .forEach( (BtnObj b) {
-      if( b.isIn( e.x, e.y ) ) {
-        b.isPress = true;
-        if( b.onPress!=null )
-          b.onPress();
-      }
-    });
-  }
-  // entryされたボタンすべてに対しMove処理をする
-  void _onMouseMoveForBtn( int x, int y ) {
-    btnList.where( (b) => b.isPress==false )
-    .forEach( (BtnObj b) {
-      b.isOn = b.isIn( x, y );
-    });
-  }
-  
-  // Gengとのやりとり ---
-  
-  final RenderList  _renderList = new RenderList();
-
   /** フレームのTimerハンドル */
   void onTimer() {
     
@@ -627,6 +603,9 @@ class SoundManager {
   
   Map<String,AudioBuffer> map = new Map();
   
+  
+  bool  soundOn = false;
+  
   SoundManager() {
     gainNode = audioContext.createGain();
     gainNode.connectNode(audioContext.destination, 0, 0);
@@ -658,9 +637,11 @@ class SoundManager {
   }
   
   void play( String key ) {
-    AudioBufferSourceNode source = audioContext.createBufferSource()
-    ..connectNode(gainNode, 0, 0)
-    ..buffer = map[key]
-    ..start(0);
+    if( soundOn ) {
+      AudioBufferSourceNode source = audioContext.createBufferSource()
+          ..connectNode(gainNode, 0, 0)
+            ..buffer = map[key]
+      ..start(0);
+    }
   }
 }

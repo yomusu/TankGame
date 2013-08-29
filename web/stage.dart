@@ -8,9 +8,9 @@ List  stageList = [
    { 'enable':true, 'name':"stage1",
      'speed':3.0, 'length':1900,
      'map':[
-         [ 900, 80, "large" ],
-         [ 1300, 80, "large" ],
-         [ 1700, 80, "small" ],
+         [ 900, 100, "large" ],
+         [ 1300, 100, "large" ],
+         [ 1700, 100, "small" ],
      ]
    },
    // Stage2

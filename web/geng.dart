@@ -491,6 +491,9 @@ class GEng {
     frameWatch.dispose();
     cpucnt.dispose();
   }
+  
+  
+  math.Random  rand = new math.Random(3000);
 }
 
 GEng geng = new GEng();

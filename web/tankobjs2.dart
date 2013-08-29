@@ -4,8 +4,6 @@ part of tankgame;
 
 class Smoke extends GObj {
   
-  static math.Random  rand = new math.Random(3000);
-  
   num z = 0;
   num dOpcity;
   num dScale;
@@ -31,9 +29,27 @@ class Smoke extends GObj {
     dScale = 0.05;
   }
   
-  void wobble( num range ) {
-    speed.x = (rand.nextDouble() - 0.5) * range;
-    speed.y = (rand.nextDouble() - 0.5) * range;
+  Smoke.bigger( { num width, num height } ) {
+    sp = new Sprite( "smoke", width:width, height:height);
+    sp.opacity = 3.0;
+    sp.scale = 1.0;
+    dOpcity = -0.1;
+    dScale = 0.05;
+  }
+  
+  void scaleRange( num from, num delta ) {
+    sp.scale = from;
+    dScale = delta;
+  }
+  
+  void wobble( num angle1, num angle2 ) {
+    speed.unit();
+    
+    var r = geng.rand.nextDouble();
+    var rot = (angle1 * r) + (angle2 * (1.0-r) );
+    speed.rotate( rot );
+    
+    speed.mul(0.5);
   }
   
   void onInit() {}

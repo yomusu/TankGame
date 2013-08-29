@@ -8,14 +8,19 @@ class Vector {
   double  x;
   double  y;
   
-  Vector() {
-    this.x = 0.0;
-    this.y = 0.0;
-  }
+  Vector() : x = 0.0, y = 0.0;
+  
+  Vector.asUnit() : x=1.0, y=0.0;
   
   Vector.fromPos( num x, num y ) {
     this.x = x.toDouble();
     this.y = y.toDouble();
+  }
+  
+  
+  void unit() {
+    x = 1.0;
+    y = 0.0;
   }
   
   void add( Vector v) {

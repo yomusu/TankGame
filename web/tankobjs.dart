@@ -72,7 +72,7 @@ class Tank extends GObj {
       ..pos.x = pos.x
       ..pos.y = pos.y + 90
       ..z = 10
-      ..wobble(0.5);
+      ..wobble( R180, R180+(R90/2.0) );
       geng.objlist.add( smk );
     }
   }
@@ -175,8 +175,7 @@ class Cannonball extends GObj {
       
       var smk = new Smoke.faster()
       ..pos.x = pos.x
-      ..pos.y = pos.y
-      ..wobble(0.5);
+      ..pos.y = pos.y;
       
       geng.objlist.add(smk);
     }
@@ -288,6 +287,11 @@ class Target extends GObj {
         ..mul( 10.0 );
       geng.objlist.add(ft);
       
+      // 爆発を配置
+      var bomb = new Bomb();
+      bomb.pos.set(pos);
+      geng.objlist.add( bomb );
+      
       dispose();
       
       geng.soundManager.play("bomb");
@@ -321,6 +325,7 @@ class FlyingTarget extends GObj {
   }
   
   void onProcess( RenderList renderList ) {
+    
     pos.add( speed );
     sp.rotate += dRotate;
     sp.x = pos.x - offset_x;
@@ -331,6 +336,58 @@ class FlyingTarget extends GObj {
   
   void onDispose() {}
 }
+
+
+/**
+ * 爆発
+ */
+class Bomb extends GObj {
+
+  Sprite sp;
+  Vector pos = new Vector();
+  Vector speed = new Vector();
+  Vector delta = new Vector();
+  
+  void onInit() {
+    sp = new Sprite( "target", width:10, height:10 );
+    
+    speed
+    ..unit()
+    ..mul( 6.0 )
+    ..rotate( -R90 + R90/2.0 );
+    
+    delta
+    ..y = 0.1;
+    
+    new Timer( const Duration(seconds:1), ()=>dispose() );
+  }
+  
+  int count =100;
+  
+  void onProcess( RenderList renderList ) {
+    
+    // 煙吐き出す
+    if( ++count>=10 ) {
+      count = 0;
+      var smoke = new Smoke.bigger( width:10, height:10 )
+      ..pos.x = pos.x
+      ..pos.y = pos.y
+      ..z = 10
+      ..scaleRange( 1.0, 0.4 );
+      geng.objlist.add( smoke );
+    }
+    
+    pos.add( speed );
+    speed.add( delta );
+    sp.x = pos.x - offset_x;
+    sp.y = pos.y;
+    // スプライト登録
+    renderList.add( 5, sp.render );
+  }
+  
+  void onDispose() {}
+}
+
 
 /**
  * 地面

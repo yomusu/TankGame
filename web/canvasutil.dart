@@ -6,9 +6,6 @@ class TextRender {
 
   // private member -------------
   
-  CanvasElement _canvas;
-  CanvasRenderingContext2D  _con;
-  
   String  _fontSize = '24pt';
   String  _fontFamily = "serif";
   String  _font = "24pt serif";
@@ -41,11 +38,6 @@ class TextRender {
     shadowOffsetY = offset;
   }
   
-  set canvas( CanvasElement c ) {
-    _canvas = c;
-    _con = ( c!=null ) ? c.context2D : null;
-  }
-  
   /** フォントサイズ  ex)"20px"等 */
   set fontSize( String size ) {
     _fontSize = size;
@@ -58,49 +50,6 @@ class TextRender {
     _font = "${_fontSize} ${_fontFamily}";
   }
   
-  // Methods -------------
-  
-  /**
-   * 複数行のテキストを描画する
-   */
-  void drawTexts( List<String> strs, num x, num y ) {
-    
-    _con.lineWidth = lineWidth;
-    
-    _con.font = _font;
-    _con.textAlign = textAlign;
-    _con.textBaseline = textBaseline;
-    
-    if( fillColor!=null ) {
-      
-      _con.save();
-      
-      if( shadowColor!=null ) {
-        _con.shadowColor = shadowColor.rgba;
-        _con.shadowOffsetX = shadowOffsetX;
-        _con.shadowOffsetY = shadowOffsetY;
-        _con.shadowBlur = shadowBlur;
-      }
-      
-      _con.setFillColorRgb(fillColor.r, fillColor.g, fillColor.b, 1);
-      var _y = y;
-      strs.forEach( (s) {
-        _con.fillText( s, x, _y );
-        _y += lineHeight;
-      });
-      
-      _con.restore();
-    }
-    
-    if( strokeColor!=null ) {
-      _con.setStrokeColorRgb(strokeColor.r, strokeColor.g, strokeColor.b, strokeColor.a);
-      var _y = y;
-      strs.forEach( (s) {
-        _con.strokeText( s, x, _y );
-        _y += lineHeight;
-      });
-    }
-  }
 }
 
 class Color {
@@ -142,21 +91,107 @@ class Color {
   String get rgba => "rgba($red,$green,$blue,$alpha)";
 }
 
+const R0 = 0.0;
 const R90 = math.PI * 0.5;
 const R180 = math.PI;
+const R360 = math.PI * 2.0;
 
-void roundRect( CanvasRenderingContext2D c, num left, num top, num w, num h, num radius) {
+
+final GCanvas2D g2d = new GCanvas2D();
+
+
+class GCanvas2D {
   
-  var l = left + radius;
-  var t = top + radius;
-  var r = left + w - radius;
-  var b = top + h - radius;
+  CanvasElement _canvas;
+  CanvasRenderingContext2D  c;
   
-  c.arc( l, t, radius, -R180, -R90 );
-  c.arc( r, t, radius,  -R90,    0 );
-  c.arc( r, b, radius,     0,  R90 );
-  c.arc( l, b, radius,   R90, R180 );
-}  
+  set canvas( CanvasElement canvas ) {
+    _canvas = canvas;
+    c = (canvas!=null) ? canvas.context2D : null;
+  }
+  
+  set fillColor( Color cl ) => c.setFillColorRgb( cl.r, cl.g, cl.b, cl.a );
+  set strokeColor( Color cl ) => c.setStrokeColorRgb( cl.r, cl.g, cl.b, cl.a );
+  
+  void fill( [Color color] ) {
+    if( color!=null )
+      fillColor = color;
+    c.fill();
+  }
+  void stroke( [Color color] ) {
+    if( color!=null )
+      strokeColor = color;
+    c.stroke();
+  }
+  void save() => c.save();
+  void restore() => c.restore();
+  void beginPath() => c.beginPath();
+  void closePath() => c.closePath();
+  
+  void roundRect( num left, num top, num w, num h, num radius) {
+    
+    var l = left + radius;
+    var t = top + radius;
+    var r = left + w - radius;
+    var b = top + h - radius;
+    
+    c.arc( l, t, radius, -R180, -R90 );
+    c.arc( r, t, radius,  -R90,    0 );
+    c.arc( r, b, radius,     0,  R90 );
+    c.arc( l, b, radius,   R90, R180 );
+  }
+  
+  void circle( num left, num top, num radius ) => c.arc( left, top, radius, R0, R360 );
+  
+  void pizza( num cx, num cy, num radius, num startAngle, num endAngle ) {
+    c.moveTo(cx,cy);
+    c.arc( cx, cy, radius, startAngle, endAngle );
+    c.moveTo(cx,cy);
+  }
+  
+  /**
+   * 複数行のテキストを描画する
+   */
+  void drawTexts( TextRender tren, List<String> strs, num x, num y ) {
+    
+    c.lineWidth = tren.lineWidth;
+    
+    c.font = tren._font;
+    c.textAlign = tren.textAlign;
+    c.textBaseline = tren.textBaseline;
+    
+    if( tren.fillColor!=null ) {
+      
+      c.save();
+      
+      if( tren.shadowColor!=null ) {
+        c.shadowColor = tren.shadowColor.rgba;
+        c.shadowOffsetX = tren.shadowOffsetX;
+        c.shadowOffsetY = tren.shadowOffsetY;
+        c.shadowBlur = tren.shadowBlur;
+      }
+      
+      c.setFillColorRgb(tren.fillColor.r, tren.fillColor.g, tren.fillColor.b, 1);
+      var _y = y;
+      strs.forEach( (s) {
+        c.fillText( s, x, _y );
+        _y += tren.lineHeight;
+      });
+      
+      c.restore();
+    }
+    
+    if( tren.strokeColor!=null ) {
+      c.setStrokeColorRgb(tren.strokeColor.r, tren.strokeColor.g, tren.strokeColor.b, tren.strokeColor.a);
+      var _y = y;
+      strs.forEach( (s) {
+        c.strokeText( s, x, _y );
+        _y += tren.lineHeight;
+      });
+    }
+  }
+}
+
 
 
 class DefaultButtonRender {
@@ -175,7 +210,7 @@ class DefaultButtonRender {
   ..fillColor = Color.Black
   ..strokeColor = null;
   
-  void render( CanvasElement canvas, GButton btn ) {
+  void render( GCanvas2D canvas, GButton btn ) {
     
     var status = btn.status;
     var left = btn.left;
@@ -183,7 +218,7 @@ class DefaultButtonRender {
     var width = btn.width;
     var height= btn.height;
     
-    var c = canvas.context2D;
+    var c = canvas.c;
     
     var textCl = Color.Black;
     var bg     = bg_normal;
@@ -203,8 +238,8 @@ class DefaultButtonRender {
     
     // 影
     c.beginPath();
-    c.setFillColorRgb( shadow.r, shadow.g, shadow.b );
-    roundRect( c, left, top+5, width, height, 20 );
+    canvas.fillColor = shadow;
+    canvas.roundRect( left, top+5, width, height, 20 );
     c.closePath();
     c.fill();
     
@@ -215,20 +250,18 @@ class DefaultButtonRender {
     
     c.beginPath();
     // 背景
-    roundRect( c, left+2, top+2, width-4, height-4, 18 );
+    canvas.roundRect( left+2, top+2, width-4, height-4, 18 );
     c.closePath();
-    c.setFillColorRgb( bg.r, bg.g, bg.b );
+    canvas.fillColor = bg;
     c.fill();
     // ボーダー
-    c.setStrokeColorRgb( border.r, border.g, border.b );
+    canvas.strokeColor = border;
     c.lineWidth = 4;
     c.stroke();
     
     if( btn.text!=null ) {
-      tren.canvas = canvas;
       tren.fillColor = textCl;
-      tren.drawTexts([btn.text], btn.x, btn.y);
-      tren.canvas = null;
+      canvas.drawTexts( tren, [btn.text], btn.x, btn.y);
     }
     
     c.restore();

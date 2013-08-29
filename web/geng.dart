@@ -49,7 +49,7 @@ abstract class GObj {
 
 DefaultButtonRender  defaultButtonRenderer = new DefaultButtonRender();
 
-typedef void ButtonRenderer( CanvasElement canvas, GButton btn );
+typedef void ButtonRenderer( GCanvas2D canvas, GButton btn );
 
 class GButton extends GObj {
   
@@ -221,8 +221,11 @@ abstract class GScreen {
     geng.objlist.gcObj();
     
     // 最前面の描画
-    if( onFrontRender!=null )
-      onFrontRender(geng.backcanvas);
+    if( onFrontRender!=null ) {
+      g2d.canvas = geng.backcanvas;
+      onFrontRender( g2d );
+      g2d.canvas = null;
+    }
     
     // ダブルバッファのフリップ
     geng.flipBuffer();
@@ -238,7 +241,7 @@ class PressEvent {
 }
 
 /** 最終的にレンダリングするFunction */
-typedef void Render( CanvasElement canvas );
+typedef void Render( GCanvas2D canvas );
 
 /**
  * レンダリングのオーダリングリスト
@@ -261,7 +264,9 @@ class RenderList {
   }
   
   void renderAll( CanvasElement canvas ) {
-    _list.values.forEach( (r)=> r(canvas) );
+    g2d.canvas = canvas;
+    _list.values.forEach( (r)=> r(g2d) );
+    g2d.canvas = null;
   }
 }
 

@@ -1,5 +1,9 @@
 part of geng;
 
+
+typedef void SpriteRender( GCanvas2D c, Sprite sp );
+
+
 /**
  * いわゆるスプライト
  * Mouseイベントもやる必要あるかもねー
@@ -9,7 +13,6 @@ class Sprite {
   num _x=0,_y=0;
   num _w=0,_h=0;
   Rect  _rect = null;
-  ImageElement _img;
   
   num _alpha = null;
   num _scale = null;
@@ -20,40 +23,53 @@ class Sprite {
   
   bool  isShow = true;
   
-  
+  SpriteRender  sprenderer;
   
   Sprite( String imgKey, { num width:10, num height:10 } ) {
-    _img = geng.imageMap[imgKey];
+    
+    var _img = geng.imageMap[imgKey];
+    sprenderer = (c,sp) {
+      c.c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
+    };
+    
     _w = width;
     _h = height;
     offsetx = _w / 2;
     offsety = _h / 2;
   }
   
-  void render( CanvasElement canvas ) {
+  Sprite.withRender( SpriteRender render, { num width:10, num height:10 } ) {
+    sprenderer = render;
+    _w = width;
+    _h = height;
+    offsetx = _w / 2;
+    offsety = _h / 2;
+  }
+  
+  
+  void render( GCanvas2D c ) {
     if( isShow ) {
-      var c = canvas.context2D;
-      c.save();
+      c.c.save();
       
       if( rotate!=null ) {
-        c.translate(_x,_y);
-        c.rotate( rotate );
+        c.c.translate(_x,_y);
+        c.c.rotate( rotate );
       } else {
-        c.translate(_x,_y);
+        c.c.translate(_x,_y);
       }
       
       if( _alpha!=null ) {
         var a = _alpha;
         a = math.max( a, 0.0 );
         a = math.min( a, 1.0 );
-        c.globalAlpha = a;
+        c.c.globalAlpha = a;
       }
       
       if( _scale!=null )
-        c.scale( _scale, _scale );
+        c.c.scale( _scale, _scale );
       
-      c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
-      c.restore();
+      sprenderer( c, this );
+      c.c.restore();
     }
   }
   

@@ -107,10 +107,8 @@ class Title extends GScreen {
     
     //---------------------
     // 最前面描画処理
-    onFrontRender = ( CanvasElement canvas ) {
-      tren.canvas = canvas;
-      tren.drawTexts(["Tank Game"], 320, 150 );
-      tren.canvas = null;
+    onFrontRender = ( GCanvas2D canvas ) {
+      canvas.drawTexts( tren, ["Tank Game"], 320, 150 );
     };
     
   }
@@ -184,10 +182,8 @@ class HowToPlay extends GScreen {
     btnList.add( retbtn );
     
     // 描画処理
-    onFrontRender = (CanvasElement canvas) {
-      tren.canvas = canvas;
-      tren.drawTexts(text, 50, 50 );
-      tren.canvas = null;
+    onFrontRender = (GCanvas2D canvas) {
+      canvas.drawTexts( tren, text, 50, 50 );
     };
   }
 }
@@ -249,10 +245,8 @@ class TankGame extends GScreen {
     ..fillColor = Color.Black
     ..strokeColor = null;
     
-    onFrontRender = ( CanvasElement c ) {
-      tren.canvas = c;
-      tren.drawTexts(["SCORE: ${score}"], 5, 5 );
-      tren.canvas = null;
+    onFrontRender = ( GCanvas2D c ) {
+      c.drawTexts( tren, ["SCORE: ${score}"], 5, 5 );
     };
     
     //-------
@@ -368,7 +362,7 @@ class FireButton extends GButton {
   ..strokeColor = null;
   
 
-  void render( CanvasElement canvas, GButton btn ) {
+  void render( GCanvas2D canvas, GButton btn ) {
     
     var status = btn.status;
     var left = btn.left;
@@ -376,7 +370,7 @@ class FireButton extends GButton {
     var width = btn.width;
     var height= btn.height;
     
-    var c = canvas.context2D;
+    var c = canvas.c;
     
     var bg     = bg_normal;
     var border = border_normal;
@@ -385,10 +379,9 @@ class FireButton extends GButton {
     
     // 影
     c.beginPath();
-    c.setFillColorRgb( shadow.r, shadow.g, shadow.b );
-    roundRect( c, left, top+10, width, height, 30 );
+    canvas.roundRect( left, top+10, width, height, 30 );
     c.closePath();
-    c.fill();
+    canvas.fill( shadow );
     
     
     // 表面
@@ -397,14 +390,12 @@ class FireButton extends GButton {
     
     c.beginPath();
     // 背景
-    roundRect( c, left+2, top+2, width-4, height-4, 28 );
+    canvas.roundRect( left+2, top+2, width-4, height-4, 28 );
     c.closePath();
-    c.setFillColorRgb( bg.r, bg.g, bg.b );
-    c.fill();
+    canvas.fill( bg );
     // ボーダー
-    c.setStrokeColorRgb( border.r, border.g, border.b );
     c.lineWidth = 4;
-    c.stroke();
+    canvas.stroke(border);
     
     //---------
     // テキスト
@@ -412,22 +403,17 @@ class FireButton extends GButton {
     if( status==GButton.ROLLON || status==GButton.ACTIVE )
       tr = tren;
       
-    tr.canvas = canvas;
-    tr.drawTexts([btn.text], btn.x+5, btn.y);
-    tr.canvas = null;
+    canvas.drawTexts( tr, [btn.text], btn.x+5, btn.y);
     
     // チャージサイン
     var cx = left + 30;
     var cy = btn.y;
       
     c.beginPath();
-    c.moveTo(cx,cy);
-    c.arc( cx, cy, 8, -R90, (2*math.PI * power)-R90 );
-    c.moveTo(cx,cy);
-    c.setFillColorRgb( tr.fillColor.r, tr.fillColor.g, tr.fillColor.b );
-    c.fill();
+    canvas.pizza( cx, cy, 8, -R90, (2*math.PI * power)-R90 );
+    canvas.fill( tr.fillColor );
     
-    c.restore();
+    canvas.restore();
   }
   
 }

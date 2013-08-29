@@ -24,9 +24,7 @@ class GameStartLogo extends GObj {
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      trenScore.canvas = canvas;
-      trenScore.drawTexts(["GAME START"], 320, 200);
-      trenScore.canvas = null;
+      canvas.drawTexts(trenScore, ["GAME START"], 320, 200);
     });
   }
   
@@ -39,10 +37,8 @@ class ResultPrint extends GObj {
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      trenScore.canvas = canvas;
-      trenScore.drawTexts(["GAME OVER"], 320, 200);
-      trenScore.drawTexts(["SCORE: ${score}"], 320, 230);
-      trenScore.canvas = null;
+      canvas.drawTexts( trenScore, ["GAME OVER"], 320, 200);
+      canvas.drawTexts( trenScore, ["SCORE: ${score}"], 320, 230);
     });
   }
   
@@ -129,7 +125,15 @@ class Cannonball extends GObj {
   Sprite sp;
   
   void onInit() {
-    sp = new Sprite( "cannon", width:50, height:50 );
+    
+    var f = (GCanvas2D c,Sprite sp) {
+      c.circle(0, 0, 10);
+      c.fill( Color.Black );
+      c.beginPath();
+      c.circle(-4, -4, 2);
+      c.fill( Color.White );
+    };
+    sp = new Sprite.withRender(f, width:20, height:20 );
     sp.offsety = 0;
   }
   
@@ -247,9 +251,8 @@ class Target extends GObj {
       // Hit mark
       if( _hitdx!=null ) {
         var hx = sp.x + _hitdx;
-        var c = canvas.context2D;
-        c.setFillColorRgb(255, 0, 0,1);
-        c.fillRect(hx-5, sp.y-5, 10, 10);
+        canvas.c.setFillColorRgb(255, 0, 0,1);
+        canvas.c.fillRect(hx-5, sp.y-5, 10, 10);
       }
     } );
   }
@@ -361,13 +364,12 @@ class Ground extends GObj {
   }
   
   void onProcess( RenderList renderList ) {
-    renderList.add( z, (CanvasElement canvas ) {
+    renderList.add( z, (GCanvas2D c) {
       
       var img = geng.imageMap["kusa"];
-      var c = canvas.context2D;
       
-      c.save();
-      c.translate( left, 0 );
+      c.c.save();
+      c.c.translate( left, 0 );
       
       points.forEach( (p) {
         
@@ -377,10 +379,10 @@ class Ground extends GObj {
         x = x % width;
         y = y % height;
         
-        c.drawImageScaled(img, x, y, 50, 50);
+        c.c.drawImageScaled(img, x, y, 50, 50);
       });
       
-      c.restore();
+      c.c.restore();
     });
   }
   
@@ -425,10 +427,7 @@ class ScorePopup extends GObj {
     var y = pos.y;
     
     renderList.add( z, (canvas) {
-      var c = canvas.context2D;
-      trenScore.canvas = canvas;
-      trenScore.drawTexts( texts, x, y);
-      trenScore.canvas = null;
+      canvas.drawTexts( trenScore, texts, x, y);
     });
   }
   

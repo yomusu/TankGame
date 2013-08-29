@@ -494,6 +494,11 @@ class GEng {
   
   
   math.Random  rand = new math.Random(3000);
+  
+  num randRange( num n1, num n2 ) {
+    var r = rand.nextDouble();
+    return (n1*r) + (n2*(1.0-r));
+  }
 }
 
 GEng geng = new GEng();

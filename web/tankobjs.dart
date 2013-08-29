@@ -288,9 +288,12 @@ class Target extends GObj {
       geng.objlist.add(ft);
       
       // 爆発を配置
-      var bomb = new Bomb();
-      bomb.pos.set(pos);
-      geng.objlist.add( bomb );
+      var range = R45 * 0.5;
+      for( num r in [-R45,-R90,-R90-R45] ) {
+        var bomb = new Bomb(r,range);
+        bomb.pos.set(pos);
+        geng.objlist.add( bomb );
+      }
       
       dispose();
       
@@ -348,16 +351,25 @@ class Bomb extends GObj {
   Vector speed = new Vector();
   Vector delta = new Vector();
   
-  void onInit() {
-    sp = new Sprite( "target", width:10, height:10 );
-    
+  num dRotate;
+  num size = 25;
+  
+  Bomb( num angle, num range ) {
+    dRotate = geng.randRange( R1*6, R1*24 );
+    var a = geng.randRange( angle - range, angle + range );
     speed
     ..unit()
-    ..mul( 6.0 )
-    ..rotate( -R90 + R90/2.0 );
+    ..mul( 5.0 )
+    ..rotate( a );
     
     delta
     ..y = 0.1;
+    
+  }
+  
+  void onInit() {
+    sp = new Sprite( "target", width:25, height:25 );
+    sp.rotate = 0.0;
     
     new Timer( const Duration(seconds:1), ()=>dispose() );
   }
@@ -369,7 +381,10 @@ class Bomb extends GObj {
     // 煙吐き出す
     if( ++count>=10 ) {
       count = 0;
-      var smoke = new Smoke.bigger( width:10, height:10 )
+      var smoke = new Smoke()
+      ..sp = new Sprite( "smoke", width:10, height:10)
+      ..opacityRange( 3.0, -0.1 )
+      ..scaleRange( 1.0, 0.02 )
       ..pos.x = pos.x
       ..pos.y = pos.y
       ..z = 10
@@ -379,6 +394,8 @@ class Bomb extends GObj {
     
     pos.add( speed );
     speed.add( delta );
+    
+    sp.rotate += dRotate;
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
     // スプライト登録

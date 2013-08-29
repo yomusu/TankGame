@@ -22,7 +22,6 @@ void main() {
     // 画像読み込み
     geng.imageMap
       ..put("tank", "./octocat.png")
-      ..put("cannon", "./octocat.png")
       ..put("target", "./img/doramu.png")
       ..put("kusa", "./kusa.png")
       ..put("smoke", "./img/kemuri.png");
@@ -185,18 +184,6 @@ class HowToPlay extends GScreen {
     onFrontRender = (GCanvas2D canvas) {
       canvas.drawTexts( tren, text, 50, 50 );
     };
-  }
-}
-
-/* 未使用 */
-void _createMap() {
-  var rand = new math.Random(0);
-  for( int x=600; x<2000; x+=200 ) {
-    var y = rand.nextInt(250) + 20;
-    Target  t = new Target.fromType('large')
-    ..pos.x = x.toDouble()
-    ..pos.y = y.toDouble();
-    geng.objlist.add( t );
   }
 }
 

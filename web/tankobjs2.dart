@@ -13,6 +13,8 @@ class Smoke extends GObj {
   Vector  speed = new Vector();
   Vector  pos = new Vector();
   
+  Smoke();
+    
   Smoke.slower() {
     sp = new Sprite( "smoke", width:50, height:50);
     sp.opacity = 1.0;
@@ -29,14 +31,10 @@ class Smoke extends GObj {
     dScale = 0.05;
   }
   
-  Smoke.bigger( { num width, num height } ) {
-    sp = new Sprite( "smoke", width:width, height:height);
+  void opacityRange( num opacity, num delta ) {
     sp.opacity = 3.0;
-    sp.scale = 1.0;
     dOpcity = -0.1;
-    dScale = 0.05;
   }
-  
   void scaleRange( num from, num delta ) {
     sp.scale = from;
     dScale = delta;

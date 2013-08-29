@@ -92,6 +92,8 @@ class Color {
 }
 
 const R0 = 0.0;
+const R1 = math.PI / 180.0;
+const R45 = math.PI * 0.5 * 0.5;
 const R90 = math.PI * 0.5;
 const R180 = math.PI;
 const R360 = math.PI * 2.0;

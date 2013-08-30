@@ -658,3 +658,8 @@ class SoundManager {
     }
   }
 }
+
+
+void delay( int milliseconds,  void callback() ) {
+  new Timer( new Duration(milliseconds:milliseconds), callback );
+}

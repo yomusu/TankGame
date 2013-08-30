@@ -31,3 +31,32 @@ List  stageList = [
 ];
 
 
+/**
+ * アイテムデータ
+ */
+List  itemList = [
+
+                  {
+                    'id' : "nom001",
+                    'obtained' : true,
+                    'price' : 0,
+                    'cannonSpeed' : 7,
+                    'text' : "まめ砲弾",
+                  },
+                  
+                  {
+                    'id' : "big001",
+                    'obtained' : true,
+                    'price' : 3000,
+                    'cannonSpeed' : 12,
+                    'text' : "デカい砲弾",
+                  },
+                  
+                  {
+                    'id' : "fast001",
+                    'obtained' : true,
+                    'price' : 3000,
+                    'cannonSpeed' : 22,
+                    'text' : "速い砲弾",
+                  },
+];

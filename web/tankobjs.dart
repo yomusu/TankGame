@@ -80,6 +80,11 @@ class Tank extends GObj {
   /** 弾を打つ */
   void fire( Point target ) {
     
+    var cannonSpeed = 20.0;
+    if( itemData.containsKey('cannonSpeed') ) {
+      cannonSpeed = (itemData['cannonSpeed'] as num).toDouble();
+    }
+    
     var b = new Cannonball();
     
     // 初期位置
@@ -90,15 +95,13 @@ class Tank extends GObj {
     ..set( target )
     ..sub( b.pos )
     ..normalize()
-    ..mul( 20.0 );
+    ..mul( cannonSpeed );
     b.speed.add( this.speed );
     
     // 加速度
     b.delta
     ..set( b.speed )
     ..mul( 0.0 );
-    
-    print( "speed=${b.speed},  delta=${b.delta}" );
     
     geng.objlist.add(b);
     
@@ -123,6 +126,7 @@ class Cannonball extends GObj {
   Vector  delta= new Vector();
   
   Sprite sp;
+  
   
   void onInit() {
     

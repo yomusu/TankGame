@@ -47,6 +47,7 @@ void main() {
   });
 }
 
+Map   itemData;
 Map   stageData;
 Tank  tank;
 int score;
@@ -80,13 +81,13 @@ class Title extends GScreen {
     var playbtn = new GButton()
     ..onPress = (){
       geng.soundManager.play("fire");
-      new Timer( const Duration(seconds:1), () {
+      new Timer( const Duration(milliseconds:500), () {
         geng.screen = new StageSelect();
       });
     }
     ..text = "ゲームスタート"
-    ..width = 150
-    ..height= 50
+    ..width = 300
+    ..height= 60
     ..x = 320
     ..y = 320;
     geng.objlist.add( playbtn );
@@ -97,10 +98,10 @@ class Title extends GScreen {
     var howtobtn = new GButton()
     ..onPress = (){ geng.screen = new HowToPlay(); }
     ..text = "あそびかた"
-    ..width = 150
-    ..height= 50
+    ..width = 300
+    ..height= 60
     ..x = 320
-    ..y = 380;
+    ..y = 420;
     geng.objlist.add( howtobtn );
     btnList.add( howtobtn );
     
@@ -113,9 +114,21 @@ class Title extends GScreen {
   }
 }
 
+TextRender  trenTitle = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "20pt"
+..textAlign = "center"
+..textBaseline = "top"
+..lineWidth = 1.0
+..fillColor = Color.Black
+..shadowColor = new Color.fromAlpha(0.5)
+..shadowOffset = 2
+..shadowBlur = 2;
+
+
 /***********
  * 
- * タイトル画面の表示
+ * ステージ選択画面の表示
  * 
  */
 class StageSelect extends GScreen {
@@ -128,9 +141,9 @@ class StageSelect extends GScreen {
     for( var stage in stageList ) {
       
       var btn = new GButton()
-      ..onPress = ( ()=>goToStage( stage ) )
+      ..onPress = ( ()=>goToNext( stage ) )
       ..text = stage['name']
-      ..width = 150
+      ..width = 300
       ..height= 50
       ..x = 320
       ..y = y
@@ -138,18 +151,91 @@ class StageSelect extends GScreen {
       geng.objlist.add( btn );
       btnList.add( btn );
       
-      y += 70;
+      y += 100;
     }
+    
+    // 戻るボタン配置
+    var btn = new GButton()
+      ..onPress = ( (){ geng.screen = new Title(); } )
+      ..text = "戻る"
+      ..width = 100
+      ..height= 40
+      ..x = 10 + (100/2)
+      ..y = 10 + (40/2);
+    geng.objlist.add( btn );
+    btnList.add( btn );
+    
+    // 最前面描画処理
+    onFrontRender = ( GCanvas2D canvas ) {
+      canvas.drawTexts( trenTitle, ["ステージの選択"], 320, 10, maxWidth:620 );
+    };
   }
   
-  void goToStage( var stage ) {
+  void goToNext( var stage ) {
     new Timer( const Duration(milliseconds:500), () {
       stageData = stage;
+      geng.screen = new ItemSelect();
+    });
+  }
+}
+
+
+/***********
+ * 
+ * アイテム選択画面の表示
+ * 
+ */
+class ItemSelect extends GScreen {
+  
+  void onStart() {
+    geng.objlist.disposeAll();
+    
+    // StartGameボタン配置
+    var y = 150;
+    for( var item in itemList ) {
+      
+      var btn = new GButton()
+      ..onPress = ( ()=>goToNext( item ) )
+      ..text = item['text']
+      ..width = 300
+      ..height= 70
+      ..x = 320
+      ..y = y
+      ..isEnable = item['obtained'];
+      geng.objlist.add( btn );
+      btnList.add( btn );
+      
+      y += 100;
+    }
+    
+    // 戻るボタン配置
+    var btn = new GButton()
+      ..onPress = ( (){ geng.screen = new StageSelect(); } )
+      ..text = "戻る"
+      ..width = 100
+      ..height= 40
+      ..x = 10 + (100/2)
+      ..y = 10 + (40/2);
+    geng.objlist.add( btn );
+    btnList.add( btn );
+    
+    // 最前面描画処理
+    onFrontRender = ( GCanvas2D canvas ) {
+      canvas.drawTexts( trenTitle, ["アイテムの選択"], 320, 10, maxWidth:620 );
+    };
+  }
+  
+  void goToNext( var item ) {
+    delay( 500, () {
+      itemData = item;
       geng.screen = new TankGame();
     });
   }
 }
 
+/**
+ * 遊び方画面
+ */
 class HowToPlay extends GScreen {
   
   List  text = """遊び方

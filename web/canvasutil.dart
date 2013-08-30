@@ -154,7 +154,7 @@ class GCanvas2D {
   /**
    * 複数行のテキストを描画する
    */
-  void drawTexts( TextRender tren, List<String> strs, num x, num y ) {
+  void drawTexts( TextRender tren, List<String> strs, num x, num y, { num maxWidth:null } ) {
     
     c.lineWidth = tren.lineWidth;
     
@@ -176,7 +176,7 @@ class GCanvas2D {
       c.setFillColorRgb(tren.fillColor.r, tren.fillColor.g, tren.fillColor.b, 1);
       var _y = y;
       strs.forEach( (s) {
-        c.fillText( s, x, _y );
+        c.fillText( s, x, _y, maxWidth );
         _y += tren.lineHeight;
       });
       
@@ -187,7 +187,7 @@ class GCanvas2D {
       c.setStrokeColorRgb(tren.strokeColor.r, tren.strokeColor.g, tren.strokeColor.b, tren.strokeColor.a);
       var _y = y;
       strs.forEach( (s) {
-        c.strokeText( s, x, _y );
+        c.strokeText( s, x, _y, maxWidth );
         _y += tren.lineHeight;
       });
     }

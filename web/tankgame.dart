@@ -21,10 +21,16 @@ void main() {
     
     // 画像読み込み
     geng.imageMap
-      ..put("tank", "./octocat.png")
+      ..put("tankUp", "./img/tankUp.png")
+      ..put("tankDown1", "./img/tankDown1.png")
+      ..put("tankDown2", "./img/tankDown2.png")
       ..put("target", "./img/doramu.png")
       ..put("kusa", "./kusa.png")
-      ..put("smoke", "./img/kemuri.png");
+      ..put("gareki01", "./img/gareki01.png")
+      ..put("gareki02", "./img/gareki02.png")
+      ..put("gareki03", "./img/gareki03.png")
+      ..put("smoke", "./img/kemuri.png")
+      ..put("smokeB", "./img/kemuriB.png");
     
     // サウンド読み込み
     geng.soundManager.put("fire","./sound/bomb.ogg");

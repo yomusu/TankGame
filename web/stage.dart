@@ -6,11 +6,13 @@ part of tankgame;
 List  stageList = [
    // Stage1
    { 'enable':true, 'name':"stage1",
-     'speed':3.0, 'length':1900,
+     'speed':3.0, 'length':2500,
      'map':[
          [ 900, 100, "large" ],
          [ 1300, 100, "large" ],
          [ 1700, 100, "small" ],
+         [ 2000, 100, "small" ],
+         [ 2300, 100, "small" ],
      ]
    },
    // Stage2

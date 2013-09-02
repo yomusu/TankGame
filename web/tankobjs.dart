@@ -51,21 +51,27 @@ class ResultPrint extends GObj {
 class Tank extends GObj {
   
   int  delta_x = 1;
-  Sprite sp;
+  Sprite sp,sp2;
   Vector  speed = new Vector();
   Vector  pos = new Vector();
   int count = 0;
   
   void onInit() {
-    sp = new Sprite( "tank", width:100, height:100 );
+    sp = new Sprite( "tankUp", width:100, height:100 );
+    sp2 = new Sprite( "tankDown1", width:100, height:100 );
     sp.offsety = 0;
+    sp2.offsety = 0;
   }
   
   void onProcess(RenderList renderList) {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
-    renderList.add( 0, sp.render );
+    renderList.add( 11, sp.render );
+    sp2.x = sp.x;
+    sp2.y = sp.y;
+    renderList.add( 10, sp2.render );
     
+    // 砂煙
     if( ++count==7 ) {
       count = 0;
       Smoke smk = new Smoke.slower()
@@ -174,8 +180,9 @@ class Cannonball extends GObj {
     renderList.add( 10, sp.render );
     
     // 煙を出す
-    if( ++count==2 ) {
-      count = 0;
+    distance += speed.scalar();
+    if( distance>40.0 ) {
+      distance = 0.0;
       
       var smk = new Smoke.faster()
       ..pos.x = pos.x
@@ -185,7 +192,7 @@ class Cannonball extends GObj {
     }
   }
   
-  int count = 0;
+  num distance = 0.0;
   
   void onDispose() {}
 }
@@ -294,7 +301,7 @@ class Target extends GObj {
       // 爆発を配置
       var range = R45 * 0.5;
       for( num r in [-R45,-R90,-R90-R45] ) {
-        var bomb = new Bomb(r,range);
+        var bomb = new Bomb(geng.rand.nextInt(2), r,range);
         bomb.pos.set(pos);
         geng.objlist.add( bomb );
       }
@@ -325,7 +332,7 @@ class FlyingTarget extends GObj {
   num   width = 80;
   
   void onInit() {
-    sp = new Sprite( "target", width:width, height:80 );
+    sp = new Sprite( "gareki03", width:width, height:40 );
     sp.rotate = 0.0;
     
     new Timer( const Duration(seconds:2), ()=>dispose() );
@@ -358,7 +365,7 @@ class Bomb extends GObj {
   num dRotate;
   num size = 25;
   
-  Bomb( num angle, num range ) {
+  Bomb( int type, num angle, num range ) {
     dRotate = geng.randRange( R1*6, R1*24 );
     var a = geng.randRange( angle - range, angle + range );
     speed
@@ -369,10 +376,17 @@ class Bomb extends GObj {
     delta
     ..y = 0.1;
     
+    switch( type%2 ) {
+      case 0:
+        sp = new Sprite( "gareki01", width:30, height:30 );
+        break;
+      case 1:
+        sp = new Sprite( "gareki02", width:40, height:40 );
+        break;
+    }
   }
   
   void onInit() {
-    sp = new Sprite( "target", width:25, height:25 );
     sp.rotate = 0.0;
     
     new Timer( const Duration(seconds:1), ()=>dispose() );
@@ -386,7 +400,7 @@ class Bomb extends GObj {
     if( ++count>=10 ) {
       count = 0;
       var smoke = new Smoke()
-      ..sp = new Sprite( "smoke", width:10, height:10)
+      ..sp = new Sprite( "smokeB", width:10, height:10)
       ..opacityRange( 3.0, -0.1 )
       ..scaleRange( 1.0, 0.02 )
       ..pos.x = pos.x

@@ -128,6 +128,16 @@ class Tank extends GObj {
     
     geng.objlist.add(b);
     
+    // 発射炎
+    var sm = new Smoke()
+    ..sp = new Sprite.withImage("smoke", width:50, height:50)
+    ..sp.opacity = 1.0
+    ..sp.scale = 0.5
+    ..dOpcity = -0.02
+    ..dScale = 0.03
+    ..pos.set( this.pos );
+    geng.objlist.add(sm);
+    
     geng.soundManager.play("fire");
   }
   

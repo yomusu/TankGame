@@ -47,6 +47,10 @@ class Sprite {
   
   SpriteRender  sprenderer;
   
+  factory Sprite.withImage( String imgKey , { num width:10, num height:10 } ) {
+    return new ImageSprite( imgKey:imgKey, width:width, height:height );
+  }
+  
   Sprite.withRender( SpriteRender render, { num width:10, num height:10 } ) {
     sprenderer = render;
     _w = width;

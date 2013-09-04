@@ -61,19 +61,21 @@ class Tank extends GObj {
   
   void onInit() {
     
+    var imgs = [ geng.imageMap["tankDown1"], geng.imageMap["tankDown2"] ];
+    var offsetOfUpper = [0,2];
+    
     sp = new ImageSprite( imgKey:"tankUp", width:100, height:100 );
     sp.offsety = 0;
-    sp2 = new ImageSprite( imgKey:"tankDown1", width:100, height:100 );
+    sp2 = new ImageSprite( img:imgs[0], width:100, height:100 );
     sp2.offsety = 0;
     
-    var imgs = [ geng.imageMap["tankDown1"], geng.imageMap["tankDown2"] ];
+    // アニメのセット
     var imgIndex = 0;
     animeTimer = new Timer.periodic(const Duration(milliseconds:200), (t) {
       imgIndex++;
       if( imgIndex >= imgs.length )
         imgIndex = 0;
-      var of = const [0,2];
-      sp.offsety = of[imgIndex];
+      sp.offsety = offsetOfUpper[imgIndex];
       sp2.image = imgs[imgIndex];
     });
   }

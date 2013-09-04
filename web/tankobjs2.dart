@@ -16,7 +16,7 @@ class Smoke extends GObj {
   Smoke();
     
   Smoke.slower() {
-    sp = new Sprite( "smoke", width:50, height:50);
+    sp = new ImageSprite( imgKey:"smoke", width:50, height:50);
     sp.opacity = 1.0;
     sp.scale = 0.0;
     dOpcity = -0.02;
@@ -24,7 +24,7 @@ class Smoke extends GObj {
   }
   
   Smoke.faster() {
-    sp = new Sprite( "smoke", width:50, height:50);
+    sp = new ImageSprite( imgKey:"smoke", width:50, height:50);
     sp.opacity = 0.8;
     sp.scale = 0.4;
     dOpcity = -0.05;

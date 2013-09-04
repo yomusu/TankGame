@@ -4,6 +4,28 @@ part of geng;
 typedef void SpriteRender( GCanvas2D c, Sprite sp );
 
 
+class ImageSprite extends Sprite {
+  
+  ImageElement  image;
+  
+  ImageSprite( { ImageElement img, String imgKey:null, num width:10, num height:10 } ) : super.empty() {
+    if( imgKey!=null )
+      image = geng.imageMap[imgKey];
+    if( img!=null )
+      image = img;
+    
+    sprenderer = (c,sp) {
+      c.c.drawImageScaled(image, -offsetx, -offsety, _w, _h);
+    };
+    
+    _w = width;
+    _h = height;
+    offsetx = _w / 2;
+    offsety = _h / 2;
+  }
+  
+}
+
 /**
  * いわゆるスプライト
  * Mouseイベントもやる必要あるかもねー
@@ -25,19 +47,6 @@ class Sprite {
   
   SpriteRender  sprenderer;
   
-  Sprite( String imgKey, { num width:10, num height:10 } ) {
-    
-    var _img = geng.imageMap[imgKey];
-    sprenderer = (c,sp) {
-      c.c.drawImageScaled(_img, -offsetx, -offsety, _w, _h);
-    };
-    
-    _w = width;
-    _h = height;
-    offsetx = _w / 2;
-    offsety = _h / 2;
-  }
-  
   Sprite.withRender( SpriteRender render, { num width:10, num height:10 } ) {
     sprenderer = render;
     _w = width;
@@ -46,6 +55,7 @@ class Sprite {
     offsety = _h / 2;
   }
   
+  Sprite.empty();
   
   void render( GCanvas2D c ) {
     if( isShow ) {
@@ -132,4 +142,3 @@ class Sprite {
     isShow = false;
   }
 }
-

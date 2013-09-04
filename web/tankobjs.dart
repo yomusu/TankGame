@@ -51,16 +51,31 @@ class ResultPrint extends GObj {
 class Tank extends GObj {
   
   int  delta_x = 1;
-  Sprite sp,sp2;
+  ImageSprite sp,sp2;
   Vector  speed = new Vector();
   Vector  pos = new Vector();
   int count = 0;
   
+  var anime;
+  var animeTimer;
+  
   void onInit() {
-    sp = new Sprite( "tankUp", width:100, height:100 );
-    sp2 = new Sprite( "tankDown1", width:100, height:100 );
+    
+    sp = new ImageSprite( imgKey:"tankUp", width:100, height:100 );
     sp.offsety = 0;
+    sp2 = new ImageSprite( imgKey:"tankDown1", width:100, height:100 );
     sp2.offsety = 0;
+    
+    var imgs = [ geng.imageMap["tankDown1"], geng.imageMap["tankDown2"] ];
+    var imgIndex = 0;
+    animeTimer = new Timer.periodic(const Duration(milliseconds:200), (t) {
+      imgIndex++;
+      if( imgIndex >= imgs.length )
+        imgIndex = 0;
+      var of = const [0,2];
+      sp.offsety = of[imgIndex];
+      sp2.image = imgs[imgIndex];
+    });
   }
   
   void onProcess(RenderList renderList) {
@@ -76,7 +91,7 @@ class Tank extends GObj {
       count = 0;
       Smoke smk = new Smoke.slower()
       ..pos.x = pos.x
-      ..pos.y = pos.y + 90
+      ..pos.y = pos.y + 100
       ..z = 10
       ..wobble( R180, R180+(R90/2.0) );
       geng.objlist.add( smk );
@@ -115,6 +130,7 @@ class Tank extends GObj {
   }
   
   void onDispose() {
+    animeTimer.cancel();
   }
 }
 
@@ -249,7 +265,7 @@ class Target extends GObj {
   }
   
   void onInit() {
-    sp = new Sprite( "target", width:_width, height:80 );
+    sp = new ImageSprite( imgKey:"target", width:_width, height:80 );
   }
   
   void onProcess( RenderList renderList ) {
@@ -332,7 +348,7 @@ class FlyingTarget extends GObj {
   num   width = 80;
   
   void onInit() {
-    sp = new Sprite( "gareki03", width:width, height:40 );
+    sp = new ImageSprite( imgKey:"gareki03", width:width, height:40 );
     sp.rotate = 0.0;
     
     new Timer( const Duration(seconds:2), ()=>dispose() );
@@ -378,10 +394,10 @@ class Bomb extends GObj {
     
     switch( type%2 ) {
       case 0:
-        sp = new Sprite( "gareki01", width:30, height:30 );
+        sp = new ImageSprite( imgKey:"gareki01", width:30, height:30 );
         break;
       case 1:
-        sp = new Sprite( "gareki02", width:40, height:40 );
+        sp = new ImageSprite( imgKey:"gareki02", width:40, height:40 );
         break;
     }
   }
@@ -400,7 +416,7 @@ class Bomb extends GObj {
     if( ++count>=10 ) {
       count = 0;
       var smoke = new Smoke()
-      ..sp = new Sprite( "smokeB", width:10, height:10)
+      ..sp = new ImageSprite( imgKey:"smokeB", width:10, height:10)
       ..opacityRange( 3.0, -0.1 )
       ..scaleRange( 1.0, 0.02 )
       ..pos.x = pos.x

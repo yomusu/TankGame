@@ -42,7 +42,8 @@ List  itemList = [
                     'id' : "nom001",
                     'obtained' : true,
                     'price' : 0,
-                    'cannonSpeed' : 7,
+                    'cannonSize' : 10,
+                    'cannonSpeed' : 8,
                     'text' : "まめ砲弾",
                   },
                   
@@ -50,7 +51,8 @@ List  itemList = [
                     'id' : "big001",
                     'obtained' : true,
                     'price' : 3000,
-                    'cannonSpeed' : 12,
+                    'cannonSize' : 26,
+                    'cannonSpeed' : 8,
                     'text' : "デカい砲弾",
                   },
                   
@@ -58,7 +60,8 @@ List  itemList = [
                     'id' : "fast001",
                     'obtained' : true,
                     'price' : 3000,
+                    'cannonSize' : 10,
                     'cannonSpeed' : 22,
-                    'text' : "速い砲弾",
+                    'text' : "スピード砲弾",
                   },
 ];

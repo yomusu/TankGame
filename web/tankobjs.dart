@@ -107,8 +107,11 @@ class Tank extends GObj {
     if( itemData.containsKey('cannonSpeed') ) {
       cannonSpeed = (itemData['cannonSpeed'] as num).toDouble();
     }
+    var cannonSize = (itemData['cannonSize'] as num).toInt();
     
     var b = new Cannonball();
+    
+    b.size = cannonSize;
     
     // 初期位置
     b.pos.set( this.pos );
@@ -160,18 +163,19 @@ class Cannonball extends GObj {
   Vector  delta= new Vector();
   
   Sprite sp;
-  
+  int size = 10;
   
   void onInit() {
     
     var f = (GCanvas2D c,Sprite sp) {
-      c.circle(0, 0, 10);
+      int hs = size ~/ 2;
+      c.circle(0, 0, hs);
       c.fill( Color.Black );
       c.beginPath();
-      c.circle(-4, -4, 2);
+      c.circle(-hs~/2, -hs~/2, 2);
       c.fill( Color.White );
     };
-    sp = new Sprite.withRender(f, width:20, height:20 );
+    sp = new Sprite.withRender(f, width:size, height:size );
     sp.offsety = 0;
   }
   
@@ -301,7 +305,7 @@ class Target extends GObj {
     if( dx==null )
       return false;
     // 交差した
-    if( dx.abs() < (_width/2) ) {
+    if( dx.abs() < (_width/2)+(ball.size~/2) ) {
       _hitdx = dx;
       
       // 得点を加算

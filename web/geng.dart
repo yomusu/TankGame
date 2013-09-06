@@ -61,10 +61,10 @@ class GButton extends GObj {
   
   // member properties ----
   
-  num x = 320;
-  num y = 180;
-  num width = 100;
-  num height= 50;
+  num x;
+  num y;
+  num width;
+  num height;
   
   /** Z値 */
   num z = 1000;
@@ -91,6 +91,7 @@ class GButton extends GObj {
   
   
   var onPress = null;
+  var onRelease = null;
   
   bool  isOn = false;
   bool  isPress = false;
@@ -101,6 +102,11 @@ class GButton extends GObj {
   
   /** ボタンレンダラ:差し替え可能 */
   ButtonRenderer renderer = defaultButtonRenderer.render;
+  
+  
+  /** Default Constructor */
+  GButton({this.text:null, this.x:320, this.y:180, this.width:100, this.height:50});
+  
   
   bool isIn( num mx, num my ) {
     
@@ -157,6 +163,19 @@ class ButtonList {
     }
   }
   
+  /** entryされたボタンすべてに対しPress処理をする */
+  void onRelease(PressEvent e) {
+    if( _btnList!=null ) {
+      _btnList.where( (b) => b.isPress )
+        .forEach( (GButton b) {
+          if( b.onRelease!=null ) {
+            b.onRelease();
+            b.isPress = false;
+          }
+        });
+    }
+  }
+  
   /** entryされたボタンすべてに対しMove処理をする */
   void onMouseMove( int x, int y ) {
     if( _btnList!=null ) {
@@ -189,6 +208,7 @@ abstract class GScreen {
   
   /** 入力デバイスのプレスイベント */
   void onPress( PressEvent e ) => btnList.onPress(e);
+  void onRelease( PressEvent e ) => btnList.onRelease(e);
   void onMove( int x, int y ) => btnList.onMouseMove(x, y);
   var onMoveOut = null;
   
@@ -432,6 +452,15 @@ class GEng {
         ..x = e.client.x - geng.canvas.offsetLeft
         ..y = e.client.y - geng.canvas.offsetTop;
         _screen.onPress(event);
+      }
+    });
+    canvas.onMouseUp.listen( (MouseEvent e) {
+      if( _screen!=null && _screen.onPress!=null ) {
+        e.preventDefault();
+        var event = new PressEvent()
+        ..x = e.client.x - geng.canvas.offsetLeft
+        ..y = e.client.y - geng.canvas.offsetTop;
+        _screen.onRelease(event);
       }
     });
     canvas.onMouseMove.listen( (MouseEvent e) {

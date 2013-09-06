@@ -131,6 +131,20 @@ TextRender  trenTitle = new TextRender()
 ..shadowOffset = 2
 ..shadowBlur = 2;
 
+TextRender  trenStageName = new TextRender()
+..fontFamily = scoreFont
+..fontSize = "20pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = Color.Black;
+
+TextRender  trenStageCaption = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "14pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = Color.Gray;
+
 
 /***********
  * 
@@ -139,33 +153,41 @@ TextRender  trenTitle = new TextRender()
  */
 class StageSelect extends GScreen {
   
+  var leftBtn,rightBtn,startBtn;
+  var nowStageIndex = 0;
+  
+  Map get selectedStage => stageList[nowStageIndex];
+
   void onStart() {
+    
+    const StageY = 200;
+    
     geng.objlist.disposeAll();
     
+    // StageSelectボタン配置
+    leftBtn = new GButton(text:"<", x:100, y:StageY, width:40, height:40)
+    ..onRelease = ( (){ _shiftStage(-1); });
+    geng.objlist.add( leftBtn );
+    btnList.add( leftBtn );
+    
+    rightBtn = new GButton(text:">", x:540, y:StageY, width:40,height:40)
+    ..onRelease = ( (){ _shiftStage(1); });
+    geng.objlist.add( rightBtn );
+    btnList.add( rightBtn );
+    
     // StartGameボタン配置
-    var y = 200;
-    for( var stage in stageList ) {
-      
-      var btn = new GButton()
-      ..onPress = ( ()=>goToNext( stage ) )
-      ..text = stage['name']
-      ..width = 300
-      ..height= 50
-      ..x = 320
-      ..y = y
-      ..isEnable = stage['enable'];
-      geng.objlist.add( btn );
-      btnList.add( btn );
-      
-      y += 100;
-    }
+    startBtn = new GButton(text:"つぎへ", x:320, y:500, width:300,height:60)
+    ..onRelease = ( (){
+      stageData = selectedStage;
+      geng.screen = new ItemSelect();
+    });
+    geng.objlist.add( startBtn );
+    btnList.add( startBtn );
+    
     
     // 戻るボタン配置
-    var btn = new GButton()
-      ..onPress = ( (){ geng.screen = new Title(); } )
-      ..text = "戻る"
-      ..width = 100
-      ..height= 40
+    var btn = new GButton(text:"戻る",width:100,height:40)
+      ..onRelease = ( (){ geng.screen = new Title(); } )
       ..x = 10 + (100/2)
       ..y = 10 + (40/2);
     geng.objlist.add( btn );
@@ -174,15 +196,38 @@ class StageSelect extends GScreen {
     // 最前面描画処理
     onFrontRender = ( GCanvas2D canvas ) {
       canvas.drawTexts( trenTitle, ["ステージの選択"], 320, 10, maxWidth:620 );
+      
+      canvas.drawTexts( trenStageName, [selectedStage['name']], 320, StageY-20 );
+      canvas.drawTexts( trenStageCaption, [selectedStage['caption']], 320, StageY+20 );
     };
+    
+    // for Disable初期化
+    _shiftStage(0);
   }
   
-  void goToNext( var stage ) {
-    new Timer( const Duration(milliseconds:500), () {
-      stageData = stage;
-      geng.screen = new ItemSelect();
-    });
+  void _shiftStage( num shift ) {
+    
+    nowStageIndex += shift;
+    
+    if( nowStageIndex <=0 ) {
+      nowStageIndex = 0;
+      leftBtn.isEnable = false;
+      rightBtn.isEnable = true;
+      
+    } else if( nowStageIndex >= (stageList.length-1) ) {
+      nowStageIndex = stageList.length-1;
+      leftBtn.isEnable = true;
+      rightBtn.isEnable = false;
+      
+    } else {
+      leftBtn.isEnable = true;
+      rightBtn.isEnable = true;
+    }
+    
+    // 
+    startBtn.isEnable = selectedStage['enable'];
   }
+  
 }
 
 

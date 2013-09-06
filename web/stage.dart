@@ -5,7 +5,8 @@ part of tankgame;
  */
 List  stageList = [
    // Stage1
-   { 'enable':true, 'name':"stage1",
+   { 'enable':true, 'name':"Stage1",
+     "caption" : "ねらえ10連コンボ！訓練専用ステージ",
      'speed':3.0, 'length':2500,
      'map':[
          [ 900, 100, "large" ],
@@ -16,7 +17,8 @@ List  stageList = [
      ]
    },
    // Stage2
-   { 'enable':true, 'name':"stage2",
+   { 'enable':true, 'name':"Stage2",
+     "caption" : "戦略が勝負を分ける！実戦専用ステージ",
      'speed':3.0, 'length':2100,
      'map':[
          [ 900, 50, "large" ],
@@ -29,7 +31,9 @@ List  stageList = [
      ]
    },
    // Stage3
-   { 'enable':false, 'name':"stage3" },
+   { 'enable':false, 'name':"Stage3",
+     "caption" : "撃て！撃ってみせろ！破壊専用ステージ",
+   },
 ];
 
 

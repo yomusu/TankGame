@@ -7,13 +7,18 @@ List  stageList = [
    // Stage1
    { 'id':'stage1', 'name':"Stage1",
      "caption" : "ねらえ10連コンボ！訓練専用ステージ",
-     'speed':3.0, 'length':2500,
+     'speed':3.0, 'length':4000,
      'map':[
          [ 900, 100, "large" ],
          [ 1300, 100, "large" ],
          [ 1700, 100, "small" ],
          [ 2000, 100, "small" ],
          [ 2300, 100, "small" ],
+         [ 2600, 100, "large" ],
+         [ 2900, 100, "large" ],
+         [ 3200, 100, "small" ],
+         [ 3500, 100, "small" ],
+         [ 3800, 100, "small" ],
      ]
    },
    // Stage2

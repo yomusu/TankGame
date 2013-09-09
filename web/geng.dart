@@ -730,8 +730,8 @@ class HiScoreManager {
   /**
    * 指定した種類のハイスコアを取得します。読み取り専用です
    */
-  List<int> getScores( String kind ) {
-    return _scoresMap[kind].toList(growable:false);
+  List<String> getScoreTexts( String kind ) {
+    return _scoresMap[kind].map((e)=>e.toString()).toList(growable:false);
   }
   
   /**

@@ -173,6 +173,7 @@ class StageSelect extends GScreen {
   var nowStageIndex = 0;
   
   Map get selectedStage => stageList[nowStageIndex];
+  var scoreList;
 
   void onStart() {
     
@@ -216,18 +217,9 @@ class StageSelect extends GScreen {
       // ステージ名の表示
       canvas.drawTexts( trenStageName, [selectedStage['name']], 320, StageY-20 );
       canvas.drawTexts( trenStageCaption, [selectedStage['caption']], 320, StageY+20 );
+      
       // ハイスコアの表示
-      var y = HiscoreTop;
-      trenHiscore.textAlign = "center";
-      canvas.drawTexts( trenHiscore, ["Hi-SCORE"], 320, y, maxWidth:300 );
-      var titles = ["1st","2nd","3rd","4th","5th"];
-      y += 20*2;
-      trenHiscore.textAlign = "right";
-      titles.forEach( (t) {
-        canvas.drawTexts( trenHiscore, [t], 250, y, maxWidth:100 );
-        canvas.drawTexts( trenHiscore, ["0000000"], 450, y, maxWidth:300 );
-        y += 20;
-      });
+      drawHiScore(canvas, scoreList, HiscoreTop);
     };
     
     // for Disable初期化
@@ -253,12 +245,34 @@ class StageSelect extends GScreen {
       rightBtn.isEnable = true;
     }
     
-    // 
+    // Hi-Scoreリストを更新
+    scoreList = geng.hiscoreManager.getScoreTexts(selectedStage['id']);
+
+    // ステージがアンロックされているかで選択可を決める
     startBtn.isEnable = gamePointManager.isUnlock(selectedStage['id']);
   }
   
 }
 
+final titles = <String>["1st","2nd","3rd","4th","5th"];
+
+// ハイスコアの表示
+void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
+  
+  const line = 20;
+  
+  trenHiscore.textAlign = "center";
+  canvas.drawTexts( trenHiscore, ["Hi-SCORE"], 320, y, maxWidth:300 );
+  
+  y += line*2;
+  trenHiscore.textAlign = "right";
+  for( int i=0; i<scoreList.length; i++ ) {
+    trenHiscore.fillColor = ( mark==i ) ? Color.Red : Color.Black;
+    canvas.drawTexts( trenHiscore, [titles[i]], 250, y, maxWidth:100 );
+    canvas.drawTexts( trenHiscore, [scoreList[i]], 450, y, maxWidth:300 );
+    y += line;
+  }
+}
 
 /***********
  * 
@@ -431,6 +445,12 @@ class TankGame extends GScreen {
         // 発射ボタン等消す
         firebtn.dispose();
         
+        // Hi-Score登録
+        int rank = -1;
+        try {
+          rank = geng.hiscoreManager.addNewRecord(stageData['id'], score );
+        } catch(e){}
+        
         // ゲームポイントを加算
         var point = gamePointManager.point;
         bool hasGotNewCommer = gamePointManager.addPoint( score );
@@ -447,22 +467,26 @@ class TankGame extends GScreen {
           });
         });
         
+        // ハイスコア
+        var scoreList = geng.hiscoreManager.getScoreTexts(stageData['id']);
+        
         // 結果表示
         onFrontRender = ( GCanvas2D c ) {
           c.drawTexts( trenScore, ["- GAME OVER -"], 320, 100);
           c.drawTexts( trenScore, ["SCORE: ${score}"], 320, 150);
-          // 
-          c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 320, 260);
-          if( hasGotNewCommer )
-            c.drawTexts( trenScore, ["You have got new goodies!!"], 320, 280);
           // Hi-Score表示
+          drawHiScore( c, scoreList, 200, mark:rank );
+          // ゲームポイント
+          c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 320, 380);
+          if( hasGotNewCommer )
+            c.drawTexts( trenScore, ["You have got new goodies!!"], 320, 410);
         };
         
         // 戻るボタン配置
         var retBtn = new GButton()
         ..onPress = () { geng.screen = new Title(); }
         ..text = "戻る"
-        ..x = 320 ..y = 400
+        ..x = 320 ..y = 500
         ..width = 100 ..height= 40;
         geng.objlist.add( retBtn );
         btnList.add( retBtn );

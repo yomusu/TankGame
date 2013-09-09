@@ -3,6 +3,7 @@ library tankgame;
 import 'dart:html';
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:collection';
 
 import 'vector.dart';
 
@@ -14,6 +15,8 @@ part 'stage.dart';
 
 
 final String  scoreFont = "'Press Start 2P', cursive";
+
+GamePointManager  gamePointManager = new GamePointManager();
 
 void main() {
   
@@ -38,6 +41,9 @@ void main() {
     
     // ハイスコアデータ読み込み
     geng.hiscoreManager.init();
+    
+    // ゲームポイントマネージャー
+    gamePointManager.init();
     
     // Retina
     query("#devicePixelRatio").text = window.devicePixelRatio.toString();
@@ -228,7 +234,7 @@ class StageSelect extends GScreen {
     }
     
     // 
-    startBtn.isEnable = selectedStage['enable'];
+    startBtn.isEnable = gamePointManager.isUnlock(selectedStage['id']);
   }
   
 }
@@ -255,7 +261,7 @@ class ItemSelect extends GScreen {
       ..height= 70
       ..x = 320
       ..y = y
-      ..isEnable = item['obtained'];
+      ..isEnable = gamePointManager.isUnlock(item['id']);
       geng.objlist.add( btn );
       btnList.add( btn );
       
@@ -405,8 +411,32 @@ class TankGame extends GScreen {
         // 発射ボタン等消す
         firebtn.dispose();
         
+        // ゲームポイントを加算
+        var point = gamePointManager.point;
+        bool hasGotNewCommer = gamePointManager.addPoint( score );
+        var newPoint = gamePointManager.point;
+        
+        // 加算処理
+        delay( 1000, () {
+          new Timer.periodic( const Duration(milliseconds:20), (t){
+            point+=10;
+            if( point >= newPoint ) {
+              point = newPoint;
+              t.cancel();
+            }
+          });
+        });
+        
         // 結果表示
-        geng.objlist.add( new ResultPrint() );
+        onFrontRender = ( GCanvas2D c ) {
+          c.drawTexts( trenScore, ["- GAME OVER -"], 320, 100);
+          c.drawTexts( trenScore, ["SCORE: ${score}"], 320, 150);
+          // 
+          c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 320, 260);
+          if( hasGotNewCommer )
+            c.drawTexts( trenScore, ["You have got new goodies!!"], 320, 280);
+          // Hi-Score表示
+        };
         
         // 戻るボタン配置
         var retBtn = new GButton()

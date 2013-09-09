@@ -5,7 +5,7 @@ part of tankgame;
  */
 List  stageList = [
    // Stage1
-   { 'enable':true, 'name':"Stage1",
+   { 'id':'stage1', 'name':"Stage1",
      "caption" : "ねらえ10連コンボ！訓練専用ステージ",
      'speed':3.0, 'length':2500,
      'map':[
@@ -17,7 +17,7 @@ List  stageList = [
      ]
    },
    // Stage2
-   { 'enable':true, 'name':"Stage2",
+   { 'id':'stage2', 'name':"Stage2",
      "caption" : "戦略が勝負を分ける！実戦専用ステージ",
      'speed':3.0, 'length':2100,
      'map':[
@@ -31,7 +31,7 @@ List  stageList = [
      ]
    },
    // Stage3
-   { 'enable':false, 'name':"Stage3",
+   { 'id':'stage3', 'name':"Stage3",
      "caption" : "撃て！撃ってみせろ！破壊専用ステージ",
    },
 ];
@@ -69,3 +69,58 @@ List  itemList = [
                     'text' : "スピード砲弾",
                   },
 ];
+
+
+
+class GamePointManager {
+  
+  /** 現在保持しているゲームポイント */
+  int _point;
+  /** Unlockされた要素 */
+  HashSet<String> _unlocked = new HashSet();
+  
+  Map unlockPoints = {
+              "stage1" : 0,     // ステージ1
+              "stage2" : 1000,  // ステージ2
+              "stage3" : 5000,  // ステージ3
+              "nom001" : 0,     // まめ砲弾
+              "big001" : 2000,  // でかい砲弾
+              "fast001" : 3000, // 速い砲弾
+  };
+  
+  /** 初期化：読み込み、初期化 */
+  void init() {
+    if( window.localStorage.containsKey("gamePoint") )
+      _point = int.parse( window.localStorage["gamePoint"] );
+    else
+      _point = 0;
+    
+    _updateUnlockSet();
+  }
+  
+  int get point => _point;
+  
+  /** ゲームポイントの追加 */
+  bool addPoint( int point ) {
+    _point += point;
+    window.localStorage["gamePoint"] = "$_point";
+    
+    // 戻り値は新しくUnlockされた要素があるかどうか
+    var oldNumberOfUnlocked = _unlocked.length;
+    _updateUnlockSet();
+    return _unlocked.length != oldNumberOfUnlocked;
+  }
+  
+  void _updateUnlockSet() {
+    unlockPoints.forEach( (key,p) {
+      if( _point >= p )
+        _unlocked.add( key );
+    });
+  }
+  
+  /** 要素がUnlockされているか確認する */
+  bool isUnlock( String key ) {
+    return _unlocked.contains(key);
+  }
+  
+}

@@ -145,6 +145,13 @@ TextRender  trenStageCaption = new TextRender()
 ..textBaseline = "middle"
 ..fillColor = Color.Gray;
 
+TextRender  trenHiscore = new TextRender()
+..fontFamily = scoreFont
+..fontSize = "12pt"
+..textAlign = "right"
+..textBaseline = "middle"
+..fillColor = Color.Black;
+
 
 /***********
  * 
@@ -161,16 +168,17 @@ class StageSelect extends GScreen {
   void onStart() {
     
     const StageY = 200;
+    const HiscoreTop = 300;
     
     geng.objlist.disposeAll();
     
     // StageSelectボタン配置
-    leftBtn = new GButton(text:"<", x:100, y:StageY, width:40, height:40)
+    leftBtn = new GButton(text:"<", x:100, y:StageY, width:50, height:50)
     ..onRelease = ( (){ _shiftStage(-1); });
     geng.objlist.add( leftBtn );
     btnList.add( leftBtn );
     
-    rightBtn = new GButton(text:">", x:540, y:StageY, width:40,height:40)
+    rightBtn = new GButton(text:">", x:540, y:StageY, width:50,height:50)
     ..onRelease = ( (){ _shiftStage(1); });
     geng.objlist.add( rightBtn );
     btnList.add( rightBtn );
@@ -196,9 +204,21 @@ class StageSelect extends GScreen {
     // 最前面描画処理
     onFrontRender = ( GCanvas2D canvas ) {
       canvas.drawTexts( trenTitle, ["ステージの選択"], 320, 10, maxWidth:620 );
-      
+      // ステージ名の表示
       canvas.drawTexts( trenStageName, [selectedStage['name']], 320, StageY-20 );
       canvas.drawTexts( trenStageCaption, [selectedStage['caption']], 320, StageY+20 );
+      // ハイスコアの表示
+      var y = HiscoreTop;
+      trenHiscore.textAlign = "center";
+      canvas.drawTexts( trenHiscore, ["Hi-SCORE"], 320, y, maxWidth:300 );
+      var titles = ["1st","2nd","3rd","4th","5th"];
+      y += 20*2;
+      trenHiscore.textAlign = "right";
+      titles.forEach( (t) {
+        canvas.drawTexts( trenHiscore, [t], 250, y, maxWidth:100 );
+        canvas.drawTexts( trenHiscore, ["0000000"], 450, y, maxWidth:300 );
+        y += 20;
+      });
     };
     
     // for Disable初期化

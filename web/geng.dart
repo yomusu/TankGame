@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:web_audio';
+import 'dart:convert';
 
 part 'sprite.dart';
 part 'canvasutil.dart';
@@ -396,6 +397,7 @@ class GEng {
   
   final ImageMap  imageMap = new ImageMap();
   final SoundManager soundManager = new SoundManager();
+  final HiScoreManager  hiscoreManager = new HiScoreManager();
   
   // setter/getter --------
   
@@ -692,3 +694,87 @@ class SoundManager {
 void delay( int milliseconds,  void callback() ) {
   new Timer( new Duration(milliseconds:milliseconds), callback );
 }
+
+
+
+/**
+ * ハイスコア管理
+ * 
+ */
+class HiScoreManager {
+  
+  Map<String,List<int>> _scoresMap;
+  
+  /** 各スコアの最大登録数 */
+  int maxLength = 5;
+
+  /**
+   * データの読み込み、もしくは初期化
+   */
+  void init() {
+    
+    if( window.localStorage.containsKey("hiscore") ) {
+      // LocalStorageから読み込み
+      var savedData = window.localStorage["hiscore"];
+      _scoresMap = new JsonDecoder(null).convert( savedData );
+    } else {
+      // 初期設定
+      _scoresMap = {
+        "stage1" : [ 500, 400, 300, 200, 100 ],
+        "stage2" : [ 500, 400, 300, 200, 100 ],
+        "stage3" : [ 500, 400, 300, 200, 100 ],
+      };
+    }
+  }
+  
+  /**
+   * 指定した種類のハイスコアを取得します。読み取り専用です
+   */
+  List<int> getScores( String kind ) {
+    return _scoresMap[kind].toList(growable:false);
+  }
+  
+  /**
+   * 新しいスコアを登録する
+   * 戻りは登録された順位です（0始まり）
+   * ランク外ならthrowされます
+   */
+  int addNewRecord( String kind, int newScore ) {
+    
+    var _list = _scoresMap[kind];
+    
+    for( int i=0; i<_list.length; i++ ) {
+      if( newScore > _list[i] ) {
+        // 追加
+        _list.insert( i, newScore );
+        // はみ出した分を削除する
+        if( _list.length > maxLength )
+          _list.removeRange(maxLength, _list.length);
+        // callback
+        writeData();
+        
+        return i;
+      }
+    }
+    
+    throw "out of ranking";
+  }
+  
+  /**
+   * ハイスコアを永続化します。
+   * 普通はaddNewRecordされる度に自動で呼ばれます
+   */
+  void writeData() {
+    var stringfy = new JsonEncoder().convert( _scoresMap );
+    window.localStorage["hiscore"] = stringfy;
+  }
+  
+  /**
+   * ハイスコアデータをクリアします
+   */
+  void allClear() {
+    window.localStorage.remove("hiscore");
+    init();
+  }
+}
+

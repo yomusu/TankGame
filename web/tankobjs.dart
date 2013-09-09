@@ -31,20 +31,6 @@ class GameStartLogo extends GObj {
   void onDispose() {}
 }
 
-class ResultPrint extends GObj {
-  
-  void onInit() {}
-  
-  void onProcess(RenderList renderList) {
-    renderList.add( 100, (canvas) {
-      canvas.drawTexts( trenScore, ["GAME OVER"], 320, 200);
-      canvas.drawTexts( trenScore, ["SCORE: ${score}"], 320, 230);
-    });
-  }
-  
-  void onDispose() {}
-}
-
 /**
  * 戦車
  */

@@ -36,6 +36,9 @@ void main() {
     geng.soundManager.put("fire","./sound/bomb.ogg");
     geng.soundManager.put("bomb","./sound/launch02.ogg");
     
+    // ハイスコアデータ読み込み
+    geng.hiscoreManager.init();
+    
     // Retina
     query("#devicePixelRatio").text = window.devicePixelRatio.toString();
     

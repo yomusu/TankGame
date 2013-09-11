@@ -3,7 +3,30 @@ part of geng;
 
 
 class TextRender {
-
+  
+  TextRender();
+  
+  TextRender.from( TextRender src ) {
+    set( src );
+  }
+  
+  void set( TextRender src ) {
+    _fontSize = src._fontSize;
+    _fontFamily = src._fontFamily;
+    _font = src._font;
+    
+    strokeColor = src.strokeColor;
+    fillColor = src.fillColor;
+    shadowColor = src.shadowColor;
+    shadowOffsetX = src.shadowOffsetX;
+    shadowOffsetY = src.shadowOffsetY;
+    shadowBlur = src.shadowBlur;
+    lineWidth = src.lineWidth;
+    lineHeight = src.lineHeight;
+    textAlign = src.textAlign;
+    textBaseline = src.textBaseline;
+  }
+  
   // private member -------------
   
   String  _fontSize = '24pt';

@@ -161,6 +161,8 @@ TextRender  trenHiscore = new TextRender()
 ..textBaseline = "middle"
 ..fillColor = Color.Black;
 
+TextRender  trenHiscoreS = new TextRender.from(trenHiscore)
+..fillColor = Color.Red;
 
 /***********
  * 
@@ -265,11 +267,12 @@ void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
   canvas.drawTexts( trenHiscore, ["Hi-SCORE"], 320, y, maxWidth:300 );
   
   y += line*2;
-  trenHiscore.textAlign = "right";
+  var tren = new TextRender.from(trenHiscore);
+  tren.textAlign = "right";
   for( int i=0; i<scoreList.length; i++ ) {
-    trenHiscore.fillColor = ( mark==i ) ? Color.Red : Color.Black;
-    canvas.drawTexts( trenHiscore, [titles[i]], 250, y, maxWidth:100 );
-    canvas.drawTexts( trenHiscore, [scoreList[i]], 450, y, maxWidth:300 );
+    tren.fillColor = ( mark==i ) ? Color.Red : Color.Black;
+    canvas.drawTexts( tren, [titles[i]], 250, y, maxWidth:100 );
+    canvas.drawTexts( tren, [scoreList[i]], 450, y, maxWidth:300 );
     y += line;
   }
 }
@@ -457,12 +460,22 @@ class TankGame extends GScreen {
         var newPoint = gamePointManager.point;
         
         // 加算処理
+        bool  hasCameEndOfCount = false;
         delay( 1000, () {
           new Timer.periodic( const Duration(milliseconds:20), (t){
             point+=10;
             if( point >= newPoint ) {
               point = newPoint;
               t.cancel();
+              hasCameEndOfCount = true;
+              // 戻るボタン配置
+              var retBtn = new GButton()
+              ..onPress = () { geng.screen = new Title(); }
+              ..text = "戻る"
+                  ..x = 320 ..y = 500
+                  ..width = 100 ..height= 40;
+              geng.objlist.add( retBtn );
+              btnList.add( retBtn );
             }
           });
         });
@@ -478,18 +491,10 @@ class TankGame extends GScreen {
           drawHiScore( c, scoreList, 200, mark:rank );
           // ゲームポイント
           c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 320, 380);
-          if( hasGotNewCommer )
-            c.drawTexts( trenScore, ["You have got new goodies!!"], 320, 410);
+          if( hasGotNewCommer && hasCameEndOfCount ) {
+            c.drawTexts( trenHiscoreS, ["You have got a secret one!!"], 320, 410);
+          }
         };
-        
-        // 戻るボタン配置
-        var retBtn = new GButton()
-        ..onPress = () { geng.screen = new Title(); }
-        ..text = "戻る"
-        ..x = 320 ..y = 500
-        ..width = 100 ..height= 40;
-        geng.objlist.add( retBtn );
-        btnList.add( retBtn );
         
         onProcess = () {
           tank.pos.add( tank.speed );

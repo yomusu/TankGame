@@ -128,4 +128,7 @@ class GamePointManager {
     return _unlocked.contains(key);
   }
   
+  void clearPoint() {
+    window.localStorage.remove("gamePoint");
+  }
 }

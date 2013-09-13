@@ -45,6 +45,10 @@ void main() {
     // ゲームポイントマネージャー
     gamePointManager.init();
     
+    // SoundのOn/Off
+    bool sound = window.localStorage.containsKey("sound") ? window.localStorage["sound"]=="true" : false;
+    geng.soundManager.soundOn = sound;
+    
     // Retina
     query("#devicePixelRatio").text = window.devicePixelRatio.toString();
     
@@ -68,6 +72,15 @@ Tank  tank;
 int score;
 double  offset_x = 0.0;
 
+clearGameData() {
+
+  // ハイスコア
+  geng.hiscoreManager.allClear();
+  // サウンドのON/OFF
+//  window.localStorage;
+  // 取得ポイント
+  gamePointManager.clearPoint();
+}
 
 /***********
  * 
@@ -93,32 +106,35 @@ class Title extends GScreen {
     
     //---------------------
     // StartGameボタン配置
-    var playbtn = new GButton()
+    var playbtn = new GButton(text:"ゲームスタート",width:300,height:60)
     ..onPress = (){
       geng.soundManager.play("fire");
       new Timer( const Duration(milliseconds:500), () {
         geng.screen = new StageSelect();
       });
     }
-    ..text = "ゲームスタート"
-    ..width = 300
-    ..height= 60
     ..x = 320
-    ..y = 320;
+    ..y = 300;
     geng.objlist.add( playbtn );
     btnList.add( playbtn );
     
     //---------------------
     // How to Playボタンの配置
-    var howtobtn = new GButton()
+    var howtobtn = new GButton(text:"あそびかた",width:300,height:60)
     ..onPress = (){ geng.screen = new HowToPlay(); }
-    ..text = "あそびかた"
-    ..width = 300
-    ..height= 60
     ..x = 320
-    ..y = 420;
+    ..y = 390;
     geng.objlist.add( howtobtn );
     btnList.add( howtobtn );
+    
+    //---------------------
+    // Configボタンの配置
+    var configbtn = new GButton(text:"設定",width:300,height:60)
+    ..onPress = (){ geng.screen = new ConfigSetting(); }
+    ..x = 320
+    ..y = 480;
+    geng.objlist.add( configbtn );
+    btnList.add( configbtn );
     
     //---------------------
     // 最前面描画処理
@@ -327,6 +343,59 @@ class ItemSelect extends GScreen {
       itemData = item;
       geng.screen = new TankGame();
     });
+  }
+}
+
+/**
+ * 遊び方画面
+ */
+class ConfigSetting extends GScreen {
+  
+  static const TextSoundOff = "サウンドをOFFにする";
+  static const TextSoundOn  = "サウンドをONにする";
+  
+  void onStart() {
+    geng.objlist.disposeAll();
+    
+    // サウンドボタン
+    var sound = new GButton(width:300,height:70)
+    ..text = geng.soundManager.soundOn ? TextSoundOff : TextSoundOn
+    ..x = 320
+    ..y = 200;
+    sound.onRelease = () {
+      if( geng.soundManager.soundOn ) {
+        geng.soundManager.soundOn = false;
+        sound.text = TextSoundOn;
+        window.localStorage["sound"] = "false";
+      } else {
+        geng.soundManager.soundOn = true;
+        sound.text = TextSoundOff;
+        window.localStorage["sound"] = "true";
+      }
+    };
+    geng.objlist.add( sound );
+    btnList.add( sound );
+    
+    // データクリアボタン
+    var clearData = new GButton(text:"データをすべてクリアする",width:300,height:70)
+    ..x = 320
+    ..y = 300
+    ..onRelease = () { clearGameData(); };
+    geng.objlist.add( clearData );
+    btnList.add( clearData );
+    
+    // 戻るボタン配置
+    var retbtn = new GButton(text:"戻る",width:200,height:70)
+    ..onRelease = () { geng.screen = new Title(); }
+    ..x = 320
+    ..y = 500;
+    geng.objlist.add( retbtn );
+    btnList.add( retbtn );
+    
+    // 最前面描画処理
+    onFrontRender = ( GCanvas2D canvas ) {
+      canvas.drawTexts( trenTitle, ["設定"], 320, 10, maxWidth:620 );
+    };
   }
 }
 

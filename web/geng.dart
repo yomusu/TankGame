@@ -719,11 +719,7 @@ class HiScoreManager {
       _scoresMap = new JsonDecoder(null).convert( savedData );
     } else {
       // 初期設定
-      _scoresMap = {
-        "stage1" : [ 500, 400, 300, 200, 100 ],
-        "stage2" : [ 500, 400, 300, 200, 100 ],
-        "stage3" : [ 500, 400, 300, 200, 100 ],
-      };
+      _scoresMap = {};
     }
   }
   
@@ -731,15 +727,21 @@ class HiScoreManager {
    * 指定した種類のハイスコアを取得します。読み取り専用です
    */
   List<String> getScoreTexts( String kind ) {
-    return _scoresMap[kind].map((e)=>e.toString()).toList(growable:false);
+    var list = (_scoresMap.containsKey(kind)) ? _scoresMap[kind] : defaultScores;
+    return list.map((e)=>e.toString()).toList(growable:false);
   }
   
+  var defaultScores=[ 500, 400, 300, 200, 100 ]; 
   /**
    * 新しいスコアを登録する
    * 戻りは登録された順位です（0始まり）
    * ランク外ならthrowされます
    */
   int addNewRecord( String kind, int newScore ) {
+    
+    // なかったらデフォルトハイスコアで初期化する
+    if( _scoresMap.containsKey(kind)==false )
+      _scoresMap[kind] = defaultScores;
     
     var _list = _scoresMap[kind];
     

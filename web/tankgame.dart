@@ -606,7 +606,7 @@ class FireButton extends GButton {
   
   void startCharge() {
     new Timer.periodic( const Duration(milliseconds:50), (t) {
-      power += 0.05;
+      power += 0.2;
       if( power >= 1.0 ) {
         power = 1.0;
         t.cancel();

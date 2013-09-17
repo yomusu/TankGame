@@ -642,7 +642,7 @@ bool isRetina() {
 
 class SoundManager {
   
-  AudioContext audioContext = new AudioContext();
+  AudioContext audioContext = null;
   GainNode gainNode = null;
   
   Map<String,AudioBuffer> map = new Map();
@@ -651,37 +651,49 @@ class SoundManager {
   bool  soundOn = false;
   
   SoundManager() {
-    gainNode = audioContext.createGain();
-    gainNode.connectNode(audioContext.destination, 0, 0);
+    try {
+      AudioContext audioContext = new AudioContext();
+      gainNode = audioContext.createGain();
+      gainNode.connectNode(audioContext.destination, 0, 0);
+    } catch( e ) {
+      print("SoundManager : This browser is unsupported AudioContext.");
+    }
   }
   
   Future<String> put( String key, String filename ) {
     
     var comp = new Completer();
     
-    HttpRequest xhr = new HttpRequest()
+    if( audioContext!=null ) {
+      // 対応ブラウザの場合、読み込み
+      HttpRequest xhr = new HttpRequest()
       ..open("GET", filename)
       ..responseType = "arraybuffer";
     
-    xhr.onLoad.listen((e) {
-      // 音声データのデコード
-      audioContext.decodeAudioData(xhr.response)
-      .then( (AudioBuffer buffer) {
-          map[key] = buffer;
-          print("loaded ${filename}");
-          comp.complete(key);
-      })
-      .catchError( (error) {
-        comp.completeError(error);
+      xhr.onLoad.listen((e) {
+        // 音声データのデコード
+        audioContext.decodeAudioData(xhr.response)
+          .then( (AudioBuffer buffer) {
+            map[key] = buffer;
+            print("loaded ${filename}");
+            comp.complete(key);
+          })
+            .catchError( (error) {
+              comp.completeError(error);
+            });
       });
-    });
-    xhr.onError.listen((e)=> comp.completeError(e));
-    xhr.send();
+      xhr.onError.listen((e)=> comp.completeError(e));
+      xhr.send();
+      
+    } else {
+      // 非対応ブラウザの場合、無視
+      Timer.run( (){ comp.complete(key); } );
+    }
     return comp.future;
   }
   
   void play( String key ) {
-    if( soundOn ) {
+    if( soundOn && audioContext!=null ) {
       AudioBufferSourceNode source = audioContext.createBufferSource()
           ..connectNode(gainNode, 0, 0)
             ..buffer = map[key]

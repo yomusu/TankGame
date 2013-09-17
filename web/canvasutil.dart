@@ -185,10 +185,12 @@ class GCanvas2D {
     c.textAlign = tren.textAlign;
     c.textBaseline = tren.textBaseline;
     
+    // 塗りつぶし、影の描画
     if( tren.fillColor!=null ) {
       
       c.save();
       
+      // 影の描画
       if( tren.shadowColor!=null ) {
         c.shadowColor = tren.shadowColor.rgba;
         c.shadowOffsetX = tren.shadowOffsetX;
@@ -196,23 +198,40 @@ class GCanvas2D {
         c.shadowBlur = tren.shadowBlur;
       }
       
+      // 塗りつぶしの描画
       c.setFillColorRgb(tren.fillColor.r, tren.fillColor.g, tren.fillColor.b, 1);
       var _y = y;
-      strs.forEach( (s) {
-        c.fillText( s, x, _y, maxWidth );
-        _y += tren.lineHeight;
-      });
+      if( maxWidth!=null ) {
+        strs.forEach( (s) {
+          c.fillText( s, x, _y, maxWidth );
+          _y += tren.lineHeight;
+        });
+      } else {
+        // maxWidth無しの場合(こうしないとdart2jsにて何故か表示されない)
+        strs.forEach( (s) {
+          c.fillText( s, x, _y );
+          _y += tren.lineHeight;
+        });
+      }
       
       c.restore();
     }
     
+    // ふちどりの描画
     if( tren.strokeColor!=null ) {
       c.setStrokeColorRgb(tren.strokeColor.r, tren.strokeColor.g, tren.strokeColor.b, tren.strokeColor.a);
       var _y = y;
-      strs.forEach( (s) {
-        c.strokeText( s, x, _y, maxWidth );
-        _y += tren.lineHeight;
-      });
+      if( maxWidth!=null ) {
+        strs.forEach( (s) {
+          c.strokeText( s, x, _y, maxWidth );
+          _y += tren.lineHeight;
+        });
+      } else {
+        strs.forEach( (s) {
+          c.strokeText( s, x, _y );
+          _y += tren.lineHeight;
+        });
+      }
     }
   }
 }

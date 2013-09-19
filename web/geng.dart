@@ -4,11 +4,14 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:collection';
 import 'dart:math' as math;
-import 'dart:web_audio';
 import 'dart:convert';
+
+import 'sound.dart';
 
 part 'sprite.dart';
 part 'canvasutil.dart';
+part 'gengutil.dart';
+
 
 final String  fontFamily = '"ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Meiryo, "メイリオ", "ＭＳ Ｐゴシック", Verdana, Geneva, Arial, Helvetica';
 
@@ -236,7 +239,7 @@ abstract class GScreen {
     geng.backcanvas.context2D.setFillColorRgb(255, 255, 255, 1.0);
     geng.backcanvas.context2D.fillRect(0,0, geng.rect.width, geng.rect.height);
     _renderList.renderAll( geng.backcanvas );
-    
+//    print( geng.rect );
     // 終わったら削除
     _renderList.clear();
     geng.objlist.gcObj();
@@ -411,64 +414,49 @@ class GEng {
   }
   
   /** フィールドの大きさ */
-  Rect get rect {
-    if( _rect==null ) {
-      var w = canvas.clientWidth;
-      var h = canvas.clientHeight;
-      _rect = new Rect(0,0,w,h);
-    }
-    return _rect;
-  }
+  Rect get rect => _rect;
   
-  
-  
-  
+  num _scale = 1.0;
   
   /**
    * フィールドを初期化する
    */
-  void initField( { int width, int height }) {
+  void initField( { int width, int height, num scale:1 }) {
     
-    if( isRetina() ) {
-      
-      // for Retina対応
-      canvas = new CanvasElement( width:width*2, height:height*2 );
-      canvas.style
-        ..width = "${width}px"
-        ..height= "${height}px";
-      canvas.context2D.scale(2.0, 2.0);
-      
-      backcanvas = canvas;
-      
-    } else {
-      canvas = new CanvasElement( width:width, height:height );
-      backcanvas = new CanvasElement( width:width, height:height );
-    }
+    _scale = scale;
+    _rect = new Rect(0,0,width,height);
+    
+    var w = (width * _scale).toInt();
+    var h = (height * _scale).toInt();
+    
+    // for Retina対応(Retina以外でも高精細になる)
+    canvas = new CanvasElement( width:w*2, height:h*2 );
+    canvas.style
+      ..width = "${w}px"
+      ..height= "${h}px";
+    canvas.context2D.scale(2*_scale, 2*_scale);
+        
+    backcanvas = canvas;
     
     
     // MouseDownからPressイベントを転送
     canvas.onMouseDown.listen( (MouseEvent e) {
       if( _screen!=null && _screen.onPress!=null ) {
         e.preventDefault();
-        var event = new PressEvent()
-        ..x = e.client.x - geng.canvas.offsetLeft
-        ..y = e.client.y - geng.canvas.offsetTop;
-        _screen.onPress(event);
+        _screen.onPress( createPressEvent(e) );
+        print( "e.client.x=${e.client.x} offsetLeft=${geng.canvas.offsetLeft}");
       }
     });
     canvas.onMouseUp.listen( (MouseEvent e) {
-      if( _screen!=null && _screen.onPress!=null ) {
+      if( _screen!=null && _screen.onRelease!=null ) {
         e.preventDefault();
-        var event = new PressEvent()
-        ..x = e.client.x - geng.canvas.offsetLeft
-        ..y = e.client.y - geng.canvas.offsetTop;
-        _screen.onRelease(event);
+        _screen.onRelease( createPressEvent(e) );
       }
     });
     canvas.onMouseMove.listen( (MouseEvent e) {
       if( _screen!=null && _screen.onMove!=null ) {
-        var x = e.client.x - geng.canvas.offsetLeft;
-        var y = e.client.y - geng.canvas.offsetTop;
+        var x = (e.client.x - geng.canvas.offsetLeft) ~/ _scale;
+        var y = (e.client.y - geng.canvas.offsetTop) ~/ _scale;
         _screen.onMove( x, y );
       }
     });
@@ -476,22 +464,51 @@ class GEng {
       if( _screen!=null && _screen.onMoveOut!=null )
         _screen.onMoveOut();
     });
+    // タッチイベント for スマホ
+    PressEvent  backupForTouch = null;
     canvas.onTouchStart.listen( (TouchEvent e) {
       if( _screen!=null && _screen.onPress!=null ) {
         e.preventDefault();
-        var event = new PressEvent()
-        ..x = e.touches[0].client.x - geng.canvas.offsetLeft
-        ..y = e.touches[0].client.y - geng.canvas.offsetTop;
+        var event = createPressEvent(e);
         _screen.onPress(event);
+        backupForTouch = event;
+      }
+    });
+    canvas.onTouchMove.listen( (TouchEvent e) {
+      if( _screen!=null && _screen.onMoveOut!=null ) {
+        var event = createPressEvent(e);
+        _screen.onMoveOut();
+        backupForTouch = event;
+      }
+    });
+    canvas.onTouchEnd.listen( (TouchEvent e) {
+      if( _screen!=null && _screen.onRelease!=null ) {
+        e.preventDefault();
+        _screen.onRelease(backupForTouch);
       }
     });
     
     geng.canvas = canvas;
   }
   
+  PressEvent createPressEvent( UIEvent e ) {
+    PressEvent  p = new PressEvent();
+    
+    if( e is TouchEvent ) {
+      print( (e as TouchEvent).touches.length );
+      var t = (e as TouchEvent).touches[0];
+      p.x = (t.client.x - geng.canvas.offsetLeft) ~/ geng._scale;
+      p.y = (t.client.y - geng.canvas.offsetTop) ~/ geng._scale;
+    } else if( e is MouseEvent ) {
+      var m = e as MouseEvent;
+      p.x = (m.client.x - geng.canvas.offsetLeft) ~/ geng._scale;
+      p.y = (m.client.y - geng.canvas.offsetTop) ~/ geng._scale;
+    }
+    return p;
+  }
   void flipBuffer() {
-    if( isRetina()==false )
-      canvas.context2D.drawImage( backcanvas, 0, 0 );
+//    if( isRetina()==false )
+//      canvas.context2D.drawImage( backcanvas, 0, 0 );
   }
   
   FrameTimer frameWatch = new FrameTimer();
@@ -533,180 +550,6 @@ class GEng {
 }
 
 GEng geng = new GEng();
-
-
-class FrameTimer {
-  
-  Stopwatch _watch = new Stopwatch();
-  var callback;
-  
-  var targetTime;
-  
-  int _duration;
-
-  void start( Duration time, void callback() ) {
-    _duration = time.inMicroseconds;
-    this.callback = callback;
-    
-    _watch.start();
-    targetTime = _watch.elapsedMicroseconds;
-    Timer.run( ()=>next() );
-  }
-  
-  void next() {
-    
-    if( _watch==null )
-      return;
-    
-    callback();
-    
-    // 次のフレーム実行時刻
-    targetTime += _duration;
-    var now = _watch.elapsedMicroseconds;
-    var wait = targetTime - now;
-//    print("wait=$wait  on ${_watch.elapsedMicroseconds}");
-    new Timer( new Duration(microseconds:wait) , ()=>next() );
-  }
-  
-  void dispose() {
-    if( _watch!=null ) {
-      _watch.stop();
-      _watch = null;
-    }
-  }
-}
-
-
-/**
- * FPSカウンター
- */
-class FPSCounter {
-  
-  Stopwatch _watch = new Stopwatch();
-  
-  var _total = 0;
-  var _fcount = 0;
-  var _startTime = 0;
-  
-  var _lastTimeForSecond = 0;
-  
-  /** 最新のFPS */
-  int lastFPS = 0;
-  /** 最新のフレーム処理時間(最後の秒からの平均) */
-  int lastAvgFrameDuration = 0;
-  
-  
-  void init() {
-    _watch.start();
-  }
-  
-  void dispose() {
-    _watch.stop();
-    _watch == null;
-  }
-  
-  void open() {
-    _startTime = _watch.elapsedMicroseconds;
-  }
-  
-  void shut() {
-    _total += _watch.elapsedMicroseconds - _startTime;
-    _fcount++;
-    
-    if( (_watch.elapsedMilliseconds - _lastTimeForSecond) >= 1000 ) {
-      _lastTimeForSecond += 1000;
-      
-      lastFPS = _fcount;
-      lastAvgFrameDuration = (_total/_fcount).toInt();
-      
-//      print( "$lastFPS fps ( $lastAvgFrameDuration us/f) on ${_watch.elapsedMilliseconds}" );
-      print( "$lastFPS fps ( ${_total/1000}ms on ${_watch.elapsedMilliseconds}" );
-      
-      _total = 0;
-      _fcount = 0;
-    }
-  }
-  
-}
-
-
-/**
- * Retinaディスプレイかどうか
- */
-bool isRetina() {
-  
-  var ratio = window.devicePixelRatio;
-  
-  return (ratio==2);
-}
-
-class SoundManager {
-  
-  AudioContext audioContext = null;
-  GainNode gainNode = null;
-  
-  Map<String,AudioBuffer> map = new Map();
-  
-  
-  bool  soundOn = false;
-  
-  SoundManager() {
-    try {
-      AudioContext audioContext = new AudioContext();
-      gainNode = audioContext.createGain();
-      gainNode.connectNode(audioContext.destination, 0, 0);
-    } catch( e ) {
-      print("SoundManager : This browser is unsupported AudioContext.");
-    }
-  }
-  
-  Future<String> put( String key, String filename ) {
-    
-    var comp = new Completer();
-    
-    if( audioContext!=null ) {
-      // 対応ブラウザの場合、読み込み
-      HttpRequest xhr = new HttpRequest()
-      ..open("GET", filename)
-      ..responseType = "arraybuffer";
-    
-      xhr.onLoad.listen((e) {
-        // 音声データのデコード
-        audioContext.decodeAudioData(xhr.response)
-          .then( (AudioBuffer buffer) {
-            map[key] = buffer;
-            print("loaded ${filename}");
-            comp.complete(key);
-          })
-            .catchError( (error) {
-              comp.completeError(error);
-            });
-      });
-      xhr.onError.listen((e)=> comp.completeError(e));
-      xhr.send();
-      
-    } else {
-      // 非対応ブラウザの場合、無視
-      Timer.run( (){ comp.complete(key); } );
-    }
-    return comp.future;
-  }
-  
-  void play( String key ) {
-    if( soundOn && audioContext!=null ) {
-      AudioBufferSourceNode source = audioContext.createBufferSource()
-          ..connectNode(gainNode, 0, 0)
-            ..buffer = map[key]
-      ..start(0);
-    }
-  }
-}
-
-
-void delay( int milliseconds,  void callback() ) {
-  new Timer( new Duration(milliseconds:milliseconds), callback );
-}
-
 
 
 /**

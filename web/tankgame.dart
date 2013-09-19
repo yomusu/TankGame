@@ -49,14 +49,9 @@ void main() {
     bool sound = window.localStorage.containsKey("sound") ? window.localStorage["sound"]=="true" : false;
     geng.soundManager.soundOn = sound;
     
-    // Retina
-    query("#devicePixelRatio").text = window.devicePixelRatio.toString();
-    
     // Canvas
-    var width = 640;
-    var height= 600;
-    
-    geng.initField( width:width, height:height );
+    num scale = isMobileDevice() ? 0.5 : 1;
+    geng.initField( width:640, height:600, scale:scale );
     
     query("#place").append( geng.canvas );
     
@@ -375,6 +370,10 @@ class ConfigSetting extends GScreen {
     };
     geng.objlist.add( sound );
     btnList.add( sound );
+    if( geng.soundManager.isSupport ==false ) {
+      sound.text = "サウンド非対応ブラウザ";
+      sound.isEnable = false;
+    }
     
     // データクリアボタン
     var clearData = new GButton(text:"データをすべてクリアする",width:300,height:70)
@@ -588,8 +587,8 @@ class FireButton extends GButton {
     text = "うつ!";
     x = 540;
     y = 530;
-    width = 120;
-    height= 60;
+    width = 140;
+    height= 100;
     
     onPress = fire;
   }

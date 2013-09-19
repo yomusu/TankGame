@@ -19,6 +19,8 @@ class SoundManager {
   
   /** サウンドを有効にするかどうか */
   bool  soundOn = false;
+  /** BrowserがAudioサポートしているかどうか */
+  bool  get isSupport => _audioContext!=null;
   
   SoundManager() {
     try {
@@ -69,7 +71,7 @@ class SoundManager {
    * サウンドを再生する
    */
   void play( String key ) {
-    if( soundOn && _audioContext!=null ) {
+    if( soundOn && isSupport ) {
       AudioBufferSourceNode source = _audioContext.createBufferSource()
           ..connectNode(_gainNode, 0, 0)
             ..buffer = _map[key]

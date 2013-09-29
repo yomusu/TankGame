@@ -82,7 +82,7 @@ class FPSCounter {
       _lastTimeForSecond += 1000;
       
       lastFPS = _fcount;
-      lastAvgFrameDuration = (_total/_fcount).toInt();
+      lastAvgFrameDuration = _total ~/_fcount;
       
 //      print( "$lastFPS fps ( $lastAvgFrameDuration us/f) on ${_watch.elapsedMilliseconds}" );
 //      print( "$lastFPS fps ( ${_total/1000}ms on ${_watch.elapsedMilliseconds}" );

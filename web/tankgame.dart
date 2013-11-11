@@ -24,11 +24,11 @@ void main() {
     
     // 画像読み込み
     geng.imageMap
-      ..put("tankUp", "./img/tankUp.png")
-      ..put("tankDown1", "./img/tankDown1.png")
-      ..put("tankDown2", "./img/tankDown2.png")
-      ..put("target", "./img/doramu.png")
-      ..put("kusa", "./kusa.png")
+      ..put("tank01", "./img/tank1.png")
+      ..put("tank02", "./img/tank2.png")
+      ..put("targetL", "./img/target_l.png")
+      ..put("targetS", "./img/target_s.png")
+      ..put("kusa", "./img/kusa.png")
       ..put("gareki01", "./img/gareki01.png")
       ..put("gareki02", "./img/gareki02.png")
       ..put("gareki03", "./img/gareki03.png")

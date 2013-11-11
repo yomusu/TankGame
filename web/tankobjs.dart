@@ -37,7 +37,7 @@ class GameStartLogo extends GObj {
 class Tank extends GObj {
   
   int  delta_x = 1;
-  ImageSprite sp,sp2;
+  ImageSprite sp2;
   Vector  speed = new Vector();
   Vector  pos = new Vector();
   int count = 0;
@@ -47,11 +47,8 @@ class Tank extends GObj {
   
   void onInit() {
     
-    var imgs = [ geng.imageMap["tankDown1"], geng.imageMap["tankDown2"] ];
-    var offsetOfUpper = [0,2];
+    var imgs = [ geng.imageMap["tank01"], geng.imageMap["tank02"] ];
     
-    sp = new ImageSprite( imgKey:"tankUp", width:100, height:100 );
-    sp.offsety = 0;
     sp2 = new ImageSprite( img:imgs[0], width:100, height:100 );
     sp2.offsety = 0;
     
@@ -61,17 +58,13 @@ class Tank extends GObj {
       imgIndex++;
       if( imgIndex >= imgs.length )
         imgIndex = 0;
-      sp.offsety = offsetOfUpper[imgIndex];
       sp2.image = imgs[imgIndex];
     });
   }
   
   void onProcess(RenderList renderList) {
-    sp.x = pos.x - offset_x;
-    sp.y = pos.y;
-    renderList.add( 11, sp.render );
-    sp2.x = sp.x;
-    sp2.y = sp.y;
+    sp2.x = pos.x - offset_x;
+    sp2.y = pos.y;
     renderList.add( 10, sp2.render );
     
     // 砂煙
@@ -251,16 +244,17 @@ class Target extends GObj {
       case 'small':
         _width = 40;
         _getScore = (dx) => 100;
+        sp = new ImageSprite( imgKey:"targetS", width:_width, height:80 );
         break;
       case 'large':
         _width = 80;
         _getScore = (dx) => 50;
+        sp = new ImageSprite( imgKey:"targetL", width:_width, height:80 );
         break;
     }
   }
   
   void onInit() {
-    sp = new ImageSprite( imgKey:"target", width:_width, height:80 );
   }
   
   void onProcess( RenderList renderList ) {

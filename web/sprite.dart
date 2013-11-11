@@ -34,7 +34,7 @@ class Sprite {
   
   num _x=0,_y=0;
   num _w=0,_h=0;
-  Rect  _rect = null;
+  Rectangle  _rect = null;
   
   num _alpha = null;
   num _scale = null;
@@ -129,11 +129,11 @@ class Sprite {
       }
   
   /** get as Rect */
-  Rect get rect {
+  Rectangle get rect {
     if( _rect==null ) {
       num x = _x - offsetx;
       num y = _y - offsety;
-      _rect = new Rect( x,y, width, height );
+      _rect = new Rectangle( x,y, width, height );
     }
     return _rect;
   }

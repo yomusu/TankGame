@@ -388,7 +388,7 @@ class GEng {
   // Private Member --------
   
   GScreen _screen = null;
-  Rect  _rect;
+  Rectangle  _rect;
   
   // Property --------
   
@@ -414,7 +414,7 @@ class GEng {
   }
   
   /** フィールドの大きさ */
-  Rect get rect => _rect;
+  Rectangle get rect => _rect;
   
   num _scale = 1.0;
   
@@ -424,7 +424,7 @@ class GEng {
   void initField( { int width, int height, num scale:1 }) {
     
     _scale = scale;
-    _rect = new Rect(0,0,width,height);
+    _rect = new Rectangle(0,0,width,height);
     
     var w = (width * _scale).toInt();
     var h = (height * _scale).toInt();
@@ -495,14 +495,13 @@ class GEng {
     PressEvent  p = new PressEvent();
     
     if( e is TouchEvent ) {
-      print( (e as TouchEvent).touches.length );
-      var t = (e as TouchEvent).touches[0];
+      print( e.touches.length );
+      var t = e.touches[0];
       p.x = (t.client.x - geng.canvas.offsetLeft) ~/ geng._scale;
       p.y = (t.client.y - geng.canvas.offsetTop) ~/ geng._scale;
     } else if( e is MouseEvent ) {
-      var m = e as MouseEvent;
-      p.x = (m.client.x - geng.canvas.offsetLeft) ~/ geng._scale;
-      p.y = (m.client.y - geng.canvas.offsetTop) ~/ geng._scale;
+      p.x = (e.client.x - geng.canvas.offsetLeft) ~/ geng._scale;
+      p.y = (e.client.y - geng.canvas.offsetTop) ~/ geng._scale;
     }
     return p;
   }

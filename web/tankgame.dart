@@ -53,7 +53,7 @@ void main() {
     num scale = isMobileDevice() ? 0.5 : 1;
     geng.initField( width:640, height:600, scale:scale );
     
-    query("#place").append( geng.canvas );
+    querySelector("#place").append( geng.canvas );
     
     // 開始
     geng.screen = new Title();

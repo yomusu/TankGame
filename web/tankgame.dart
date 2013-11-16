@@ -33,7 +33,8 @@ void main() {
       ..put("gareki02", "./img/minidaruma02.png")
       ..put("gareki03", "./img/minidaruma03.png")
       ..put("smoke", "./img/kemuri.png")
-      ..put("smokeB", "./img/kemuriB.png");
+      ..put("smokeB", "./img/kemuriB.png")
+      ..put("tama", "./img/yuki01.png");
     
     // サウンド読み込み
     geng.soundManager.put("fire","./sound/bomb.ogg");
@@ -51,7 +52,7 @@ void main() {
     
     // Canvas
     num scale = isMobileDevice() ? 0.5 : 1;
-    geng.initField( width:640, height:600, scale:scale );
+    geng.initField( width:570, height:570, scale:scale );
     
     querySelector("#place").append( geng.canvas );
     
@@ -77,24 +78,26 @@ clearGameData() {
   gamePointManager.clearPoint();
 }
 
+TextRender  trenLogo = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "28pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..lineWidth = 1.0
+..lineHeight = 35
+..strokeColor = Color.Black
+..fillColor = Color.Yellow
+..shadowColor = new Color.fromAlpha(0.5)
+..shadowOffset = 5
+..shadowBlur = 10;
+
+
 /***********
  * 
  * タイトル画面の表示
  * 
  */
 class Title extends GScreen {
-  
-  TextRender  tren = new TextRender()
-  ..fontFamily = scoreFont
-  ..fontSize = "28pt"
-  ..textAlign = "center"
-  ..textBaseline = "middle"
-  ..lineWidth = 2.0
-  ..strokeColor = Color.Black
-  ..fillColor = Color.Yellow
-  ..shadowColor = new Color.fromAlpha(0.5)
-  ..shadowOffset = 5
-  ..shadowBlur = 10;
   
   void onStart() {
     geng.objlist.disposeAll();
@@ -108,25 +111,16 @@ class Title extends GScreen {
         geng.screen = new StageSelect();
       });
     }
-    ..x = 320
+    ..x = 285
     ..y = 300;
     geng.objlist.add( playbtn );
     btnList.add( playbtn );
     
     //---------------------
-    // How to Playボタンの配置
-    var howtobtn = new GButton(text:"あそびかた",width:300,height:60)
-    ..onPress = (){ geng.screen = new HowToPlay(); }
-    ..x = 320
-    ..y = 390;
-    geng.objlist.add( howtobtn );
-    btnList.add( howtobtn );
-    
-    //---------------------
     // Configボタンの配置
     var configbtn = new GButton(text:"設定",width:300,height:60)
     ..onPress = (){ geng.screen = new ConfigSetting(); }
-    ..x = 320
+    ..x = 285
     ..y = 480;
     geng.objlist.add( configbtn );
     btnList.add( configbtn );
@@ -134,7 +128,7 @@ class Title extends GScreen {
     //---------------------
     // 最前面描画処理
     onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( tren, ["Tank Game"], 320, 150 );
+      canvas.drawTexts( trenLogo, ["肉の万世","クリスマス ゆきがっせん"], 285, 150 );
     };
     
   }
@@ -398,46 +392,6 @@ class ConfigSetting extends GScreen {
   }
 }
 
-/**
- * 遊び方画面
- */
-class HowToPlay extends GScreen {
-  
-  List  text = """遊び方
-
-マウスをクリックするとたまをうつよ！
-つぎつぎと あらわれる まとに あてよう！
-れんぞくして あてると こうとくてんだ！
-""".split("\n");
-  
-  TextRender  tren = new TextRender()
-  ..fontFamily = fontFamily
-  ..fontSize = "14pt"
-  ..textAlign = "left"
-  ..textBaseline = "ideographic"
-  ..lineHeight = 32
-  ..fillColor = Color.Black
-  ..strokeColor = null;
-  
-  void onStart() {
-    geng.objlist.disposeAll();
-    
-    // 戻るボタン配置
-    var retbtn = new GButton()
-    ..onPress = () { geng.screen = new Title(); }
-    ..text = "戻る"
-    ..x = 320
-    ..y = 300;
-    geng.objlist.add( retbtn );
-    btnList.add( retbtn );
-    
-    // 描画処理
-    onFrontRender = (GCanvas2D canvas) {
-      canvas.drawTexts( tren, text, 50, 50 );
-    };
-  }
-}
-
 /***********
  * 
  * ゲーム本体
@@ -450,8 +404,8 @@ class TankGame extends GScreen {
     
     // 戦車の初期位置
     tank = new Tank()
-    ..pos.x = 320.0
-    ..pos.y = 500.0
+    ..pos.x = 260.0
+    ..pos.y = 430.0
     ..speed.x = stageData['speed'];
     geng.objlist.add( tank );
     
@@ -505,7 +459,7 @@ class TankGame extends GScreen {
       tank.pos.add( tank.speed );
       
       // 画面表示位置
-      offset_x = math.max( 0.0, tank.pos.x - 320.0 );
+      offset_x = math.max( 0.0, tank.pos.x - 285.0 );
       
       // 地面スクロール
       ground.translateX = offset_x;
@@ -585,8 +539,8 @@ class FireButton extends GButton {
   FireButton() {
     renderer = render;
     text = "うつ!";
-    x = 540;
-    y = 530;
+    x = 480;
+    y = 500;
     width = 140;
     height= 100;
     

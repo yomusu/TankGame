@@ -49,12 +49,12 @@ class Tank extends GObj {
     
     var imgs = [ geng.imageMap["tank01"], geng.imageMap["tank02"] ];
     
-    sp2 = new ImageSprite( img:imgs[0], width:100, height:100 );
+    sp2 = new ImageSprite( img:imgs[0], width:130, height:130 );
     sp2.offsety = 0;
     
     // アニメのセット
     var imgIndex = 0;
-    animeTimer = new Timer.periodic(const Duration(milliseconds:200), (t) {
+    animeTimer = new Timer.periodic(const Duration(milliseconds:400), (t) {
       imgIndex++;
       if( imgIndex >= imgs.length )
         imgIndex = 0;
@@ -68,7 +68,7 @@ class Tank extends GObj {
     renderList.add( 10, sp2.render );
     
     // 砂煙
-    if( ++count==7 ) {
+    if( ++count==20 ) {
       count = 0;
       Smoke smk = new Smoke.slower()
       ..pos.x = pos.x
@@ -145,16 +145,7 @@ class Cannonball extends GObj {
   int size = 10;
   
   void onInit() {
-    
-    var f = (GCanvas2D c,Sprite sp) {
-      int hs = size ~/ 2;
-      c.circle(0, 0, hs);
-      c.fill( Color.Black );
-      c.beginPath();
-      c.circle(-hs~/2, -hs~/2, 2);
-      c.fill( Color.White );
-    };
-    sp = new Sprite.withRender(f, width:size, height:size );
+    sp = new Sprite.withImage("tama", width: size, height: size);
     sp.offsety = 0;
   }
   
@@ -191,16 +182,16 @@ class Cannonball extends GObj {
     renderList.add( 10, sp.render );
     
     // 煙を出す
-    distance += speed.scalar();
-    if( distance>40.0 ) {
-      distance = 0.0;
-      
-      var smk = new Smoke.faster()
-      ..pos.x = pos.x
-      ..pos.y = pos.y;
-      
-      geng.objlist.add(smk);
-    }
+//    distance += speed.scalar();
+//    if( distance>40.0 ) {
+//      distance = 0.0;
+//      
+//      var smk = new Smoke.faster()
+//      ..pos.x = pos.x
+//      ..pos.y = pos.y;
+//      
+//      geng.objlist.add(smk);
+//    }
   }
   
   num distance = 0.0;
@@ -242,14 +233,14 @@ class Target extends GObj {
   Target.fromType( String type ) {
     switch( type ) {
       case 'small':
-        _width = 40;
+        _width = 60;
         _getScore = (dx) => 100;
-        sp = new ImageSprite( imgKey:"targetS", width:_width, height:80 );
+        sp = new ImageSprite( imgKey:"targetS", width:_width, height:120 );
         break;
       case 'large':
-        _width = 80;
+        _width = 120;
         _getScore = (dx) => 50;
-        sp = new ImageSprite( imgKey:"targetL", width:_width, height:80 );
+        sp = new ImageSprite( imgKey:"targetL", width:_width, height:120 );
         break;
     }
   }
@@ -337,7 +328,7 @@ class FlyingTarget extends GObj {
   num   width = 80;
   
   void onInit() {
-    sp = new ImageSprite( imgKey:"gareki03", width:width, height:40 );
+    sp = new ImageSprite( imgKey:"gareki03", width:width, height:80 );
     sp.rotate = 0.0;
     
     new Timer( const Duration(seconds:2), ()=>dispose() );
@@ -383,10 +374,10 @@ class Bomb extends GObj {
     
     switch( type%2 ) {
       case 0:
-        sp = new ImageSprite( imgKey:"gareki01", width:30, height:30 );
+        sp = new ImageSprite( imgKey:"gareki01", width:60, height:60 );
         break;
       case 1:
-        sp = new ImageSprite( imgKey:"gareki02", width:40, height:40 );
+        sp = new ImageSprite( imgKey:"gareki02", width:60, height:60 );
         break;
     }
   }

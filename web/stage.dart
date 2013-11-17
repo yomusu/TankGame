@@ -49,16 +49,6 @@ List  stageList = [
          [ 2920, 320, "small" ],
      ]
    },
-   // Stage3
-   { 'id':'stage3', 'name':"Stage3",
-     "caption" : "考えるな、感じろ！超高速ステージ",
-     'speed':6.0, 'length':3000,
-     'map':[
-         [ 1300, 180, "small" ],
-         [ 2000, 200, "small" ],
-         [ 2600, 70, "small" ],
-     ]
-   },
 ];
 
 
@@ -71,27 +61,9 @@ List  itemList = [
                     'id' : "nom001",
                     'obtained' : true,
                     'price' : 0,
-                    'cannonSize' : 14,
-                    'cannonSpeed' : 8,
+                    'cannonSize' : 20,
+                    'cannonSpeed' : 6,
                     'text' : "まめ砲弾",
-                  },
-                  
-                  {
-                    'id' : "big001",
-                    'obtained' : true,
-                    'price' : 3000,
-                    'cannonSize' : 26,
-                    'cannonSpeed' : 10,
-                    'text' : "デカい砲弾",
-                  },
-                  
-                  {
-                    'id' : "fast001",
-                    'obtained' : true,
-                    'price' : 3000,
-                    'cannonSize' : 16,
-                    'cannonSpeed' : 22,
-                    'text' : "スピード砲弾",
                   },
 ];
 

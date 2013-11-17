@@ -103,22 +103,41 @@ class Title extends GScreen {
     geng.objlist.disposeAll();
     
     //---------------------
+    // 練習ボタン配置
+    var practicebtn = new GButton(text:"れんしゅう",width:300,height:60)
+    ..onPress = (){
+      geng.soundManager.play("fire");
+      new Timer( const Duration(milliseconds:500), () {
+        stageData = stageList[0];
+        itemData = itemList[0];
+        geng.screen = new TankGame();
+      });
+    }
+    ..x = 285
+    ..y = 300;
+    geng.objlist.add( practicebtn );
+    btnList.add( practicebtn );
+    
+    //---------------------
     // StartGameボタン配置
     var playbtn = new GButton(text:"ゲームスタート",width:300,height:60)
     ..onPress = (){
       geng.soundManager.play("fire");
       new Timer( const Duration(milliseconds:500), () {
-        geng.screen = new StageSelect();
+        stageData = stageList[1];
+        itemData = itemList[0];
+        geng.screen = new TankGame();
+//        geng.screen = new StageSelect();
       });
     }
     ..x = 285
-    ..y = 300;
+    ..y = 380;
     geng.objlist.add( playbtn );
     btnList.add( playbtn );
     
     //---------------------
     // Configボタンの配置
-    var configbtn = new GButton(text:"設定",width:300,height:60)
+    var configbtn = new GButton(text:"せってい",width:300,height:60)
     ..onPress = (){ geng.screen = new ConfigSetting(); }
     ..x = 285
     ..y = 480;
@@ -145,20 +164,6 @@ TextRender  trenTitle = new TextRender()
 ..shadowOffset = 2
 ..shadowBlur = 2;
 
-TextRender  trenStageName = new TextRender()
-..fontFamily = scoreFont
-..fontSize = "20pt"
-..textAlign = "center"
-..textBaseline = "middle"
-..fillColor = Color.Black;
-
-TextRender  trenStageCaption = new TextRender()
-..fontFamily = fontFamily
-..fontSize = "14pt"
-..textAlign = "center"
-..textBaseline = "middle"
-..fillColor = Color.Gray;
-
 TextRender  trenHiscore = new TextRender()
 ..fontFamily = scoreFont
 ..fontSize = "12pt"
@@ -168,98 +173,6 @@ TextRender  trenHiscore = new TextRender()
 
 TextRender  trenHiscoreS = new TextRender.from(trenHiscore)
 ..fillColor = Color.Red;
-
-/***********
- * 
- * ステージ選択画面の表示
- * 
- */
-class StageSelect extends GScreen {
-  
-  var leftBtn,rightBtn,startBtn;
-  var nowStageIndex = 0;
-  
-  Map get selectedStage => stageList[nowStageIndex];
-  var scoreList;
-
-  void onStart() {
-    
-    const StageY = 200;
-    const HiscoreTop = 300;
-    
-    geng.objlist.disposeAll();
-    
-    // StageSelectボタン配置
-    leftBtn = new GButton(text:"<", x:100, y:StageY, width:50, height:50)
-    ..onRelease = ( (){ _shiftStage(-1); });
-    geng.objlist.add( leftBtn );
-    btnList.add( leftBtn );
-    
-    rightBtn = new GButton(text:">", x:540, y:StageY, width:50,height:50)
-    ..onRelease = ( (){ _shiftStage(1); });
-    geng.objlist.add( rightBtn );
-    btnList.add( rightBtn );
-    
-    // StartGameボタン配置
-    startBtn = new GButton(text:"つぎへ", x:320, y:500, width:300,height:60)
-    ..onRelease = ( (){
-      stageData = selectedStage;
-      geng.screen = new ItemSelect();
-    });
-    geng.objlist.add( startBtn );
-    btnList.add( startBtn );
-    
-    
-    // 戻るボタン配置
-    var btn = new GButton(text:"戻る",width:100,height:40)
-      ..onRelease = ( (){ geng.screen = new Title(); } )
-      ..x = 10 + (100/2)
-      ..y = 10 + (40/2);
-    geng.objlist.add( btn );
-    btnList.add( btn );
-    
-    // 最前面描画処理
-    onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenTitle, ["ステージの選択"], 320, 10, maxWidth:620 );
-      // ステージ名の表示
-      canvas.drawTexts( trenStageName, [selectedStage['name']], 320, StageY-20 );
-      canvas.drawTexts( trenStageCaption, [selectedStage['caption']], 320, StageY+20 );
-      
-      // ハイスコアの表示
-      drawHiScore(canvas, scoreList, HiscoreTop);
-    };
-    
-    // for Disable初期化
-    _shiftStage(0);
-  }
-  
-  void _shiftStage( num shift ) {
-    
-    nowStageIndex += shift;
-    
-    if( nowStageIndex <=0 ) {
-      nowStageIndex = 0;
-      leftBtn.isEnable = false;
-      rightBtn.isEnable = true;
-      
-    } else if( nowStageIndex >= (stageList.length-1) ) {
-      nowStageIndex = stageList.length-1;
-      leftBtn.isEnable = true;
-      rightBtn.isEnable = false;
-      
-    } else {
-      leftBtn.isEnable = true;
-      rightBtn.isEnable = true;
-    }
-    
-    // Hi-Scoreリストを更新
-    scoreList = geng.hiscoreManager.getScoreTexts(selectedStage['id']);
-
-    // ステージがアンロックされているかで選択可を決める
-    startBtn.isEnable = gamePointManager.isUnlock(selectedStage['id']);
-  }
-  
-}
 
 final titles = <String>["1st","2nd","3rd","4th","5th"];
 
@@ -282,61 +195,8 @@ void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
   }
 }
 
-/***********
- * 
- * アイテム選択画面の表示
- * 
- */
-class ItemSelect extends GScreen {
-  
-  void onStart() {
-    geng.objlist.disposeAll();
-    
-    // StartGameボタン配置
-    var y = 150;
-    for( var item in itemList ) {
-      
-      var btn = new GButton()
-      ..onPress = ( ()=>goToNext( item ) )
-      ..text = item['text']
-      ..width = 300
-      ..height= 70
-      ..x = 320
-      ..y = y
-      ..isEnable = gamePointManager.isUnlock(item['id']);
-      geng.objlist.add( btn );
-      btnList.add( btn );
-      
-      y += 100;
-    }
-    
-    // 戻るボタン配置
-    var btn = new GButton()
-      ..onPress = ( (){ geng.screen = new StageSelect(); } )
-      ..text = "戻る"
-      ..width = 100
-      ..height= 40
-      ..x = 10 + (100/2)
-      ..y = 10 + (40/2);
-    geng.objlist.add( btn );
-    btnList.add( btn );
-    
-    // 最前面描画処理
-    onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenTitle, ["アイテムの選択"], 320, 10, maxWidth:620 );
-    };
-  }
-  
-  void goToNext( var item ) {
-    delay( 500, () {
-      itemData = item;
-      geng.screen = new TankGame();
-    });
-  }
-}
-
 /**
- * 遊び方画面
+ * 設定画面
  */
 class ConfigSetting extends GScreen {
   
@@ -387,7 +247,7 @@ class ConfigSetting extends GScreen {
     
     // 最前面描画処理
     onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenTitle, ["設定"], 320, 10, maxWidth:620 );
+      canvas.drawTexts( trenTitle, ["せってい"], 320, 10, maxWidth:620 );
     };
   }
 }
@@ -404,7 +264,7 @@ class TankGame extends GScreen {
     
     // 戦車の初期位置
     tank = new Tank()
-    ..pos.x = 260.0
+    ..pos.x = 200.0
     ..pos.y = 430.0
     ..speed.x = stageData['speed'];
     geng.objlist.add( tank );
@@ -559,7 +419,7 @@ class FireButton extends GButton {
   
   void startCharge() {
     new Timer.periodic( const Duration(milliseconds:50), (t) {
-      power += 0.2;
+      power += 0.15;
       if( power >= 1.0 ) {
         power = 1.0;
         t.cancel();

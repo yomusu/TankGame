@@ -425,7 +425,8 @@ class Bomb extends GObj {
  */
 class Ground extends GObj {
   
-  List  points = new List();
+  List  points01 = new List();
+  List  points02 = new List();
   
   num z = 0;
   num translateX = 0;
@@ -444,22 +445,28 @@ class Ground extends GObj {
     width = geng.rect.width + (marginH*2);
     height= geng.rect.height+ (marginV*2);
     
-    points = [
-      [79,10],   [193,50],   [477,30],   [607,60],
-      [150,200], [292,162],  [427,239],  [559,110],
-      [18,306],  [252,252],  [384,290],  [635,325],
+    points01 = [
+      [79,10],   [477,30], 
+      [150,200], [427,239],
+      [18,306],  [384,290],
+    ];
+    points02 = [
+      [193,50],  [607,60],
+      [292,162], [559,110],
+      [252,252], [635,325],
     ];
   }
   
   void onProcess( RenderList renderList ) {
     renderList.add( z, (GCanvas2D c) {
       
-      var img = geng.imageMap["kusa"];
+      var img01 = geng.imageMap["snow01"];
+      var img02 = geng.imageMap["snow02"];
       
       c.c.save();
       c.c.translate( left, 0 );
       
-      points.forEach( (p) {
+      points01.forEach( (p) {
         
         var x = p[0] - translateX;
         var y = p[1] * 1.5;
@@ -467,7 +474,18 @@ class Ground extends GObj {
         x = x % width;
         y = y % height;
         
-        c.c.drawImageScaled(img, x, y, 50, 50);
+        c.c.drawImageScaled(img01, x, y, 42, 10);
+      });
+      
+      points02.forEach( (p) {
+        
+        var x = p[0] - translateX;
+        var y = p[1] * 1.5;
+        
+        x = x % width;
+        y = y % height;
+        
+        c.c.drawImageScaled(img02, x, y, 24, 6);
       });
       
       c.c.restore();
@@ -475,7 +493,8 @@ class Ground extends GObj {
   }
   
   void onDispose() {
-    points.clear();
+    points01.clear();
+    points02.clear();
   }
   
 }

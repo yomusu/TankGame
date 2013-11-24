@@ -111,7 +111,7 @@ class Title extends GScreen {
       new Timer( const Duration(milliseconds:500), () {
         stageData = stageList[0];
         itemData = itemList[0];
-        geng.screen = new TankGame();
+        geng.screen = new TankGamePracticely();
       });
     }
     ..x = 285
@@ -165,17 +165,40 @@ TextRender  trenTitle = new TextRender()
 ..shadowOffset = 2
 ..shadowBlur = 2;
 
-TextRender  trenHiscore = new TextRender()
+var trenMessage = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "14pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = Color.Black
+..strokeColor = null
+..lineHeight = 40;
+
+var trenButton = new TextRender()
+..fontFamily = fontFamily
+..fontSize = "14pt"
+..textAlign = "center"
+..textBaseline = "middle"
+..fillColor = new Color.fromString("#FFFFFF")
+..strokeColor = new Color.fromString("#FFFFFF")
+..lineWidth = 1;
+
+var scoretren = new TextRender()
 ..fontFamily = scoreFont
 ..fontSize = "12pt"
+..textAlign = "left"
+..textBaseline = "top"
+..fillColor = Color.Black
+..strokeColor = null;
+
+TextRender  trenHiscore = new TextRender.from(scoretren)
 ..textAlign = "right"
-..textBaseline = "middle"
-..fillColor = Color.Black;
+..textBaseline = "middle";
 
 TextRender  trenHiscoreS = new TextRender.from(trenHiscore)
 ..fillColor = Color.Red;
 
-final titles = <String>["1st","2nd","3rd","4th","5th"];
+final titles = <String>["1ばん","2ばん","3ばん","4ばん","5ばん"];
 
 // ハイスコアの表示
 void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
@@ -183,15 +206,15 @@ void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
   const line = 20;
   
   trenHiscore.textAlign = "center";
-  canvas.drawTexts( trenHiscore, ["Hi-SCORE"], 320, y, maxWidth:300 );
+  canvas.drawTexts( trenHiscore, ["ハイスコア"], 285, y, maxWidth:300 );
   
   y += line*2;
   var tren = new TextRender.from(trenHiscore);
   tren.textAlign = "right";
   for( int i=0; i<scoreList.length; i++ ) {
     tren.fillColor = ( mark==i ) ? Color.Red : Color.Black;
-    canvas.drawTexts( tren, [titles[i]], 250, y, maxWidth:100 );
-    canvas.drawTexts( tren, [scoreList[i]], 450, y, maxWidth:300 );
+    canvas.drawTexts( tren, [titles[i]], 215, y, maxWidth:100 );
+    canvas.drawTexts( tren, [scoreList[i]], 415, y, maxWidth:300 );
     y += line;
   }
 }
@@ -210,7 +233,7 @@ class ConfigSetting extends GScreen {
     // サウンドボタン
     var sound = new GButton(width:300,height:70)
     ..text = geng.soundManager.soundOn ? TextSoundOff : TextSoundOn
-    ..x = 320
+    ..x = 285
     ..y = 200;
     sound.onRelease = () {
       if( geng.soundManager.soundOn ) {
@@ -232,7 +255,7 @@ class ConfigSetting extends GScreen {
     
     // データクリアボタン
     var clearData = new GButton(text:"データをすべてクリアする",width:300,height:70)
-    ..x = 320
+    ..x = 285
     ..y = 300
     ..onRelease = () { clearGameData(); };
     geng.objlist.add( clearData );
@@ -241,14 +264,14 @@ class ConfigSetting extends GScreen {
     // 戻るボタン配置
     var retbtn = new GButton(text:"戻る",width:200,height:70)
     ..onRelease = () { geng.screen = new Title(); }
-    ..x = 320
+    ..x = 285
     ..y = 500;
     geng.objlist.add( retbtn );
     btnList.add( retbtn );
     
     // 最前面描画処理
     onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenTitle, ["せってい"], 320, 10, maxWidth:620 );
+      canvas.drawTexts( trenTitle, ["せってい"], 285, 10, maxWidth:620 );
     };
   }
 }
@@ -290,16 +313,8 @@ class TankGame extends GScreen {
     offset_x = 0.0;
     
     // スコア表示
-    var tren = new TextRender()
-    ..fontFamily = scoreFont
-    ..fontSize = "12pt"
-    ..textAlign = "left"
-    ..textBaseline = "top"
-    ..fillColor = Color.Black
-    ..strokeColor = null;
-    
     onFrontRender = ( GCanvas2D c ) {
-      c.drawTexts( tren, ["SCORE: ${score}"], 5, 5 );
+      c.drawTexts( scoretren, ["SCORE: ${score}"], 5, 5 );
     };
     
     //-------
@@ -337,30 +352,16 @@ class TankGame extends GScreen {
           rank = geng.hiscoreManager.addNewRecord(stageData['id'], score );
         } catch(e){}
         
-        // ゲームポイントを加算
-        var point = gamePointManager.point;
-        bool hasGotNewCommer = gamePointManager.addPoint( score );
-        var newPoint = gamePointManager.point;
-        
         // 加算処理
-        bool  hasCameEndOfCount = false;
         delay( 1000, () {
-          new Timer.periodic( const Duration(milliseconds:20), (t){
-            point+=10;
-            if( point >= newPoint ) {
-              point = newPoint;
-              t.cancel();
-              hasCameEndOfCount = true;
-              // 戻るボタン配置
-              var retBtn = new GButton()
-              ..onPress = () { geng.screen = new Title(); }
-              ..text = "戻る"
-                  ..x = 320 ..y = 500
-                  ..width = 100 ..height= 40;
-              geng.objlist.add( retBtn );
-              btnList.add( retBtn );
-            }
-          });
+          // 戻るボタン配置
+          var retBtn = new GButton()
+          ..onPress = () { geng.screen = new Title(); }
+          ..text = "戻る"
+              ..x = 285 ..y = 500
+              ..width = 100 ..height= 40;
+          geng.objlist.add( retBtn );
+          btnList.add( retBtn );
         });
         
         // ハイスコア
@@ -368,15 +369,15 @@ class TankGame extends GScreen {
         
         // 結果表示
         onFrontRender = ( GCanvas2D c ) {
-          c.drawTexts( trenScore, ["- GAME OVER -"], 320, 100);
-          c.drawTexts( trenScore, ["SCORE: ${score}"], 320, 150);
+          c.drawTexts( trenScore, ["- ゲーム しゅうりょう! -"], 285, 100);
+          c.drawTexts( trenScore, ["とくてん: ${score}"], 285, 180);
           // Hi-Score表示
-          drawHiScore( c, scoreList, 200, mark:rank );
+          drawHiScore( c, scoreList, 270, mark:rank );
           // ゲームポイント
-          c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 320, 380);
-          if( hasGotNewCommer && hasCameEndOfCount ) {
-            c.drawTexts( trenHiscoreS, ["You have got a secret one!!"], 320, 410);
-          }
+//          c.drawTexts( trenScore, ["TOTAL POINT: ${point}"], 285, 380);
+//          if( hasGotNewCommer && hasCameEndOfCount ) {
+//            c.drawTexts( trenHiscoreS, ["You have got a secret one!!"], 285, 410);
+//          }
         };
         
         onProcess = () {
@@ -394,6 +395,107 @@ class TankGame extends GScreen {
 
 }
 
+/***********
+ * 
+ * ゲーム本体
+ * 
+ */
+class TankGamePracticely extends GScreen {
+  
+  void onStart() {
+    geng.objlist.disposeAll();
+    
+    // 戦車の初期位置
+    tank = new Tank()
+    ..pos.x = 200.0
+    ..pos.y = 430.0
+    ..speed.x = stageData['speed'];
+    geng.objlist.add( tank );
+    
+    // スコアをクリア
+    score = 0;
+    
+    //---------------
+    // Targetを配置
+    stageData['map'].forEach( (d) {
+      Target  t = new Target.fromType(d[2])
+      ..pos.x = d[0].toDouble()
+      ..pos.y = d[1].toDouble();
+      
+      geng.objlist.add( t );
+    });
+
+    // 地面
+    var ground = new Ground();
+    geng.objlist.add( ground );
+    
+    offset_x = 0.0;
+    
+    //-------
+    // Fireボタン配置
+    var firebtn = new FireButton();
+    geng.objlist.add( firebtn );
+    btnList.add(firebtn);
+    
+    // スタート表示
+    var startLogo = new GameStartLogo();
+    geng.objlist.add( startLogo );
+    
+    //-----------
+    // 最初の処理
+    onProcess = () {
+      
+      // 戦車移動
+      tank.pos.add( tank.speed );
+      
+      // 画面表示位置
+      offset_x = math.max( 0.0, tank.pos.x - 285.0 );
+      
+      // 地面スクロール
+      ground.translateX = offset_x;
+      
+      // ステージ終了判定
+      if( offset_x >= stageData['length'] ) {
+        
+        // 発射ボタン等消す
+        firebtn.dispose();
+        
+        // メッセージ表示
+        var message;
+        if( score<=50 ) {
+          message = ["まだまだ かな？",
+                     "もうちょっと れんしゅうしてみよう！"];
+        } else {
+          message = ["なかなかやるね！",
+                     "つぎは ほんばん に ちょうせんしてみよう！"];
+        }
+        onFrontRender = ( GCanvas2D c ) {
+          c.drawTexts( trenMessage, message, 285, 200);
+        };
+        
+        // 戻るボタン配置
+        var retBtn = new GButton()
+        ..onPress = () { geng.screen = new Title(); }
+        ..text = "戻る"
+            ..x = 285 ..y = 400
+            ..width = 100 ..height= 40;
+        geng.objlist.add( retBtn );
+        btnList.add( retBtn );
+        
+        onProcess = () {
+          tank.pos.add( tank.speed );
+        };
+      }
+    };
+    
+    // 2秒後にオープニング終了
+    new Timer( const Duration(seconds:2), () {
+      // スタートロゴを消す
+      startLogo.dispose();
+    });
+  }
+
+}
 
 class FireButton extends GButton {
   
@@ -432,15 +534,6 @@ class FireButton extends GButton {
   static Color shadow    = new Color.fromString("#c20000");
   static Color bg_normal = new Color.fromString("#ff3030");
   static Color border_normal = new Color.fromString("#d9000b");
-  
-  static var tren = new TextRender()
-  ..fontFamily = fontFamily
-  ..fontSize = "14pt"
-  ..textAlign = "center"
-  ..textBaseline = "middle"
-  ..fillColor = new Color.fromString("#FFFFFF")
-  ..strokeColor = new Color.fromString("#FFFFFF")
-  ..lineWidth = 1;
   
   static var trenOff = new TextRender()
   ..fontFamily = fontFamily
@@ -490,7 +583,7 @@ class FireButton extends GButton {
     // テキスト
     var tr = trenOff;
     if( status==GButton.ROLLON || status==GButton.ACTIVE )
-      tr = tren;
+      tr = trenButton;
       
     canvas.drawTexts( tr, [btn.text], btn.x+5, btn.y);
     

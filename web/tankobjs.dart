@@ -24,7 +24,7 @@ class GameStartLogo extends GObj {
   
   void onProcess(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      canvas.drawTexts(trenScore, ["GAME START"], 320, 200);
+      canvas.drawTexts(trenScore, ["GAME START"], 285, 200);
     });
   }
   
@@ -72,7 +72,7 @@ class Tank extends GObj {
       count = 0;
       Smoke smk = new Smoke.slower()
       ..pos.x = pos.x
-      ..pos.y = pos.y + 100
+      ..pos.y = pos.y + 130
       ..z = 10
       ..wobble( R180, R180+(R90/2.0) );
       geng.objlist.add( smk );

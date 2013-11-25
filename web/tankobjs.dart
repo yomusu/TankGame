@@ -229,6 +229,7 @@ class Target extends GObj {
   bool  get isBombed => _hitdx!=null;
   
   var _getScore;
+  List<int> bombTypes;
   
   Target.fromType( String type ) {
     switch( type ) {
@@ -236,11 +237,13 @@ class Target extends GObj {
         _width = 60;
         _getScore = (dx) => 100;
         sp = new ImageSprite( imgKey:"targetS", width:_width, height:120 );
+        bombTypes = [0,1,3,4,3,4];
         break;
       case 'large':
         _width = 120;
         _getScore = (dx) => 50;
         sp = new ImageSprite( imgKey:"targetL", width:_width, height:120 );
+        bombTypes = [0,1,2,0,1,3,4,3,4,3,4,3];
         break;
     }
   }
@@ -282,22 +285,10 @@ class Target extends GObj {
       ..texts[0] = s.toString();
       geng.objlist.add( pop );
       
-      // 自分飛んでく
-      var ft = new FlyingTarget();
-      ft.width = _width;
-      ft.pos.set(pos);
-      
-      ft.speed
-        ..x = _hitdx * -1.0
-        ..y = _width.toDouble() * -1.0
-        ..normalize()
-        ..mul( 10.0 );
-      geng.objlist.add(ft);
-      
       // 爆発を配置
-      var range = R45 * 0.5;
-      for( num r in [-R45,-R90,-R90-R45] ) {
-        var bomb = new Bomb(geng.rand.nextInt(2), r,range);
+      var range = R90 * 0.5;
+      for( var type in bombTypes ) {
+        var bomb = new Bomb(type, -R90,range);
         bomb.pos.set(pos);
         geng.objlist.add( bomb );
       }
@@ -310,38 +301,6 @@ class Target extends GObj {
     } else {
       return false;
     }
-  }
-  
-  void onDispose() {}
-}
-
-/**
- * 看板
- */
-class FlyingTarget extends GObj {
-
-  Sprite sp;
-  Vector pos = new Vector();
-  Vector speed = new Vector();
-  
-  num   dRotate = math.PI/180.0 * 24;
-  num   width = 80;
-  
-  void onInit() {
-    sp = new ImageSprite( imgKey:"gareki03", width:width, height:80 );
-    sp.rotate = 0.0;
-    
-    new Timer( const Duration(seconds:2), ()=>dispose() );
-  }
-  
-  void onProcess( RenderList renderList ) {
-    
-    pos.add( speed );
-    sp.rotate += dRotate;
-    sp.x = pos.x - offset_x;
-    sp.y = pos.y;
-    // スプライト登録
-    renderList.add( 5, sp.render );
   }
   
   void onDispose() {}
@@ -362,22 +321,36 @@ class Bomb extends GObj {
   num size = 25;
   
   Bomb( int type, num angle, num range ) {
-    dRotate = geng.randRange( R1*6, R1*24 );
-    var a = geng.randRange( angle - range, angle + range );
+    var a = geng.randRange( -(R1*30), -(R180-(R1*30)) );
     speed
     ..unit()
-    ..mul( 5.0 )
+    ..mul( geng.randRange( 3.0, 10.0 ) )
     ..rotate( a );
     
     delta
     ..y = 0.1;
     
-    switch( type%2 ) {
+    var scale = 0.3;
+    switch( type ) {
       case 0:
-        sp = new ImageSprite( imgKey:"gareki01", width:60, height:60 );
+        dRotate = geng.randRange( R1*6, R1*20 );
+        sp = new ImageSprite( imgKey:"gareki01", width:174*scale, height:206*scale );
         break;
       case 1:
-        sp = new ImageSprite( imgKey:"gareki02", width:60, height:60 );
+        dRotate = geng.randRange( R1*6, R1*20 );
+        sp = new ImageSprite( imgKey:"gareki02", width:139*scale, height:176*scale );
+        break;
+      case 2:
+        dRotate = geng.randRange( R1*6, R1*20 );
+        sp = new ImageSprite( imgKey:"gareki03", width:150*scale, height:188*scale );
+        break;
+      case 3:
+        dRotate = geng.randRange( R1*6, R1*24 );
+        sp = new ImageSprite( imgKey:"star01", width:35*0.5, height:35*0.5 );
+        break;
+      case 4:
+        dRotate = 0;
+        sp = new ImageSprite( imgKey:"ball01", width:34*0.5, height:34*0.5 );
         break;
     }
   }
@@ -385,26 +358,12 @@ class Bomb extends GObj {
   void onInit() {
     sp.rotate = 0.0;
     
-    new Timer( const Duration(seconds:1), ()=>dispose() );
+    new Timer( const Duration(milliseconds:1500), ()=>dispose() );
   }
   
   int count =100;
   
   void onProcess( RenderList renderList ) {
-    
-    // 煙吐き出す
-    if( ++count>=10 ) {
-      count = 0;
-      var smoke = new Smoke()
-      ..sp = new ImageSprite( imgKey:"smokeB", width:10, height:10)
-      ..opacityRange( 3.0, -0.1 )
-      ..scaleRange( 1.0, 0.02 )
-      ..pos.x = pos.x
-      ..pos.y = pos.y
-      ..z = 10
-      ..scaleRange( 1.0, 0.4 );
-      geng.objlist.add( smoke );
-    }
     
     pos.add( speed );
     speed.add( delta );

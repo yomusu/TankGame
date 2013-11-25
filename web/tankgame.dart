@@ -34,8 +34,9 @@ void main() {
       ..put("gareki02", "./img/minidaruma02.png")
       ..put("gareki03", "./img/minidaruma03.png")
       ..put("smoke", "./img/kemuri.png")
-      ..put("smokeB", "./img/kemuriB.png")
-      ..put("tama", "./img/yuki01.png");
+      ..put("tama", "./img/yuki01.png")
+      ..put("star01", "./img/star01.png")
+      ..put("ball01", "./img/ball01.png");
     
     // サウンド読み込み
     geng.soundManager.put("fire","./sound/bomb.ogg");

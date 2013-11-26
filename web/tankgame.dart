@@ -341,6 +341,9 @@ class TankGame extends GScreen {
       // 地面スクロール
       ground.translateX = offset_x;
       
+      // 再描画指示
+      geng.repaint();
+      
       // ステージ終了判定
       if( offset_x >= stageData['length'] ) {
         
@@ -363,6 +366,7 @@ class TankGame extends GScreen {
               ..width = 100 ..height= 40;
           geng.objlist.add( retBtn );
           btnList.add( retBtn );
+          geng.repaint();
         });
         
         // ハイスコア
@@ -383,6 +387,8 @@ class TankGame extends GScreen {
         
         onProcess = () {
           tank.pos.add( tank.speed );
+          if( 570 < (tank.pos.x - offset_x) )
+            tank.dispose();
         };
       }
     };
@@ -391,6 +397,7 @@ class TankGame extends GScreen {
     new Timer( const Duration(seconds:2), () {
       // スタートロゴを消す
       startLogo.dispose();
+      geng.repaint();
     });
   }
 
@@ -455,6 +462,9 @@ class TankGamePracticely extends GScreen {
       // 地面スクロール
       ground.translateX = offset_x;
       
+      // 再描画指示
+      geng.repaint();
+      
       // ステージ終了判定
       if( offset_x >= stageData['length'] ) {
         
@@ -493,6 +503,7 @@ class TankGamePracticely extends GScreen {
     new Timer( const Duration(seconds:2), () {
       // スタートロゴを消す
       startLogo.dispose();
+      geng.repaint();
     });
   }
 

@@ -22,7 +22,10 @@ class GameStartLogo extends GObj {
   
   void onInit() {}
   
-  void onProcess(RenderList renderList) {
+  void onProcess( GPInfo handle ) {
+    
+  }
+  void onPrepareRender(RenderList renderList) {
     renderList.add( 100, (canvas) {
       canvas.drawTexts(trenScore, ["GAME START"], 285, 200);
     });
@@ -62,10 +65,10 @@ class Tank extends GObj {
     });
   }
   
-  void onProcess(RenderList renderList) {
+  void onProcess(GPInfo handle) {
+    
     sp2.x = pos.x - offset_x;
     sp2.y = pos.y;
-    renderList.add( 10, sp2.render );
     
     // 砂煙
     if( ++count==20 ) {
@@ -77,6 +80,9 @@ class Tank extends GObj {
       ..wobble( R180, R180+(R90/2.0) );
       geng.objlist.add( smk );
     }
+  }
+  void onPrepareRender(RenderList renderList) {
+    renderList.add( 10, sp2.render );
   }
   
   /** 弾を打つ */
@@ -149,8 +155,7 @@ class Cannonball extends GObj {
     sp.offsety = 0;
   }
   
-  void onProcess( RenderList renderList ) {
-    
+  void onProcess( GPInfo handle ) {
     // 移動&加速
     oldpos.set( pos );
     pos.add( speed );
@@ -178,20 +183,9 @@ class Cannonball extends GObj {
     } on StateError {
       // あたってねえし
     }
-    
+  }
+  void onPrepareRender( RenderList renderList ) {
     renderList.add( 10, sp.render );
-    
-    // 煙を出す
-//    distance += speed.scalar();
-//    if( distance>40.0 ) {
-//      distance = 0.0;
-//      
-//      var smk = new Smoke.faster()
-//      ..pos.x = pos.x
-//      ..pos.y = pos.y;
-//      
-//      geng.objlist.add(smk);
-//    }
   }
   
   num distance = 0.0;
@@ -251,10 +245,11 @@ class Target extends GObj {
   void onInit() {
   }
   
-  void onProcess( RenderList renderList ) {
+  void onProcess( GPInfo handle ) {
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
-    // スプライト登録
+  }
+  void onPrepareRender( RenderList renderList ) {
     renderList.add( 5, (canvas) {
       sp.render(canvas);
       // Hit mark
@@ -363,15 +358,18 @@ class Bomb extends GObj {
   
   int count =100;
   
-  void onProcess( RenderList renderList ) {
-    
+  void onProcess( GPInfo handle ) {
     pos.add( speed );
     speed.add( delta );
     
     sp.rotate += dRotate;
     sp.x = pos.x - offset_x;
     sp.y = pos.y;
-    // スプライト登録
+    
+    geng.repaint();
+  }
+  
+  void onPrepareRender( RenderList renderList ) {
     renderList.add( 5, sp.render );
   }
   
@@ -416,7 +414,10 @@ class Ground extends GObj {
     ];
   }
   
-  void onProcess( RenderList renderList ) {
+  void onProcess( GPInfo handle ) {
+    
+  }
+  void onPrepareRender( RenderList renderList ) {
     renderList.add( z, (GCanvas2D c) {
       
       var img01 = geng.imageMap["snow01"];
@@ -482,12 +483,15 @@ class ScorePopup extends GObj {
     new Timer( const Duration(seconds:1), ()=>dispose() );
   }
   
-  void onProcess( RenderList renderList ) {
+  void onProcess( GPInfo handle ) {
     
     // 動き
     pos.add( speed );
     speed.add( delta );
     
+    geng.repaint();  
+  }
+  void onPrepareRender( RenderList renderList ) {
     // 座標変換
     var x = pos.x - offset_x;
     var y = pos.y;

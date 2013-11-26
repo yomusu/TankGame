@@ -52,8 +52,7 @@ class Smoke extends GObj {
   
   void onInit() {}
   
-  void onProcess(RenderList renderList) {
-    
+  void onProcess( GPInfo handle ) {
     pos.add( speed );
     
     sp.opacity += dOpcity;
@@ -64,9 +63,12 @@ class Smoke extends GObj {
     else {
       sp.x = pos.x - offset_x;
       sp.y = pos.y;
-    
-      renderList.add( 50, sp.render );
+      
+      geng.repaint();
     }
+  }
+  void onPrepareRender(RenderList renderList) {
+    renderList.add( 50, sp.render );
   }
   
   void onDispose() {}

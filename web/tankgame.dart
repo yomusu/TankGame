@@ -502,7 +502,7 @@ class FireButton extends GButton {
   
   FireButton() {
     renderer = render;
-    text = "うつ!";
+    text = "なげる!";
     x = 480;
     y = 500;
     width = 140;

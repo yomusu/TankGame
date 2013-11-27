@@ -39,8 +39,9 @@ void main() {
       ..put("ball01", "./img/ball01.png");
     
     // サウンド読み込み
-    geng.soundManager.put("fire","./sound/bomb.ogg");
-    geng.soundManager.put("bomb","./sound/launch02.ogg");
+    geng.soundManager.put("bell","./sound/xmasbell.ogg");
+    geng.soundManager.put("fire","./sound/bag.ogg");
+    geng.soundManager.put("bomb","./sound/pyo.ogg");
     
     // ハイスコアデータ読み込み
     geng.hiscoreManager.init();
@@ -49,7 +50,7 @@ void main() {
     gamePointManager.init();
     
     // SoundのOn/Off
-    bool sound = window.localStorage.containsKey("sound") ? window.localStorage["sound"]=="true" : false;
+    bool sound = window.localStorage.containsKey("sound") ? window.localStorage["sound"]=="true" : true;
     geng.soundManager.soundOn = sound;
     
     // Canvas
@@ -108,7 +109,7 @@ class Title extends GScreen {
     // 練習ボタン配置
     var practicebtn = new GButton(text:"れんしゅう",width:300,height:60)
     ..onPress = (){
-      geng.soundManager.play("fire");
+      geng.soundManager.play("bell");
       new Timer( const Duration(milliseconds:500), () {
         stageData = stageList[0];
         itemData = itemList[0];
@@ -124,7 +125,7 @@ class Title extends GScreen {
     // StartGameボタン配置
     var playbtn = new GButton(text:"ゲームスタート",width:300,height:60)
     ..onPress = (){
-      geng.soundManager.play("fire");
+      geng.soundManager.play("bell");
       new Timer( const Duration(milliseconds:500), () {
         stageData = stageList[1];
         itemData = itemList[0];

@@ -154,7 +154,10 @@ class GButton extends GObj {
   void onPrepareRender( RenderList renderList ) {
     var s = status;
     if( s!=HIDDEN )
-      renderList.add(z, (c)=>renderer(c,this) );
+      renderList.add(z, (c) {
+        if( renderer!=null )
+          renderer(c,this);
+      } );
   }
   
   void onDispose(){}
@@ -236,6 +239,7 @@ abstract class GScreen {
   var onProcess = null;
   /** 最前面描画 */
   var onFrontRender = null;
+  var onBackRender = null;
   
   /** 入力デバイスのプレスイベント */
   void onPress( PressEvent e ) => btnList.onPress(e);
@@ -268,9 +272,15 @@ abstract class GScreen {
       geng.objlist.prepareRenderAll(_renderList);
       g2d.canvas = geng.backcanvas;
 
+      // 最前面の描画
+      if( onBackRender!=null ) {
+        onBackRender( g2d );
+      } else {
+        g2d.c.setFillColorRgb(255, 255, 255, 1.0);
+        g2d.c.fillRect(0,0, geng.rect.width, geng.rect.height);
+      }
+      
       // Do Rendering
-      g2d.c.setFillColorRgb(255, 255, 255, 1.0);
-      g2d.c.fillRect(0,0, geng.rect.width, geng.rect.height);
       _renderList.renderAll( g2d );
       
       // 終わったら削除

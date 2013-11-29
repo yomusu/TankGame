@@ -24,6 +24,8 @@ void main() {
     
     // 画像読み込み
     geng.imageMap
+      ..put("title", "./img/title.png")
+      ..put("starttext", "./img/starttext.png")
       ..put("tank01", "./img/boo01.png")
       ..put("tank02", "./img/boo02.png")
       ..put("targetL", "./img/usidaruma01.png")
@@ -81,19 +83,6 @@ clearGameData() {
   gamePointManager.clearPoint();
 }
 
-TextRender  trenLogo = new TextRender()
-..fontFamily = fontFamily
-..fontSize = "28pt"
-..textAlign = "center"
-..textBaseline = "middle"
-..lineWidth = 1.0
-..lineHeight = 35
-..strokeColor = Color.Black
-..fillColor = Color.Yellow
-..shadowColor = new Color.fromAlpha(0.5)
-..shadowOffset = 5
-..shadowBlur = 10;
-
 
 /***********
  * 
@@ -101,6 +90,52 @@ TextRender  trenLogo = new TextRender()
  * 
  */
 class Title extends GScreen {
+  
+  Timer timer;
+  bool isBtnVisible = true;
+  
+  void onStart() {
+    geng.objlist.disposeAll();
+    
+    //---------------------
+    // 練習ボタン配置
+    var practicebtn = new GButton(width:570,height:570)
+    ..renderer = null
+    ..onPress = (){
+      timer.cancel();
+      geng.screen = new StageSelect();
+    }
+    ..x = 285
+    ..y = 300;
+    
+    geng.objlist.add( practicebtn );
+    btnList.add( practicebtn );
+    
+    //---------------------
+    // 最前面描画処理
+    onBackRender = ( GCanvas2D canvas ) {
+      var img = geng.imageMap["title"];
+      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
+    };
+    // クリックでスタート表示
+    onFrontRender = ( GCanvas2D canvas ) {
+      if( isBtnVisible ) {
+        const width = 134*1.2;
+        const height= 46*1.2;
+        var img = geng.imageMap["starttext"];
+        canvas.c.drawImageScaled(img, 250, 420, width, height );
+      }
+    };
+    
+    // 点滅
+    timer = new Timer.periodic( const Duration(milliseconds:500), (t){
+      geng.repaint();
+      isBtnVisible = (isBtnVisible==false);
+    });
+  }
+}
+
+class StageSelect extends GScreen {
   
   void onStart() {
     geng.objlist.disposeAll();
@@ -117,24 +152,24 @@ class Title extends GScreen {
       });
     }
     ..x = 285
-    ..y = 300;
+    ..y = 220;
+    
     geng.objlist.add( practicebtn );
     btnList.add( practicebtn );
     
     //---------------------
     // StartGameボタン配置
-    var playbtn = new GButton(text:"ゲームスタート",width:300,height:60)
+    var playbtn = new GButton(text:"ゲームスタート", width:300,height:60)
     ..onPress = (){
       geng.soundManager.play("bell");
       new Timer( const Duration(milliseconds:500), () {
         stageData = stageList[1];
         itemData = itemList[0];
         geng.screen = new TankGame();
-//        geng.screen = new StageSelect();
       });
     }
     ..x = 285
-    ..y = 380;
+    ..y = practicebtn.y + 110;
     geng.objlist.add( playbtn );
     btnList.add( playbtn );
     
@@ -143,14 +178,28 @@ class Title extends GScreen {
     var configbtn = new GButton(text:"せってい",width:300,height:60)
     ..onPress = (){ geng.screen = new ConfigSetting(); }
     ..x = 285
-    ..y = 480;
+    ..y = practicebtn.y + (110 * 2);
     geng.objlist.add( configbtn );
     btnList.add( configbtn );
     
     //---------------------
     // 最前面描画処理
-    onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenLogo, ["肉の万世","クリスマス ゆきがっせん"], 285, 150 );
+    Color bgColor = new Color.fromString("#ffffff");
+    Color borderColor = new Color.fromString("#A2896F");
+    onBackRender = ( GCanvas2D canvas ) {
+      var img = geng.imageMap["title"];
+      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
+      
+      canvas.c.beginPath();
+      // 背景
+      canvas.roundRect( 100, 150, 370, 360, 18 );
+      canvas.c.closePath();
+      canvas.fillColor = bgColor;
+      canvas.c.fill();
+      // ボーダー
+      canvas.strokeColor = borderColor;
+      canvas.c.lineWidth = 4;
+      canvas.c.stroke();
     };
     
   }

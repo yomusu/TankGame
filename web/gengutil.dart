@@ -28,8 +28,15 @@ class FrameTimer {
     // 次のフレーム実行時刻
     targetTime += _duration;
     var now = _watch.elapsedMicroseconds;
-    var wait = math.max( targetTime - now, 1000 );
-    print("wait=$wait  on ${_watch.elapsedMicroseconds}");
+    var wait = targetTime - now;
+    
+    // 処理落ちした場合は、もろもろ補正
+    if( wait < 1000 ) {
+      wait = 1000;
+      targetTime = now + 1000;
+//      print("wait=$wait  on ${_watch.elapsedMicroseconds}");
+    }
+    
     new Timer( new Duration(microseconds:wait) , ()=>next() );
   }
   

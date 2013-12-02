@@ -38,7 +38,9 @@ void main() {
       ..put("smoke", "./img/kemuri.png")
       ..put("tama", "./img/yuki01.png")
       ..put("star01", "./img/star01.png")
-      ..put("ball01", "./img/ball01.png");
+      ..put("ball01", "./img/ball01.png")
+      ..put("gamestart", "./img/gamestart.png")
+      ;
     
     // サウンド読み込み
     geng.soundManager.put("bell","./sound/xmasbell.ogg");
@@ -56,8 +58,8 @@ void main() {
     geng.soundManager.soundOn = sound;
     
     // Canvas
-    num scale = isMobileDevice() ? 0.5 : 1;
-    geng.initField( width:570, height:570, scale:scale );
+//    num scale = isMobileDevice() ? 0.5 : 1;
+    geng.initField( width:570, height:570, scale:1 );
     
     querySelector("#place").append( geng.canvas );
     
@@ -203,7 +205,6 @@ class StageSelect extends GScreen {
       canvas.c.lineWidth = 4;
       canvas.c.stroke();
     };
-    
   }
 }
 
@@ -293,10 +294,10 @@ class ConfigSetting extends GScreen {
     geng.objlist.disposeAll();
     
     // サウンドボタン
-    var sound = new GButton(width:300,height:70)
+    var sound = new GButton(width:300,height:60)
     ..text = geng.soundManager.soundOn ? TextSoundOff : TextSoundOn
     ..x = 285
-    ..y = 200;
+    ..y = 220;
     sound.onRelease = () {
       if( geng.soundManager.soundOn ) {
         geng.soundManager.soundOn = false;
@@ -316,24 +317,39 @@ class ConfigSetting extends GScreen {
     }
     
     // データクリアボタン
-    var clearData = new GButton(text:"データをすべてクリアする",width:300,height:70)
+    var clearData = new GButton(text:"データをすべてクリアする",width:300,height:60)
     ..x = 285
-    ..y = 300
+    ..y = sound.y + 110
     ..onRelease = () { clearGameData(); };
     geng.objlist.add( clearData );
     btnList.add( clearData );
     
     // 戻るボタン配置
-    var retbtn = new GButton(text:"戻る",width:200,height:70)
+    var retbtn = new GButton(text:"戻る",width:300,height:60)
     ..onRelease = () { geng.screen = new Title(); }
     ..x = 285
-    ..y = 500;
+    ..y = sound.y + (110*2);
     geng.objlist.add( retbtn );
     btnList.add( retbtn );
     
+    //---------------------
     // 最前面描画処理
-    onFrontRender = ( GCanvas2D canvas ) {
-      canvas.drawTexts( trenTitle, ["せってい"], 285, 10, maxWidth:620 );
+    Color bgColor = new Color.fromString("#ffffff");
+    Color borderColor = new Color.fromString("#A2896F");
+    onBackRender = ( GCanvas2D canvas ) {
+      var img = geng.imageMap["title"];
+      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
+      
+      canvas.c.beginPath();
+      // 背景
+      canvas.roundRect( 100, 150, 370, 360, 18 );
+      canvas.c.closePath();
+      canvas.fillColor = bgColor;
+      canvas.c.fill();
+      // ボーダー
+      canvas.strokeColor = borderColor;
+      canvas.c.lineWidth = 4;
+      canvas.c.stroke();
     };
   }
 }
@@ -523,9 +539,11 @@ class TankGamePracticely extends TankGame {
   
   void onEndOfStage() {
     
+    var score = resultToScore( numberOfHit, numberOfFire, stageData );
+    
     // メッセージ表示
     var message;
-    if( score<=50 ) {
+    if( score <= 70 ) {
       message = ["まだまだ かな？",
                  "もうちょっと れんしゅうしてみよう！"];
     } else {

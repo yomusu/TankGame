@@ -72,10 +72,14 @@ class SoundManager {
    */
   void play( String key ) {
     if( soundOn && isSupport ) {
-      AudioBufferSourceNode source = _audioContext.createBufferSource()
-          ..connectNode(_gainNode, 0, 0)
-            ..buffer = _map[key]
-      ..start(0);
+      try {
+        AudioBufferSourceNode source = _audioContext.createBufferSource()
+            ..connectNode(_gainNode, 0, 0)
+              ..buffer = _map[key]
+        ..start(0);
+      } catch(e) {
+        _audioContext = null;
+      }
     }
   }
 }

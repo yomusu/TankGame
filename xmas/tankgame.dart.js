@@ -578,16 +578,6 @@ JSString: {"": "String/Interceptor;",
   substring$1: function($receiver, startIndex) {
     return this.substring$2($receiver, startIndex, null);
   },
-  indexOf$2: function(receiver, pattern, start) {
-    if (typeof start !== "number" || Math.floor(start) !== start)
-      throw H.wrapException(new P.ArgumentError(start));
-    if (start < 0 || start > receiver.length)
-      throw H.wrapException(P.RangeError$range(start, 0, receiver.length));
-    return receiver.indexOf(pattern, start);
-  },
-  indexOf$1: function($receiver, pattern) {
-    return this.indexOf$2($receiver, pattern, 0);
-  },
   get$isEmpty: function(receiver) {
     return receiver.length === 0;
   },
@@ -7328,15 +7318,6 @@ TypedData_ListMixin: {"": "TypedData+ListMixin;", $isList: true, $asList: null, 
 
 TypedData_ListMixin_FixedLengthListMixin: {"": "TypedData_ListMixin+FixedLengthListMixin;", $asList: null}}],
 ["geng", "geng.dart", , B, {
-isMobileDevice: function() {
-  var ua, t1, t2, isiPad;
-  ua = window.navigator.userAgent;
-  t1 = C.JSString_methods.indexOf$1(ua, "iPod");
-  t2 = C.JSString_methods.indexOf$1(ua, "iPhone");
-  isiPad = C.JSString_methods.indexOf$1(ua, "iPad") >= 0;
-  return J.getInterceptor$asx(ua).indexOf$1(ua, "Android") >= 0 || t1 >= 0 || t2 >= 0 || isiPad;
-},
-
 TextRender: {"": "Object;_fontSize,_fontFamily,_font,strokeColor,fillColor,shadowColor,shadowOffsetX,shadowOffsetY,shadowBlur,lineWidth,lineHeight,textAlign,textBaseline",
   set$1: function(src) {
     this._fontSize = src._fontSize;
@@ -7365,13 +7346,7 @@ TextRender: {"": "Object;_fontSize,_fontFamily,_font,strokeColor,fillColor,shado
 
 Color: {"": "Object;red,green,blue,alpha",
   get$rgba: function() {
-    return "rgba(" + H.S(this.red) + "," + H.S(this.green) + "," + H.S(this.blue) + "," + H.S(this.alpha) + ")";
-  },
-  Color$fromAlpha$1: function(a) {
-    this.red = 0;
-    this.green = 0;
-    this.blue = 0;
-    this.alpha = a;
+    return "rgba(" + H.S(this.red) + "," + H.S(this.green) + "," + H.S(this.blue) + "," + this.alpha + ")";
   },
   Color$fromString$1: function(rgb) {
     if (C.JSString_methods.startsWith$1(rgb, "#"))
@@ -7389,12 +7364,6 @@ Color: {"": "Object;red,green,blue,alpha",
 Color$fromString: function(rgb) {
   var t1 = new B.Color(null, null, null, 1);
   t1.Color$fromString$1(rgb);
-  return t1;
-},
-
-Color$fromAlpha: function(a) {
-  var t1 = new B.Color(null, null, null, 1);
-  t1.Color$fromAlpha$1(a);
   return t1;
 }}
 
@@ -7414,7 +7383,7 @@ GCanvas2D: {"": "Object;_canvas,c<",
       t4 = color.blue;
       t5 = color.alpha;
       t1.toString;
-      t1.fillStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ")";
+      t1.fillStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + t5 + ")";
     }
     this.c.fill();
   },
@@ -7427,7 +7396,7 @@ GCanvas2D: {"": "Object;_canvas,c<",
       t4 = color.blue;
       t5 = color.alpha;
       t1.toString;
-      t1.strokeStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ")";
+      t1.strokeStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + t5 + ")";
     }
     this.c.stroke();
   },
@@ -7487,7 +7456,7 @@ GCanvas2D: {"": "Object;_canvas,c<",
       t6 = t2.blue;
       t2 = t2.alpha;
       t3.toString;
-      t3.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t5) + ", " + H.S(t6) + ", " + H.S(t2) + ")";
+      t3.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t5) + ", " + H.S(t6) + ", " + t2 + ")";
       t1._y_1 = y;
       strs.toString;
       if (maxWidth != null)
@@ -7567,9 +7536,8 @@ DefaultButtonRender: {"": "Object;shadow,bg_normal,border_normal,border_on,borde
     t3 = t1.red;
     t4 = t1.green;
     t5 = t1.blue;
-    t1 = t1.alpha;
     t2.toString;
-    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + H.S(t1) + ")";
+    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + t1.alpha + ")";
     canvas.roundRect$5(left, $top + 5, width, height, 20);
     c.closePath();
     c.fill();
@@ -7582,17 +7550,15 @@ DefaultButtonRender: {"": "Object;shadow,bg_normal,border_normal,border_on,borde
     t2 = bg.red;
     t3 = bg.green;
     t4 = bg.blue;
-    t5 = bg.alpha;
     t1.toString;
-    t1.fillStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ")";
+    t1.fillStyle = "rgba(" + H.S(t2) + ", " + H.S(t3) + ", " + H.S(t4) + ", " + bg.alpha + ")";
     c.fill();
-    t5 = canvas.c;
-    t4 = border.red;
-    t3 = border.green;
-    t2 = border.blue;
-    t1 = border.alpha;
-    t5.toString;
-    t5.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t3) + ", " + H.S(t2) + ", " + H.S(t1) + ")";
+    t4 = canvas.c;
+    t3 = border.red;
+    t2 = border.green;
+    t1 = border.blue;
+    t4.toString;
+    t4.strokeStyle = "rgba(" + H.S(t3) + ", " + H.S(t2) + ", " + H.S(t1) + ", " + border.alpha + ")";
     c.lineWidth = 4;
     c.stroke();
     if (btn.text != null) {
@@ -8007,8 +7973,8 @@ GEng: {"": "Object;_screen,_rect,objlist,canvas,backcanvas,imageMap,soundManager
     t2 = new P.Rectangle(0, 0, width, height);
     H.setRuntimeTypeInfo(t2, [null]);
     this._rect = t2;
-    w = C.JSNumber_methods.toInt$0(width * this._scale);
-    h = C.JSNumber_methods.toInt$0(height * this._scale);
+    w = C.JSInt_methods.toInt$0(width * this._scale);
+    h = C.JSInt_methods.toInt$0(height * this._scale);
     this.canvas = W.CanvasElement_CanvasElement(h * 2, w * 2);
     t2 = this.canvas.style;
     J.getInterceptor$x(t2).set$width(t2, "" + w + "px");
@@ -8603,14 +8569,19 @@ SoundManager: {"": "Object;_audioContext,_gainNode,_map,soundOn",
     return comp.future;
   },
   play$1: function(_, key) {
-    var source, t1;
-    if (this.soundOn && this._audioContext != null) {
-      source = this._audioContext.createBufferSource();
-      source.connect(this._gainNode, 0, 0);
-      t1 = this._map;
-      source.buffer = t1.$index(t1, key);
-      C.AudioBufferSourceNode_methods.start$1(source, 0);
-    }
+    var source, t1, exception;
+    if (this.soundOn && this._audioContext != null)
+      try {
+        source = this._audioContext.createBufferSource();
+        source.connect(this._gainNode, 0, 0);
+        t1 = this._map;
+        source.buffer = t1.$index(t1, key);
+        C.AudioBufferSourceNode_methods.start$1(source, 0);
+      } catch (exception) {
+        H.unwrapException(exception);
+        this._audioContext = null;
+      }
+
   },
   SoundManager$0: function() {
     var exception;
@@ -8694,6 +8665,8 @@ resultToScore: function(hit, fire, stage) {
     throw H.iae(fire);
   Arate = hit / fire;
   P.print("K=" + Krate + " A=" + Arate);
+  if (hit === 29 && Arate > 0.99)
+    return 80;
   t1 = Krate > 0.99;
   if (t1 && Arate > 0.99)
     return 100;
@@ -8709,7 +8682,7 @@ resultToScore: function(hit, fire, stage) {
 },
 
 resultToLevelText: function(score) {
-  var map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
+  var map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 80, "\u30b5\u30fc\u30ed\u30a4\u30f3", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
   return map.$index(map, score);
 },
 
@@ -8739,7 +8712,7 @@ drawHiScore: function(canvas, scoreList, y, mark) {
       throw H.ioore(t2, i);
     canvas.drawTexts$5$maxWidth(tren, [t2[i]], 215, y, 100);
     t2 = t1.$index(scoreList, i);
-    map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
+    map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 80, "\u30b5\u30fc\u30ed\u30a4\u30f3", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
     canvas.drawTexts$5$maxWidth(tren, [map.$index(map, t2)], 415, y, 300);
     y += 20;
     ++i;
@@ -8791,7 +8764,7 @@ GamePointManager__updateUnlockSet_closure: {"": "Closure;this_0",
 
 main_closure: {"": "Closure;",
   call$0: function() {
-    var t1, sound, scale;
+    var t1, sound;
     t1 = $.get$geng().imageMap;
     t1.put$2("title", "./img/title.png");
     t1.put$2("starttext", "./img/starttext.png");
@@ -8808,6 +8781,7 @@ main_closure: {"": "Closure;",
     t1.put$2("tama", "./img/yuki01.png");
     t1.put$2("star01", "./img/star01.png");
     t1.put$2("ball01", "./img/ball01.png");
+    t1.put$2("gamestart", "./img/gamestart.png");
     $.get$geng().soundManager.put$2("bell", "./sound/xmasbell.ogg");
     $.get$geng().soundManager.put$2("fire", "./sound/bag.ogg");
     $.get$geng().soundManager.put$2("bomb", "./sound/pyo.ogg");
@@ -8815,8 +8789,7 @@ main_closure: {"": "Closure;",
     $.get$gamePointManager().init$0();
     sound = window.localStorage.getItem("sound") == null || window.localStorage.getItem("sound") === "true";
     $.get$geng().soundManager.soundOn = sound;
-    scale = B.isMobileDevice() ? 0.5 : 1;
-    $.get$geng().initField$3$height$scale$width(570, scale, 570);
+    $.get$geng().initField$3$height$scale$width(570, 1, 570);
     document.querySelector("#place").appendChild($.get$geng().canvas);
     t1 = $.get$geng();
     t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
@@ -8975,18 +8948,16 @@ StageSelect_onStart_closure2: {"": "Closure;bgColor_0,borderColor_1",
     t3 = t1.red;
     t4 = t1.green;
     t5 = t1.blue;
-    t1 = t1.alpha;
     t2.toString;
-    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + H.S(t1) + ")";
+    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + t1.alpha + ")";
     canvas.c.fill();
     t1 = this.borderColor_1;
     t5 = canvas.c;
     t4 = t1.red;
     t3 = t1.green;
     t2 = t1.blue;
-    t1 = t1.alpha;
     t5.toString;
-    t5.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t3) + ", " + H.S(t2) + ", " + H.S(t1) + ")";
+    t5.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t3) + ", " + H.S(t2) + ", " + t1.alpha + ")";
     canvas.c.lineWidth = 4;
     canvas.c.stroke();
   },
@@ -8997,10 +8968,10 @@ ConfigSetting: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackR
   onStart$0: function() {
     var sound, t1, clearData, retbtn;
     $.get$geng().objlist.disposeAll$0();
-    sound = new B.GButton(320, 180, 300, 70, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+    sound = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
     sound.text = $.get$geng().soundManager.soundOn ? "\u30b5\u30a6\u30f3\u30c9\u3092OFF\u306b\u3059\u308b" : "\u30b5\u30a6\u30f3\u30c9\u3092ON\u306b\u3059\u308b";
     sound.x = 285;
-    sound.y = 200;
+    sound.y = 220;
     sound.onRelease = new X.ConfigSetting_onStart_closure(sound);
     $.get$geng().objlist._addObjlist.push(sound);
     sound.onInit$0();
@@ -9010,21 +8981,21 @@ ConfigSetting: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackR
       sound.text = "\u30b5\u30a6\u30f3\u30c9\u975e\u5bfe\u5fdc\u30d6\u30e9\u30a6\u30b6";
       sound.isEnable = false;
     }
-    clearData = new B.GButton(320, 180, 300, 70, 1000, null, null, false, false, true, true, "\u30c7\u30fc\u30bf\u3092\u3059\u3079\u3066\u30af\u30ea\u30a2\u3059\u308b", $.get$defaultButtonRenderer().get$render(), false);
+    clearData = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u30c7\u30fc\u30bf\u3092\u3059\u3079\u3066\u30af\u30ea\u30a2\u3059\u308b", $.get$defaultButtonRenderer().get$render(), false);
     clearData.x = 285;
-    clearData.y = 300;
+    clearData.y = sound.y + 110;
     clearData.onRelease = new X.ConfigSetting_onStart_closure0();
     $.get$geng().objlist._addObjlist.push(clearData);
     clearData.onInit$0();
     t1.add$1(t1, clearData);
-    retbtn = new B.GButton(320, 180, 200, 70, 1000, null, null, false, false, true, true, "\u623b\u308b", $.get$defaultButtonRenderer().get$render(), false);
+    retbtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u623b\u308b", $.get$defaultButtonRenderer().get$render(), false);
     retbtn.onRelease = new X.ConfigSetting_onStart_closure1();
     retbtn.x = 285;
-    retbtn.y = 500;
+    retbtn.y = sound.y + 220;
     $.get$geng().objlist._addObjlist.push(retbtn);
     retbtn.onInit$0();
     t1.add$1(t1, retbtn);
-    this.onFrontRender = new X.ConfigSetting_onStart_closure2();
+    this.onBackRender = new X.ConfigSetting_onStart_closure2(B.Color$fromString("#ffffff"), B.Color$fromString("#A2896F"));
   },
   static: {
 "": "ConfigSetting_TextSoundOff,ConfigSetting_TextSoundOn",
@@ -9067,9 +9038,32 @@ ConfigSetting_onStart_closure1: {"": "Closure;",
   $is_void_: true
 },
 
-ConfigSetting_onStart_closure2: {"": "Closure;",
+ConfigSetting_onStart_closure2: {"": "Closure;bgColor_1,borderColor_2",
   call$1: function(canvas) {
-    canvas.drawTexts$5$maxWidth($.get$trenTitle(), ["\u305b\u3063\u3066\u3044"], 285, 10, 620);
+    var t1, img, t2, t3, t4, t5;
+    t1 = $.get$geng().imageMap.map;
+    img = t1.$index(t1, "title");
+    canvas.get$c().drawImage(img, 0, 0, 570, 570);
+    canvas.c.beginPath();
+    canvas.roundRect$5(100, 150, 370, 360, 18);
+    canvas.c.closePath();
+    t1 = this.bgColor_1;
+    t2 = canvas.c;
+    t3 = t1.red;
+    t4 = t1.green;
+    t5 = t1.blue;
+    t2.toString;
+    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + t1.alpha + ")";
+    canvas.c.fill();
+    t1 = this.borderColor_2;
+    t5 = canvas.c;
+    t4 = t1.red;
+    t3 = t1.green;
+    t2 = t1.blue;
+    t5.toString;
+    t5.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t3) + ", " + H.S(t2) + ", " + t1.alpha + ")";
+    canvas.c.lineWidth = 4;
+    canvas.c.stroke();
   },
   $is_args1: true
 },
@@ -9339,13 +9333,11 @@ TankGame_onEndOfStage_closure5: {"": "Closure;",
 
 TankGamePracticely: {"": "TankGame;_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
   onEndOfStage$0: function() {
-    var t1, t2, retBtn;
+    var t1, score, retBtn;
     t1 = {};
+    score = X.resultToScore($.numberOfHit, $.numberOfFire, $.stageData);
     t1.message_0 = null;
-    t2 = $.score;
-    if (typeof t2 !== "number")
-      throw t2.$le();
-    if (t2 <= 50)
+    if (score <= 70)
       t1.message_0 = ["\u307e\u3060\u307e\u3060 \u304b\u306a\uff1f", "\u3082\u3046\u3061\u3087\u3063\u3068 \u308c\u3093\u3057\u3085\u3046\u3057\u3066\u307f\u3088\u3046\uff01"];
     else
       t1.message_0 = ["\u306a\u304b\u306a\u304b\u3084\u308b\u306d\uff01", "\u3064\u304e\u306f \u307b\u3093\u3070\u3093 \u306b \u3061\u3087\u3046\u305b\u3093\u3057\u3066\u307f\u3088\u3046\uff01"];
@@ -9511,7 +9503,10 @@ GameStartLogo: {"": "GObj;_isDisposed",
 
 GameStartLogo_onPrepareRender_closure: {"": "Closure;",
   call$1: function(canvas) {
-    canvas.drawTexts$4($.get$trenScore(), ["GAME START"], 285, 200);
+    var t1, img;
+    t1 = $.get$geng().imageMap.map;
+    img = t1.$index(t1, "gamestart");
+    canvas.get$c().drawImage(img, 135, 249.25, 300, 41.5);
   },
   $is_args1: true
 },
@@ -9692,12 +9687,9 @@ Cannonball_onProcess_closure0: {"": "Closure;this_0",
   $is_args1: true
 },
 
-Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
+Target: {"": "GObj;sp,pos,_width,_hitdx,bombTypes,_isDisposed",
   get$isBombed: function() {
     return this._hitdx != null;
-  },
-  _getScore$1: function(arg0) {
-    return this._getScore.call$1(arg0);
   },
   onInit$0: function() {
   },
@@ -9716,20 +9708,13 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
     t1.$indexSet(t1, 5, new X.Target_onPrepareRender_closure(this));
   },
   bomb$1: function(ball) {
-    var t1, dx, s, t2, bomb;
+    var t1, dx, t2, bomb;
     t1 = this.pos;
     dx = X.getDeltaXonH(t1, ball.oldpos, ball.pos);
     if (dx == null)
       return false;
     if (J.abs$0$n(dx) < this._width / 2 + C.JSInt_methods.$tdiv(ball.size, 2)) {
       this._hitdx = dx;
-      s = this._getScore$1(dx);
-      t2 = $.score;
-      if (typeof t2 !== "number")
-        throw t2.$add();
-      if (typeof s !== "number")
-        throw H.iae(s);
-      $.score = t2 + s;
       for (t2 = this.bombTypes, t2 = new H.ListIterator(t2, t2.length, 0, null); t2.moveNext$0();) {
         bomb = X.Bomb$(t2._current, -1.5707963267948966, 0.7853981633974483);
         bomb.pos.set$1(t1);
@@ -9753,15 +9738,13 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
   Target$fromType$1: function(type) {
     switch (type) {
       case "small":
-        this._width = 60;
-        this._getScore = new X.Target$fromType_closure();
-        this.sp = B.ImageSprite$(120, null, "targetS", this._width);
+        this._width = 30;
+        this.sp = B.ImageSprite$(120, null, "targetS", 60);
         this.bombTypes = [0, 1, 3, 4, 3, 4];
         break;
       case "large":
-        this._width = 120;
-        this._getScore = new X.Target$fromType_closure0();
-        this.sp = B.ImageSprite$(120, null, "targetL", this._width);
+        this._width = 65;
+        this.sp = B.ImageSprite$(120, null, "targetL", 120);
         this.bombTypes = [0, 1, 2, 0, 1, 3, 4, 3, 4, 3, 4, 3];
         break;
       default:
@@ -9770,25 +9753,11 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
   $isTarget: true,
   static: {
 Target$fromType: function(type) {
-  var t1 = new X.Target(null, new U.Vector(0, 0), 80, null, null, null, false);
+  var t1 = new X.Target(null, new U.Vector(0, 0), 80, null, null, false);
   t1.Target$fromType$1(type);
   return t1;
 }}
 
-},
-
-Target$fromType_closure: {"": "Closure;",
-  call$1: function(dx) {
-    return 100;
-  },
-  $is_args1: true
-},
-
-Target$fromType_closure0: {"": "Closure;",
-  call$1: function(dx) {
-    return 50;
-  },
-  $is_args1: true
 },
 
 Target_onPrepareRender_closure: {"": "Closure;this_0",
@@ -10712,27 +10681,13 @@ Isolate.$lazy($, "geng", "geng", "get$geng", function() {
   return new B.GEng(null, null, new B.GObjList(P.List_List(null, null), P.List_List(null, null)), null, null, new B.ImageMap(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), Q.SoundManager$(), new B.HiScoreManager(null, 5, [10, 10, 10, 10, 10]), 1, new B.FrameTimer(new P.Stopwatch(null, null), null, null, null), new B.FPSCounter(new P.Stopwatch(null, null), 0, 0, 0, 0, 0, 0), C.C__Random, 0);
 });
 Isolate.$lazy($, "stageList", "stageList", "get$stageList", function() {
-  return [H.fillLiteralMap(["id", "stage0", "name", "Stage0", "caption", "\u8a66\u3057\u6253\u3061\u3053\u3061\u3089", "speed", 3, "length", 3800, "map", [[900, 150, "large"], [1400, 150, "large"], [1900, 150, "large"], [2400, 150, "small"], [2900, 150, "small"], [3400, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 130, "large"], [250, 150, "small"], [350, 260, "large"], [250, 100, "small"], [250, 270, "large"], [300, 150, "small"], [300, 100, "large"], [400, 100, "small"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [120, 100, "small"], [150, 100, "small"], [150, 100, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
+  return [H.fillLiteralMap(["id", "stage0", "speed", 3, "map", [[900, 150, "large"], [500, 150, "large"], [500, 150, "large"], [500, 150, "small"], [500, 150, "small"], [500, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 130, "large"], [250, 150, "small"], [350, 260, "large"], [250, 100, "small"], [250, 270, "large"], [300, 150, "small"], [250, 100, "large"], [200, 150, "small"], [180, 100, "small"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [125, 100, "small"], [150, 100, "small"], [150, 100, "small"], [250, 280, "small"], [180, 240, "small"], [180, 200, "small"], [180, 160, "small"], [180, 120, "small"], [180, 90, "small"], [250, 90, "large"], [180, 280, "small"], [180, 90, "large"], [180, 280, "small"], [180, 90, "large"], [250, 50, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "itemList", "itemList", "get$itemList", function() {
   return [H.fillLiteralMap(["id", "nom001", "obtained", true, "price", 0, "cannonSize", 20, "cannonSpeed", 6, "text", "\u307e\u3081\u7832\u5f3e"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "gamePointManager", "gamePointManager", "get$gamePointManager", function() {
   return new X.GamePointManager(null, P.HashSet_HashSet(null, null, null, null), H.fillLiteralMap(["stage0", 0, "stage1", 0, "stage2", 1000, "stage3", 5000, "nom001", 0, "big001", 2000, "fast001", 3000], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-});
-Isolate.$lazy($, "trenTitle", "trenTitle", "get$trenTitle", function() {
-  var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
-  t1.set$fontFamily(t1, "\"\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4 Pro W3\", \"Hiragino Kaku Gothic Pro\", Meiryo, \"\u30e1\u30a4\u30ea\u30aa\", \"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\", Verdana, Geneva, Arial, Helvetica");
-  t1.set$fontSize(t1, "20pt");
-  t1.textAlign = "center";
-  t1.textBaseline = "top";
-  t1.lineWidth = 1;
-  t1.fillColor = $.get$Color_Black();
-  t1.shadowColor = B.Color$fromAlpha(0.5);
-  t1.shadowOffsetX = 2;
-  t1.shadowOffsetY = 2;
-  t1.shadowBlur = 2;
-  return t1;
 });
 Isolate.$lazy($, "trenMessage", "trenMessage", "get$trenMessage", function() {
   var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");

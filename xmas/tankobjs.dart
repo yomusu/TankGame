@@ -14,7 +14,10 @@ class GameStartLogo extends GObj {
   }
   void onPrepareRender(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      canvas.drawTexts(trenScore, ["GAME START"], 285, 200);
+      var img = geng.imageMap["gamestart"];
+      var w = 600 / 2;
+      var h = 83 / 2;
+      canvas.c.drawImageScaled(img, 285-(w/2), 270-(h/2), w, h);
     });
   }
   
@@ -209,21 +212,18 @@ class Target extends GObj {
   
   bool  get isBombed => _hitdx!=null;
   
-  var _getScore;
   List<int> bombTypes;
   
   Target.fromType( String type ) {
     switch( type ) {
       case 'small':
-        _width = 60;
-        _getScore = (dx) => 100;
-        sp = new ImageSprite( imgKey:"targetS", width:_width, height:120 );
+        _width = 30;
+        sp = new ImageSprite( imgKey:"targetS", width:60, height:120 );
         bombTypes = [0,1,3,4,3,4];
         break;
       case 'large':
-        _width = 120;
-        _getScore = (dx) => 50;
-        sp = new ImageSprite( imgKey:"targetL", width:_width, height:120 );
+        _width = 65;
+        sp = new ImageSprite( imgKey:"targetL", width:120, height:120 );
         bombTypes = [0,1,2,0,1,3,4,3,4,3,4,3];
         break;
     }
@@ -256,16 +256,6 @@ class Target extends GObj {
     // 交差した
     if( dx.abs() < (_width/2)+(ball.size~/2) ) {
       _hitdx = dx;
-      
-      // 得点を加算
-      num s = _getScore(dx);
-      score += s;
-      // ポップアップ
-//      var pop = new ScorePopup()
-//      ..pos.x = pos.x + _hitdx
-//      ..pos.y = pos.y
-//      ..texts[0] = s.toString();
-//      geng.objlist.add( pop );
       
       // 爆発を配置
       var range = R90 * 0.5;

@@ -29,7 +29,14 @@ class FrameTimer {
     targetTime += _duration;
     var now = _watch.elapsedMicroseconds;
     var wait = targetTime - now;
-//    print("wait=$wait  on ${_watch.elapsedMicroseconds}");
+    
+    // 処理落ちした場合は、もろもろ補正
+    if( wait < 1000 ) {
+      wait = 1000;
+      targetTime = now + 1000;
+//      print("wait=$wait  on ${_watch.elapsedMicroseconds}");
+    }
+    
     new Timer( new Duration(microseconds:wait) , ()=>next() );
   }
   

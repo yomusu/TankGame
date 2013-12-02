@@ -97,7 +97,7 @@ $$.BoundClosure$0 = [P, {"": "BoundClosure;_self,__js_helper$_target,_receiver,_
   $is_void_: true
 }];
 
-$$.BoundClosure$20 = [P, {"": "BoundClosure;_self,__js_helper$_target,_receiver,__js_helper$_name",
+$$.BoundClosure$20 = [B, {"": "BoundClosure;_self,__js_helper$_target,_receiver,__js_helper$_name",
   call$2: function(p0, p1) {
     return this.__js_helper$_target.call(this._self, p0, p1);
   },
@@ -306,11 +306,6 @@ JSArray: {"": "List/Interceptor;",
   },
   forEach$1: function(receiver, f) {
     return H.IterableMixinWorkaround_forEach(receiver, f);
-  },
-  map$1: function(receiver, f) {
-    var t1 = new H.MappedListIterable(receiver, f);
-    H.setRuntimeTypeInfo(t1, [null, null]);
-    return t1;
   },
   elementAt$1: function(receiver, index) {
     if (index < 0 || index >= receiver.length)
@@ -1131,9 +1126,6 @@ ReceivePortImpl: {"": "Stream;_id<,_controller<",
     t1 = new P._ControllerStream(t1);
     H.setRuntimeTypeInfo(t1, [null]);
     return t1.listen$4$cancelOnError$onDone$onError(onData, cancelOnError, onDone, onError);
-  },
-  listen$3$onDone$onError: function(onData, onDone, onError) {
-    return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
   },
   close$0: function(_) {
     var t1 = this._controller;
@@ -2767,46 +2759,6 @@ Symbol_getName: function(symbol) {
   return symbol.get$_name();
 },
 
-ListIterable: {"": "IterableBase;",
-  get$iterator: function(_) {
-    return new H.ListIterator(this, this.get$length(this), 0, null);
-  },
-  forEach$1: function(_, action) {
-    var $length, i;
-    $length = this.get$length(this);
-    for (i = 0; i < $length; ++i) {
-      action.call$1(this.elementAt$1(this, i));
-      if ($length !== this.get$length(this))
-        throw H.wrapException(P.ConcurrentModificationError$(this));
-    }
-  },
-  map$1: function(_, f) {
-    var t1 = new H.MappedListIterable(this, f);
-    H.setRuntimeTypeInfo(t1, [null, null]);
-    return t1;
-  },
-  toList$1$growable: function(_, growable) {
-    var result, i, t1;
-    if (growable) {
-      result = P.List_List(null, H.getRuntimeTypeArgument(this, "ListIterable", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(this, "ListIterable", 0)]);
-      C.JSArray_methods.set$length(result, this.get$length(this));
-    } else {
-      result = P.List_List(this.get$length(this), H.getRuntimeTypeArgument(this, "ListIterable", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(this, "ListIterable", 0)]);
-    }
-    for (i = 0; i < this.get$length(this); ++i) {
-      t1 = this.elementAt$1(this, i);
-      if (i >= result.length)
-        throw H.ioore(result, i);
-      result[i] = t1;
-    }
-    return result;
-  },
-  $asIterableBase: null,
-  $isEfficientLength: true
-},
-
 ListIterator: {"": "Object;_iterable,_dev$_length,_index,_current",
   get$current: function() {
     return this._current;
@@ -2880,22 +2832,6 @@ MappedIterator: {"": "Iterator;_current,_iterator,_f",
   $asIterator: function($S, $T) {
     return [$T];
   }
-},
-
-MappedListIterable: {"": "ListIterable;_source,_f",
-  _f$1: function(arg0) {
-    return this._f.call$1(arg0);
-  },
-  get$length: function(_) {
-    return J.get$length$asx(this._source);
-  },
-  elementAt$1: function(_, index) {
-    return this._f$1(J.elementAt$1$ax(this._source, index));
-  },
-  $asListIterable: function($S, $T) {
-    return [$T];
-  },
-  $isEfficientLength: true
 },
 
 WhereIterable: {"": "IterableBase;_iterable,_f",
@@ -3151,22 +3087,6 @@ _rootRunUnary: function($self, $parent, zone, f, arg) {
   try {
     $.Zone__current = zone;
     t1 = f.call$1(arg);
-    return t1;
-  } finally {
-    $.Zone__current = old;
-  }
-},
-
-_rootRunBinary: function($self, $parent, zone, f, arg1, arg2) {
-  var old, t1, t2;
-  t1 = $.Zone__current;
-  t2 = zone;
-  if (t1 == null ? t2 == null : t1 === t2)
-    return f.call$2(arg1, arg2);
-  old = t1;
-  try {
-    $.Zone__current = zone;
-    t1 = f.call$2(arg1, arg2);
     return t1;
   } finally {
     $.Zone__current = old;
@@ -3672,11 +3592,6 @@ _Future__propagateToListeners__closure0: {"": "Closure;box_0,listener_7",
 },
 
 Stream: {"": "Object;",
-  map$1: function(_, convert) {
-    var t1 = new P._MapStream(convert, this);
-    H.setRuntimeTypeInfo(t1, [H.getRuntimeTypeArgument(this, "Stream", 0), null]);
-    return t1;
-  },
   forEach$1: function(_, action) {
     var t1, future;
     t1 = {};
@@ -3798,15 +3713,6 @@ _StreamController: {"": "Object;",
       t1.add$1(t1, new P._DelayedData(value, null));
     }
   },
-  _addError$2: function(error, stackTrace) {
-    var t1 = this._state;
-    if ((t1 & 1) !== 0)
-      this._sendError$2(error, stackTrace);
-    else if ((t1 & 3) === 0) {
-      t1 = this._ensurePendingEvents$0();
-      t1.add$1(t1, new P._DelayedError(error, stackTrace, null));
-    }
-  },
   _subscribe$1: function(cancelOnError) {
     var t1, t2, subscription, pendingEvents, addState;
     if ((this._state & 3) !== 0)
@@ -3863,9 +3769,6 @@ _SyncStreamControllerDispatch: {"": "Object;",
   _sendData$1: function(data) {
     this.get$_subscription()._async$_add$1(data);
   },
-  _sendError$2: function(error, stackTrace) {
-    this.get$_subscription()._addError$2(error, stackTrace);
-  },
   _sendDone$0: function() {
     this.get$_subscription()._close$0();
   }
@@ -3874,9 +3777,6 @@ _SyncStreamControllerDispatch: {"": "Object;",
 _AsyncStreamControllerDispatch: {"": "Object;",
   _sendData$1: function(data) {
     this.get$_subscription()._addPending$1(new P._DelayedData(data, null));
-  },
-  _sendError$2: function(error, stackTrace) {
-    this.get$_subscription()._addPending$1(new P._DelayedError(error, stackTrace, null));
   },
   _sendDone$0: function() {
     this.get$_subscription()._addPending$1(C.C__DelayedDone);
@@ -4033,15 +3933,6 @@ _BufferingStreamSubscription: {"": "Object;_async$_onData,_onError,_onDone,_zone
     else
       this._addPending$1(new P._DelayedData(data, null));
   },
-  _addError$2: function(error, stackTrace) {
-    var t1 = this._state;
-    if ((t1 & 8) !== 0)
-      return;
-    if (t1 < 32)
-      this._sendError$2(error, stackTrace);
-    else
-      this._addPending$1(new P._DelayedError(error, stackTrace, null));
-  },
   _close$0: function() {
     var t1 = this._state;
     if ((t1 & 8) !== 0)
@@ -4085,24 +3976,6 @@ _BufferingStreamSubscription: {"": "Object;_async$_onData,_onError,_onDone,_zone
     this._zone.runUnaryGuarded$2(this._async$_onData, data);
     this._state = (this._state & 4294967263) >>> 0;
     this._checkState$1((t1 & 4) !== 0);
-  },
-  _sendError$2: function(error, stackTrace) {
-    var t1, t2, t3;
-    t1 = this._state;
-    t2 = new P._BufferingStreamSubscription__sendError_sendError(this, error, stackTrace);
-    if ((t1 & 1) !== 0) {
-      this._state = (t1 | 16) >>> 0;
-      this._cancel$0();
-      t1 = this._cancelFuture;
-      t3 = J.getInterceptor(t1);
-      if (typeof t1 === "object" && t1 !== null && !!t3.$isFuture)
-        t1.whenComplete$1(t2);
-      else
-        t2.call$0();
-    } else {
-      t2.call$0();
-      this._checkState$1((t1 & 4) !== 0);
-    }
   },
   _sendDone$0: function() {
     var t1, t2, t3;
@@ -4162,34 +4035,6 @@ _BufferingStreamSubscription: {"": "Object;_async$_onData,_onError,_onDone,_zone
 
 },
 
-_BufferingStreamSubscription__sendError_sendError: {"": "Closure;this_0,error_1,stackTrace_2",
-  call$0: function() {
-    var t1, t2, t3, t4, t5;
-    t1 = this.this_0;
-    t2 = t1._state;
-    if ((t2 & 8) !== 0 && (t2 & 16) === 0)
-      return;
-    t1._state = (t2 | 32) >>> 0;
-    t2 = t1._zone;
-    t3 = $.Zone__current;
-    t2.toString;
-    t3.toString;
-    if (t3 == null ? t2 != null : t3 !== t2)
-      P._rootHandleUncaughtError(t3, null, t3, this.error_1, this.stackTrace_2);
-    else {
-      t3 = t1._onError;
-      t4 = J.getInterceptor(t3);
-      t5 = this.error_1;
-      if (!!t4.$is_args2)
-        t2.runBinaryGuarded$3(t3, t5, this.stackTrace_2);
-      else
-        t2.runUnaryGuarded$2(t3, t5);
-    }
-    t1._state = (t1._state & 4294967263) >>> 0;
-  },
-  $is_void_: true
-},
-
 _BufferingStreamSubscription__sendDone_sendDone: {"": "Closure;this_0",
   call$0: function() {
     var t1, t2;
@@ -4212,9 +4057,6 @@ _StreamImpl: {"": "Stream;",
     subscription.onDone$1(onDone);
     return subscription;
   },
-  listen$3$onDone$onError: function(onData, onDone, onError) {
-    return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
-  },
   _createSubscription$1: function(cancelOnError) {
     var t1, t2;
     t1 = $.Zone__current;
@@ -4229,12 +4071,6 @@ _DelayedEvent: {"": "Object;next@"},
 _DelayedData: {"": "_DelayedEvent;value,next",
   perform$1: function(dispatch) {
     dispatch._sendData$1(this.value);
-  }
-},
-
-_DelayedError: {"": "_DelayedEvent;error>,stackTrace<,next",
-  perform$1: function(dispatch) {
-    dispatch._sendError$2(this.error, this.stackTrace);
   }
 },
 
@@ -4318,124 +4154,6 @@ _cancelAndErrorClosure_closure: {"": "Closure;subscription_0,future_1",
   $is_args2: true
 },
 
-_ForwardingStream: {"": "Stream;",
-  listen$4$cancelOnError$onDone$onError: function(onData, cancelOnError, onDone, onError) {
-    var result = P._ForwardingStreamSubscription$(this, true === cancelOnError, H.getRuntimeTypeArgument(this, "_ForwardingStream", 0), H.getRuntimeTypeArgument(this, "_ForwardingStream", 1));
-    result.onData$1(onData);
-    result.onError$1(result, onError);
-    result.onDone$1(onDone);
-    return result;
-  },
-  listen$3$onDone$onError: function(onData, onDone, onError) {
-    return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
-  },
-  _handleData$2: function(data, sink) {
-    sink._async$_add$1(data);
-  },
-  $asStream: function($S, $T) {
-    return [$T];
-  }
-},
-
-_ForwardingStreamSubscription: {"": "_BufferingStreamSubscription;_stream,_subscription,_async$_onData,_onError,_onDone,_zone,_state,_cancelFuture,_pending",
-  _async$_add$1: function(data) {
-    if ((this._state & 2) !== 0)
-      return;
-    P._BufferingStreamSubscription.prototype._async$_add$1.call(this, data);
-  },
-  _addError$2: function(error, stackTrace) {
-    if ((this._state & 2) !== 0)
-      return;
-    P._BufferingStreamSubscription.prototype._addError$2.call(this, error, stackTrace);
-  },
-  _onPause$0: function() {
-    var t1 = this._subscription;
-    if (t1 == null)
-      return;
-    t1.pause$0(t1);
-  },
-  get$_onPause: function() {
-    return new P.BoundClosure$0(this, P._ForwardingStreamSubscription.prototype._onPause$0, null, "_onPause$0");
-  },
-  _onResume$0: function() {
-    var t1 = this._subscription;
-    if (t1 == null)
-      return;
-    t1.resume$0();
-  },
-  get$_onResume: function() {
-    return new P.BoundClosure$0(this, P._ForwardingStreamSubscription.prototype._onResume$0, null, "_onResume$0");
-  },
-  _onCancel$0: function() {
-    var t1 = this._subscription;
-    if (t1 != null) {
-      this._subscription = null;
-      t1.cancel$0();
-    }
-    return;
-  },
-  _handleData$1: function(data) {
-    this._stream._handleData$2(data, this);
-  },
-  get$_handleData: function() {
-    return new H.BoundClosure$1(this, P._ForwardingStreamSubscription.prototype._handleData$1, null, "_handleData$1");
-  },
-  _handleError$2: function(error, stackTrace) {
-    this._addError$2(error, stackTrace);
-  },
-  get$_handleError: function() {
-    return new P.BoundClosure$20(this, P._ForwardingStreamSubscription.prototype._handleError$2, null, "_handleError$2");
-  },
-  _handleDone$0: function() {
-    this._close$0();
-  },
-  get$_handleDone: function() {
-    return new P.BoundClosure$0(this, P._ForwardingStreamSubscription.prototype._handleDone$0, null, "_handleDone$0");
-  },
-  _ForwardingStreamSubscription$2: function(_stream, cancelOnError, $S, $T) {
-    var t1, t2;
-    t1 = this.get$_handleData();
-    t2 = this.get$_handleError();
-    this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
-  },
-  $as_BufferingStreamSubscription: function($S, $T) {
-    return [$T];
-  },
-  static: {
-_ForwardingStreamSubscription$: function(_stream, cancelOnError, $S, $T) {
-  var t1, t2;
-  t1 = $.Zone__current;
-  t2 = cancelOnError ? 1 : 0;
-  t2 = new P._ForwardingStreamSubscription(_stream, null, null, null, null, t1, t2, null, null);
-  H.setRuntimeTypeInfo(t2, [$S, $T]);
-  t2._ForwardingStreamSubscription$2(_stream, cancelOnError, $S, $T);
-  return t2;
-}}
-
-},
-
-_MapStream: {"": "_ForwardingStream;_transform,_async$_source",
-  _transform$1: function(arg0) {
-    return this._transform.call$1(arg0);
-  },
-  _handleData$2: function(inputEvent, sink) {
-    var outputEvent, e, s, exception, t1;
-    outputEvent = null;
-    try {
-      outputEvent = this._transform$1(inputEvent);
-    } catch (exception) {
-      t1 = H.unwrapException(exception);
-      e = t1;
-      s = new H._StackTrace(exception, null);
-      sink._addError$2(e, s);
-      return;
-    }
-
-    sink._async$_add$1(outputEvent);
-  },
-  $as_ForwardingStream: null
-},
-
 _BaseZone: {"": "Object;",
   runGuarded$1: function(f) {
     var e, s, t1, exception;
@@ -4454,19 +4172,6 @@ _BaseZone: {"": "Object;",
     var e, s, t1, exception;
     try {
       t1 = this.runUnary$2(f, arg);
-      return t1;
-    } catch (exception) {
-      t1 = H.unwrapException(exception);
-      e = t1;
-      s = new H._StackTrace(exception, null);
-      return this.handleUncaughtError$2(e, s);
-    }
-
-  },
-  runBinaryGuarded$3: function(f, arg1, arg2) {
-    var e, s, t1, exception;
-    try {
-      t1 = this.runBinary$3(f, arg1, arg2);
       return t1;
     } catch (exception) {
       t1 = H.unwrapException(exception);
@@ -4559,9 +4264,6 @@ _RootZone: {"": "_BaseZone;",
   },
   runUnary$2: function(f, arg) {
     return P._rootRunUnary(this, null, this, f, arg);
-  },
-  runBinary$3: function(f, arg1, arg2) {
-    return P._rootRunBinary(this, null, this, f, arg1, arg2);
   },
   registerCallback$1: function(f) {
     return f;
@@ -5451,25 +5153,6 @@ HashSetIterator: {"": "Object;_set,_elements,_offset,_collection$_current",
 },
 
 _HashSetBase: {"": "IterableBase;",
-  toList$1$growable: function(_, growable) {
-    var result, t1, i, element, i0;
-    if (growable) {
-      result = P.List_List(null, H.getRuntimeTypeArgument(this, "_HashSetBase", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(this, "_HashSetBase", 0)]);
-      C.JSArray_methods.set$length(result, this.get$length(this));
-    } else {
-      result = P.List_List(this.get$length(this), H.getRuntimeTypeArgument(this, "_HashSetBase", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(this, "_HashSetBase", 0)]);
-    }
-    for (t1 = this.get$iterator(this), i = 0; t1.moveNext$0(); i = i0) {
-      element = t1._collection$_current;
-      i0 = i + 1;
-      if (i >= result.length)
-        throw H.ioore(result, i);
-      result[i] = element;
-    }
-    return result;
-  },
   toString$0: function(_) {
     return H.IterableMixinWorkaround_toStringIterable(this, "{", "}");
   },
@@ -5478,9 +5161,6 @@ _HashSetBase: {"": "IterableBase;",
 },
 
 IterableBase: {"": "Object;",
-  map$1: function(_, f) {
-    return H.MappedIterable_MappedIterable(this, f, H.getRuntimeTypeArgument(this, "IterableBase", 0), null);
-  },
   forEach$1: function(_, f) {
     var t1;
     for (t1 = this.get$iterator(this); t1.moveNext$0();)
@@ -5545,31 +5225,6 @@ ListMixin: {"": "Object;",
       if ($length !== receiver.length)
         throw H.wrapException(P.ConcurrentModificationError$(receiver));
     }
-  },
-  map$1: function(receiver, f) {
-    var t1 = new H.MappedListIterable(receiver, f);
-    H.setRuntimeTypeInfo(t1, [null, null]);
-    return t1;
-  },
-  toList$1$growable: function(receiver, growable) {
-    var result, i, t1;
-    if (growable) {
-      result = P.List_List(null, H.getRuntimeTypeArgument(receiver, "ListMixin", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-      C.JSArray_methods.set$length(result, this.get$length(receiver));
-    } else {
-      result = P.List_List(this.get$length(receiver), H.getRuntimeTypeArgument(receiver, "ListMixin", 0));
-      H.setRuntimeTypeInfo(result, [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-    }
-    for (i = 0; i < this.get$length(receiver); ++i) {
-      if (i >= receiver.length)
-        throw H.ioore(receiver, i);
-      t1 = receiver[i];
-      if (i >= result.length)
-        throw H.ioore(result, i);
-      result[i] = t1;
-    }
-    return result;
   },
   _rangeCheck$2: function(receiver, start, end) {
     if (start < 0 || start > this.get$length(receiver))
@@ -5687,19 +5342,6 @@ ListQueue: {"": "IterableBase;_table,_head,_tail,_modificationCount",
   get$length: function(_) {
     return (this._tail - this._head & this._table.length - 1) >>> 0;
   },
-  toList$1$growable: function(_, growable) {
-    var list;
-    if (growable) {
-      list = P.List_List(null, H.getRuntimeTypeArgument(this, "ListQueue", 0));
-      H.setRuntimeTypeInfo(list, [H.getRuntimeTypeArgument(this, "ListQueue", 0)]);
-      C.JSArray_methods.set$length(list, this.get$length(this));
-    } else {
-      list = P.List_List(this.get$length(this), H.getRuntimeTypeArgument(this, "ListQueue", 0));
-      H.setRuntimeTypeInfo(list, [H.getRuntimeTypeArgument(this, "ListQueue", 0)]);
-    }
-    this._writeToList$1(list);
-    return list;
-  },
   toString$0: function(_) {
     return H.IterableMixinWorkaround_toStringIterable(this, "{", "}");
   },
@@ -5744,24 +5386,6 @@ ListQueue: {"": "IterableBase;_table,_head,_tail,_modificationCount",
     this._head = 0;
     this._tail = this._table.length;
     this._table = newTable;
-  },
-  _writeToList$1: function(target) {
-    var t1, t2, t3, $length, firstPartSize;
-    t1 = this._head;
-    t2 = this._tail;
-    t3 = this._table;
-    if (t1 <= t2) {
-      $length = t2 - t1;
-      H.IterableMixinWorkaround_setRangeList(target, 0, $length, t3, t1);
-      return $length;
-    } else {
-      firstPartSize = t3.length - t1;
-      H.IterableMixinWorkaround_setRangeList(target, 0, firstPartSize, t3, t1);
-      t1 = this._tail;
-      t2 = this._table;
-      H.IterableMixinWorkaround_setRangeList(target, firstPartSize, firstPartSize + t1, t2, 0);
-      return this._tail + firstPartSize;
-    }
   },
   ListQueue$1: function(initialCapacity, $E) {
     var t1 = P.List_List(8, $E);
@@ -7295,9 +6919,6 @@ _EventStream: {"": "Stream;_target,_eventType,_useCapture",
     t1._tryResume$0();
     return t1;
   },
-  listen$3$onDone$onError: function(onData, onDone, onError) {
-    return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
-  },
   $asStream: null
 },
 
@@ -7310,21 +6931,6 @@ _EventStreamSubscription: {"": "StreamSubscription;_pauseCount,_target,_eventTyp
     this._unlisten$0();
     this._target = null;
     this._onData = null;
-  },
-  pause$1: function(_, resumeSignal) {
-    if (this._target == null)
-      return;
-    this._pauseCount = this._pauseCount + 1;
-    this._unlisten$0();
-  },
-  pause$0: function($receiver) {
-    return this.pause$1($receiver, null);
-  },
-  resume$0: function() {
-    if (this._target == null || this._pauseCount <= 0)
-      return;
-    this._pauseCount = this._pauseCount - 1;
-    this._tryResume$0();
   },
   _tryResume$0: function() {
     var t1 = this._onData;
@@ -7997,16 +7603,21 @@ DefaultButtonRender: {"": "Object;shadow,bg_normal,border_normal,border_on,borde
     c.restore();
   },
   get$render: function() {
-    return new P.BoundClosure$20(this, B.DefaultButtonRender.prototype.render$2, null, "render$2");
+    return new B.BoundClosure$20(this, B.DefaultButtonRender.prototype.render$2, null, "render$2");
   }
 },
+
+GPInfo: {"": "Object;_numRepaint"},
 
 GObj: {"": "Object;",
   get$isDisposed: function() {
     return this._isDisposed;
   },
-  process$1: function(renderList) {
-    return this.onProcess$1(renderList);
+  process$1: function(handle) {
+    return this.onProcess$1(handle);
+  },
+  prepareRender$1: function(renderList) {
+    return this.onPrepareRender$1(renderList);
   },
   dispose$0: function() {
     this.onDispose$0();
@@ -8014,7 +7625,7 @@ GObj: {"": "Object;",
   }
 },
 
-GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
+GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn<,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
   get$left: function(_) {
     return this.x - this.width / 2;
   },
@@ -8057,11 +7668,13 @@ GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn,isPress<,isVisi
   },
   onInit$0: function() {
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
+  },
+  onPrepareRender$1: function(renderList) {
     var t1;
     if (this.get$status(this) !== -1) {
       t1 = renderList._list;
-      t1.$indexSet(t1, this.z, new B.GButton_onProcess_closure(this));
+      t1.$indexSet(t1, this.z, new B.GButton_onPrepareRender_closure(this));
     }
   },
   onDispose$0: function() {
@@ -8072,10 +7685,11 @@ GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn,isPress<,isVisi
 
 },
 
-GButton_onProcess_closure: {"": "Closure;this_0",
+GButton_onPrepareRender_closure: {"": "Closure;this_0",
   call$1: function(c) {
     var t1 = this.this_0;
-    return t1.renderer$2(c, t1);
+    if (t1.renderer != null)
+      t1.renderer$2(c, t1);
   },
   $is_args1: true
 },
@@ -8131,6 +7745,8 @@ ButtonList_onPress_closure0: {"": "Closure;e_0",
     t1 = this.e_0;
     t2 = J.getInterceptor$x(t1);
     if (b.isIn$2(t2.get$x(t1), t2.get$y(t1))) {
+      t1 = $.get$geng();
+      t1._repaintCount = t1._repaintCount + 1;
       b.isPress = true;
       if (b.onPress != null)
         b.onPress$0();
@@ -8148,7 +7764,10 @@ ButtonList_onRelease_closure: {"": "Closure;",
 
 ButtonList_onRelease_closure0: {"": "Closure;",
   call$1: function(b) {
+    var t1;
     if (b.get$onRelease() != null) {
+      t1 = $.get$geng();
+      t1._repaintCount = t1._repaintCount + 1;
       b.onRelease$0();
       b.isPress = false;
     }
@@ -8165,7 +7784,13 @@ ButtonList_onMouseMove_closure: {"": "Closure;",
 
 ButtonList_onMouseMove_closure0: {"": "Closure;x_0,y_1",
   call$1: function(b) {
+    var oldOn, t1;
+    oldOn = b.get$isOn();
     b.isOn = b.isIn$2(this.x_0, this.y_1);
+    if (b.isOn !== oldOn) {
+      t1 = $.get$geng();
+      t1._repaintCount = t1._repaintCount + 1;
+    }
   },
   $is_args1: true
 },
@@ -8176,6 +7801,9 @@ GScreen: {"": "Object;",
   },
   onFrontRender$1: function(arg0) {
     return this.onFrontRender.call$1(arg0);
+  },
+  onBackRender$1: function(arg0) {
+    return this.onBackRender.call$1(arg0);
   },
   onPress$1: function(e) {
     return this.btnList.onPress$1(e);
@@ -8194,29 +7822,35 @@ GScreen: {"": "Object;",
     return t1.onMouseMove$2(t1, x, y);
   },
   get$onMove: function() {
-    return new P.BoundClosure$20(this, B.GScreen.prototype.onMove$2, null, "onMove$2");
+    return new B.BoundClosure$20(this, B.GScreen.prototype.onMove$2, null, "onMove$2");
   },
   onTimer$0: function() {
+    var t1, t2;
     if (this.onProcess != null)
       this.onProcess$0();
-    var t1 = this._renderList;
-    $.get$geng().objlist.processAll$1(t1);
-    J.get$context2D$x($.get$geng().backcanvas).fillStyle = "rgba(255, 255, 255, 1)";
-    J.get$context2D$x($.get$geng().backcanvas).fillRect(0, 0, $.get$geng()._rect.width, $.get$geng()._rect.height);
-    t1.renderAll$1($.get$geng().backcanvas);
-    t1 = t1._list;
-    t1._root = null;
-    t1._count = 0;
-    t1._modificationCount = t1._modificationCount + 1;
-    $.get$geng().objlist.gcObj$0();
-    if (this.onFrontRender != null) {
-      t1 = $.get$g2d();
-      t1.set$canvas(t1, $.get$geng().backcanvas);
-      this.onFrontRender$1($.get$g2d());
+    $.get$geng().objlist.processAll$1(new B.GPInfo(0));
+    if ($.get$geng().popRepaintRequest$0()) {
+      t1 = this._renderList;
+      $.get$geng().objlist.prepareRenderAll$1(t1);
+      t2 = $.get$g2d();
+      t2.set$canvas(t2, $.get$geng().backcanvas);
+      if (this.onBackRender != null)
+        this.onBackRender$1($.get$g2d());
+      else {
+        $.get$g2d().c.fillStyle = "rgba(255, 255, 255, 1)";
+        $.get$g2d().c.fillRect(0, 0, $.get$geng()._rect.width, $.get$geng()._rect.height);
+      }
+      t1.renderAll$1($.get$g2d());
+      t1 = t1._list;
+      t1._root = null;
+      t1._count = 0;
+      t1._modificationCount = t1._modificationCount + 1;
+      $.get$geng().objlist.gcObj$0();
+      if (this.onFrontRender != null)
+        this.onFrontRender$1($.get$g2d());
       t1 = $.get$g2d();
       t1.set$canvas(t1, null);
     }
-    $.get$geng().toString;
   }
 },
 
@@ -8225,14 +7859,10 @@ PressEvent: {"": "Object;x>,y>"},
 RenderList: {"": "Object;_list",
   renderAll$1: function(canvas) {
     var t1, t2;
-    t1 = $.get$g2d();
-    t1.set$canvas(t1, canvas);
     t1 = this._list;
     t2 = new P._SplayTreeValueIterable(t1);
     H.setRuntimeTypeInfo(t2, [H.getRuntimeTypeArgument(t1, "SplayTreeMap", 0), H.getRuntimeTypeArgument(t1, "SplayTreeMap", 1)]);
-    t2.forEach$1(t2, new B.RenderList_renderAll_closure());
-    t2 = $.get$g2d();
-    t2.set$canvas(t2, null);
+    t2.forEach$1(t2, new B.RenderList_renderAll_closure(canvas));
   },
   static: {
 RenderList$: function() {
@@ -8249,17 +7879,14 @@ RenderList_closure: {"": "Closure;",
   $is_args2: true
 },
 
-RenderList_renderAll_closure: {"": "Closure;",
+RenderList_renderAll_closure: {"": "Closure;canvas_0",
   call$1: function(r) {
-    return r.call$1($.get$g2d());
+    return r.call$1(this.canvas_0);
   },
   $is_args1: true
 },
 
 ImageMap: {"": "Object;map",
-  map$1: function($receiver, arg0) {
-    return this.map.call$1(arg0);
-  },
   put$2: function(key, src) {
     var img, t1, t2;
     img = W.ImageElement_ImageElement(null, null, null);
@@ -8300,12 +7927,16 @@ GObjList: {"": "Object;_addObjlist,objlist",
     this.gcObj$0();
     C.JSArray_methods.set$length(t1, 0);
   },
-  processAll$1: function(renderList) {
+  processAll$1: function(handle) {
     var t1 = this._addObjlist;
     C.JSArray_methods.addAll$1(this.objlist, t1);
     C.JSArray_methods.set$length(t1, 0);
     t1 = this.where$0(this);
-    t1.forEach$1(t1, new B.GObjList_processAll_closure(renderList));
+    t1.forEach$1(t1, new B.GObjList_processAll_closure(handle));
+  },
+  prepareRenderAll$1: function(renderList) {
+    var t1 = this.where$0(this);
+    t1.forEach$1(t1, new B.GObjList_prepareRenderAll_closure(renderList));
   },
   where$1: function(_, test) {
     var r, t1;
@@ -8337,9 +7968,16 @@ GObjList_disposeAll_closure: {"": "Closure;",
   $is_args1: true
 },
 
-GObjList_processAll_closure: {"": "Closure;renderList_0",
+GObjList_processAll_closure: {"": "Closure;handle_0",
   call$1: function(v) {
-    return v.process$1(this.renderList_0);
+    return v.process$1(this.handle_0);
+  },
+  $is_args1: true
+},
+
+GObjList_prepareRenderAll_closure: {"": "Closure;renderList_0",
+  call$1: function(v) {
+    return v.prepareRender$1(this.renderList_0);
   },
   $is_args1: true
 },
@@ -8358,7 +7996,7 @@ GObjList_where_closure0: {"": "Closure;test_0",
   $is_args1: true
 },
 
-GEng: {"": "Object;_screen,_rect,objlist,canvas,backcanvas,imageMap,soundManager,hiscoreManager,_scale,frameWatch,cpucnt,rand",
+GEng: {"": "Object;_screen,_rect,objlist,canvas,backcanvas,imageMap,soundManager,hiscoreManager,_scale,frameWatch,cpucnt,rand,_repaintCount",
   set$screen: function(_, s) {
     P.Timer_Timer(C.Duration_0, new B.GEng_screen_closure(this, s));
   },
@@ -8477,6 +8115,11 @@ GEng: {"": "Object;_screen,_rect,objlist,canvas,backcanvas,imageMap,soundManager
   randRange$2: function(n1, n2) {
     var r = Math.random();
     return n1 * r + n2 * (1 - r);
+  },
+  popRepaintRequest$0: function() {
+    var t1 = this._repaintCount;
+    this._repaintCount = 0;
+    return t1 > 0;
   }
 },
 
@@ -8484,8 +8127,11 @@ GEng_screen_closure: {"": "Closure;this_0,s_1",
   call$0: function() {
     var t1 = this.s_1;
     this.this_0._screen = t1;
-    if (t1 != null)
+    if (t1 != null) {
       t1.onStart$0();
+      t1 = $.get$geng();
+      t1._repaintCount = t1._repaintCount + 1;
+    }
   },
   $is_void_: true
 },
@@ -8640,10 +8286,6 @@ HiScoreManager: {"": "Object;_scoresMap,maxLength,defaultScores",
     else
       this._scoresMap = H.fillLiteralMap([], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
   },
-  getScoreTexts$1: function(kind) {
-    var list = J.containsKey$1$x(this._scoresMap, kind) ? J.$index$asx(this._scoresMap, kind) : this.defaultScores;
-    return J.toList$1$growable$ax(J.map$1$ax(list, new B.HiScoreManager_getScoreTexts_closure()), false);
-  },
   addNewRecord$2: function(kind, newScore) {
     var _list, t1, i, t2, t3, stringfy;
     if (!J.containsKey$1$x(this._scoresMap, kind))
@@ -8658,8 +8300,6 @@ HiScoreManager: {"": "Object;_scoresMap,maxLength,defaultScores",
       if (!(i < t2))
         break;
       t2 = t1.$index(_list, i);
-      if (typeof newScore !== "number")
-        throw newScore.$gt();
       if (typeof t2 !== "number")
         throw H.iae(t2);
       if (newScore > t2) {
@@ -8680,13 +8320,6 @@ HiScoreManager: {"": "Object;_scoresMap,maxLength,defaultScores",
   }
 },
 
-HiScoreManager_getScoreTexts_closure: {"": "Closure;",
-  call$1: function(e) {
-    return J.toString$0(e);
-  },
-  $is_args1: true
-},
-
 FrameTimer: {"": "Object;_watch,callback,targetTime,_geng0$_duration",
   callback$0: function() {
     return this.callback.call$0();
@@ -8701,7 +8334,7 @@ FrameTimer: {"": "Object;_watch,callback,targetTime,_geng0$_duration",
     P.Timer_Timer(C.Duration_0, new B.FrameTimer_start_closure(this));
   },
   next$0: function() {
-    var t1, t2, now;
+    var t1, t2, now, wait;
     if (this._watch == null)
       return;
     this.callback$0();
@@ -8716,7 +8349,12 @@ FrameTimer: {"": "Object;_watch,callback,targetTime,_geng0$_duration",
     t2 = this.targetTime;
     if (typeof t2 !== "number")
       throw t2.$sub();
-    P.Timer_Timer(P.Duration$(0, 0, t2 - now, 0, 0, 0), new B.FrameTimer_next_closure(this));
+    wait = t2 - now;
+    if (wait < 1000) {
+      this.targetTime = now + 1000;
+      wait = 1000;
+    }
+    P.Timer_Timer(P.Duration$(0, 0, wait, 0, 0, 0), new B.FrameTimer_next_closure(this));
   },
   dispose$0: function() {
     var t1 = this._watch;
@@ -9044,28 +8682,67 @@ SoundManager_put_closure1: {"": "Closure;key_11,comp_12",
   $is_void_: true
 }}],
 ["tankgame", "tankgame.dart", , X, {
+resultToScore: function(hit, fire, stage) {
+  var t1, Krate, Arate;
+  t1 = J.get$length$asx(stage.$index(stage, "map"));
+  if (typeof hit !== "number")
+    throw hit.$div();
+  if (typeof t1 !== "number")
+    throw H.iae(t1);
+  Krate = hit / t1;
+  if (typeof fire !== "number")
+    throw H.iae(fire);
+  Arate = hit / fire;
+  P.print("K=" + Krate + " A=" + Arate);
+  t1 = Krate > 0.99;
+  if (t1 && Arate > 0.99)
+    return 100;
+  else if (t1 && Arate > 0.8)
+    return 90;
+  else if (Krate > 0.9 && Arate > 0.8)
+    return 70;
+  else if (Krate > 0.85 && Arate > 0.7)
+    return 50;
+  else if (Krate > 0.7 && Arate > 0.5)
+    return 30;
+  return 10;
+},
+
+resultToLevelText: function(score) {
+  var map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
+  return map.$index(map, score);
+},
+
 main: function() {
   P.Timer_Timer(C.Duration_0, new X.main_closure());
 },
 
 drawHiScore: function(canvas, scoreList, y, mark) {
-  var tren, i, t1;
+  var tren, t1, i, t2, map;
   $.get$trenHiscore().textAlign = "center";
   canvas.drawTexts$5$maxWidth($.get$trenHiscore(), ["\u30cf\u30a4\u30b9\u30b3\u30a2"], 285, y, 300);
   y += 40;
   tren = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
   tren.set$1($.get$trenHiscore());
   tren.textAlign = "right";
-  for (i = 0; i < scoreList.length; ++i) {
+  t1 = J.getInterceptor$asx(scoreList);
+  i = 0;
+  while (true) {
+    t2 = t1.get$length(scoreList);
+    if (typeof t2 !== "number")
+      throw H.iae(t2);
+    if (!(i < t2))
+      break;
     tren.fillColor = mark === i ? $.get$Color_Red() : $.get$Color_Black();
-    t1 = $.get$titles();
+    t2 = $.get$titles();
     if (i >= 5)
-      throw H.ioore(t1, i);
-    canvas.drawTexts$5$maxWidth(tren, [t1[i]], 215, y, 100);
-    if (i >= scoreList.length)
-      throw H.ioore(scoreList, i);
-    canvas.drawTexts$5$maxWidth(tren, [scoreList[i]], 415, y, 300);
+      throw H.ioore(t2, i);
+    canvas.drawTexts$5$maxWidth(tren, [t2[i]], 215, y, 100);
+    t2 = t1.$index(scoreList, i);
+    map = H.fillLiteralMap([100, "\u304b\u307f\u3055\u307e", 90, "\u305f\u3064\u3058\u3093", 70, "\u305b\u3093\u305b\u3044", 50, "\u305b\u3093\u3071\u3044", 30, "\u3044\u3061\u306d\u3093\u305b\u3044", 10, "\u3042\u304b\u3061\u3083\u3093"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
+    canvas.drawTexts$5$maxWidth(tren, [map.$index(map, t2)], 415, y, 300);
     y += 20;
+    ++i;
   }
 },
 
@@ -9116,6 +8793,8 @@ main_closure: {"": "Closure;",
   call$0: function() {
     var t1, sound, scale;
     t1 = $.get$geng().imageMap;
+    t1.put$2("title", "./img/title.png");
+    t1.put$2("starttext", "./img/starttext.png");
     t1.put$2("tank01", "./img/boo01.png");
     t1.put$2("tank02", "./img/boo02.png");
     t1.put$2("targetL", "./img/usidaruma01.png");
@@ -9129,106 +8808,192 @@ main_closure: {"": "Closure;",
     t1.put$2("tama", "./img/yuki01.png");
     t1.put$2("star01", "./img/star01.png");
     t1.put$2("ball01", "./img/ball01.png");
-    $.get$geng().soundManager.put$2("fire", "./sound/bomb.ogg");
-    $.get$geng().soundManager.put$2("bomb", "./sound/launch02.ogg");
+    $.get$geng().soundManager.put$2("bell", "./sound/xmasbell.ogg");
+    $.get$geng().soundManager.put$2("fire", "./sound/bag.ogg");
+    $.get$geng().soundManager.put$2("bomb", "./sound/pyo.ogg");
     $.get$geng().hiscoreManager.init$0();
     $.get$gamePointManager().init$0();
-    sound = window.localStorage.getItem("sound") != null && window.localStorage.getItem("sound") === "true";
+    sound = window.localStorage.getItem("sound") == null || window.localStorage.getItem("sound") === "true";
     $.get$geng().soundManager.soundOn = sound;
     scale = B.isMobileDevice() ? 0.5 : 1;
     $.get$geng().initField$3$height$scale$width(570, scale, 570);
     document.querySelector("#place").appendChild($.get$geng().canvas);
     t1 = $.get$geng();
-    t1.set$screen(t1, new X.Title(B.RenderList$(), new B.ButtonList(null), null, null, null));
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
     $.get$geng().startTimer$0();
   },
   $is_void_: true
 },
 
-Title: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onMoveOut",
+Title: {"": "GScreen;timer,isBtnVisible,_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
   onStart$0: function() {
-    var practicebtn, t1, playbtn, configbtn;
+    var practicebtn, t1;
     $.get$geng().objlist.disposeAll$0();
-    practicebtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u308c\u3093\u3057\u3085\u3046", $.get$defaultButtonRenderer().get$render(), false);
-    practicebtn.onPress = new X.Title_onStart_closure();
+    practicebtn = new B.GButton(320, 180, 570, 570, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+    practicebtn.renderer = null;
+    practicebtn.onPress = new X.Title_onStart_closure(this);
     practicebtn.x = 285;
     practicebtn.y = 300;
     $.get$geng().objlist._addObjlist.push(practicebtn);
     practicebtn.onInit$0();
     t1 = this.btnList;
     t1.add$1(t1, practicebtn);
-    playbtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u30b2\u30fc\u30e0\u30b9\u30bf\u30fc\u30c8", $.get$defaultButtonRenderer().get$render(), false);
-    playbtn.onPress = new X.Title_onStart_closure0();
-    playbtn.x = 285;
-    playbtn.y = 380;
-    $.get$geng().objlist._addObjlist.push(playbtn);
-    playbtn.onInit$0();
-    t1.add$1(t1, playbtn);
-    configbtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u305b\u3063\u3066\u3044", $.get$defaultButtonRenderer().get$render(), false);
-    configbtn.onPress = new X.Title_onStart_closure1();
-    configbtn.x = 285;
-    configbtn.y = 480;
-    $.get$geng().objlist._addObjlist.push(configbtn);
-    configbtn.onInit$0();
-    t1.add$1(t1, configbtn);
-    this.onFrontRender = new X.Title_onStart_closure2();
+    this.onBackRender = new X.Title_onStart_closure0();
+    this.onFrontRender = new X.Title_onStart_closure1(this);
+    this.timer = P.Timer_Timer$periodic(C.Duration_500000, new X.Title_onStart_closure2(this));
   }
 },
 
-Title_onStart_closure: {"": "Closure;",
+Title_onStart_closure: {"": "Closure;this_0",
   call$0: function() {
-    var t1 = $.get$geng().soundManager;
-    t1.play$1(t1, "fire");
-    P.Timer_Timer(C.Duration_500000, new X.Title_onStart__closure0());
-  },
-  $is_void_: true
-},
-
-Title_onStart__closure0: {"": "Closure;",
-  call$0: function() {
-    $.stageData = $.get$stageList()[0];
-    $.itemData = $.get$itemList()[0];
+    this.this_0.timer.cancel$0();
     var t1 = $.get$geng();
-    t1.set$screen(t1, new X.TankGamePracticely(B.RenderList$(), new B.ButtonList(null), null, null, null));
+    t1.set$screen(t1, new X.StageSelect(B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
 
 Title_onStart_closure0: {"": "Closure;",
-  call$0: function() {
-    var t1 = $.get$geng().soundManager;
-    t1.play$1(t1, "fire");
-    P.Timer_Timer(C.Duration_500000, new X.Title_onStart__closure());
-  },
-  $is_void_: true
-},
-
-Title_onStart__closure: {"": "Closure;",
-  call$0: function() {
-    $.stageData = $.get$stageList()[1];
-    $.itemData = $.get$itemList()[0];
-    var t1 = $.get$geng();
-    t1.set$screen(t1, new X.TankGame(B.RenderList$(), new B.ButtonList(null), null, null, null));
-  },
-  $is_void_: true
-},
-
-Title_onStart_closure1: {"": "Closure;",
-  call$0: function() {
-    var t1 = $.get$geng();
-    t1.set$screen(t1, new X.ConfigSetting(B.RenderList$(), new B.ButtonList(null), null, null, null));
-  },
-  $is_void_: true
-},
-
-Title_onStart_closure2: {"": "Closure;",
   call$1: function(canvas) {
-    canvas.drawTexts$4($.get$trenLogo(), ["\u8089\u306e\u4e07\u4e16", "\u30af\u30ea\u30b9\u30de\u30b9 \u3086\u304d\u304c\u3063\u305b\u3093"], 285, 150);
+    var t1, img;
+    t1 = $.get$geng().imageMap.map;
+    img = t1.$index(t1, "title");
+    canvas.get$c().drawImage(img, 0, 0, 570, 570);
   },
   $is_args1: true
 },
 
-ConfigSetting: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onMoveOut",
+Title_onStart_closure1: {"": "Closure;this_1",
+  call$1: function(canvas) {
+    var t1, img;
+    if (this.this_1.isBtnVisible) {
+      t1 = $.get$geng().imageMap.map;
+      img = t1.$index(t1, "starttext");
+      canvas.get$c().drawImage(img, 250, 420, 160.79999999999998, 55.199999999999996);
+    }
+  },
+  $is_args1: true
+},
+
+Title_onStart_closure2: {"": "Closure;this_2",
+  call$1: function(t) {
+    var t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+    t1 = this.this_2;
+    t1.isBtnVisible = !t1.isBtnVisible;
+  },
+  $is_args1: true
+},
+
+StageSelect: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
+  onStart$0: function() {
+    var practicebtn, t1, playbtn, configbtn;
+    $.get$geng().objlist.disposeAll$0();
+    practicebtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u308c\u3093\u3057\u3085\u3046", $.get$defaultButtonRenderer().get$render(), false);
+    practicebtn.onPress = new X.StageSelect_onStart_closure();
+    practicebtn.x = 285;
+    practicebtn.y = 220;
+    $.get$geng().objlist._addObjlist.push(practicebtn);
+    practicebtn.onInit$0();
+    t1 = this.btnList;
+    t1.add$1(t1, practicebtn);
+    playbtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u30b2\u30fc\u30e0\u30b9\u30bf\u30fc\u30c8", $.get$defaultButtonRenderer().get$render(), false);
+    playbtn.onPress = new X.StageSelect_onStart_closure0();
+    playbtn.x = 285;
+    playbtn.y = practicebtn.y + 110;
+    $.get$geng().objlist._addObjlist.push(playbtn);
+    playbtn.onInit$0();
+    t1.add$1(t1, playbtn);
+    configbtn = new B.GButton(320, 180, 300, 60, 1000, null, null, false, false, true, true, "\u305b\u3063\u3066\u3044", $.get$defaultButtonRenderer().get$render(), false);
+    configbtn.onPress = new X.StageSelect_onStart_closure1();
+    configbtn.x = 285;
+    configbtn.y = practicebtn.y + 220;
+    $.get$geng().objlist._addObjlist.push(configbtn);
+    configbtn.onInit$0();
+    t1.add$1(t1, configbtn);
+    this.onBackRender = new X.StageSelect_onStart_closure2(B.Color$fromString("#ffffff"), B.Color$fromString("#A2896F"));
+  }
+},
+
+StageSelect_onStart_closure: {"": "Closure;",
+  call$0: function() {
+    var t1 = $.get$geng().soundManager;
+    t1.play$1(t1, "bell");
+    P.Timer_Timer(C.Duration_500000, new X.StageSelect_onStart__closure0());
+  },
+  $is_void_: true
+},
+
+StageSelect_onStart__closure0: {"": "Closure;",
+  call$0: function() {
+    $.stageData = $.get$stageList()[0];
+    $.itemData = $.get$itemList()[0];
+    var t1 = $.get$geng();
+    t1.set$screen(t1, new X.TankGamePracticely(B.RenderList$(), new B.ButtonList(null), null, null, null, null));
+  },
+  $is_void_: true
+},
+
+StageSelect_onStart_closure0: {"": "Closure;",
+  call$0: function() {
+    var t1 = $.get$geng().soundManager;
+    t1.play$1(t1, "bell");
+    P.Timer_Timer(C.Duration_500000, new X.StageSelect_onStart__closure());
+  },
+  $is_void_: true
+},
+
+StageSelect_onStart__closure: {"": "Closure;",
+  call$0: function() {
+    $.stageData = $.get$stageList()[1];
+    $.itemData = $.get$itemList()[0];
+    var t1 = $.get$geng();
+    t1.set$screen(t1, new X.TankGame(B.RenderList$(), new B.ButtonList(null), null, null, null, null));
+  },
+  $is_void_: true
+},
+
+StageSelect_onStart_closure1: {"": "Closure;",
+  call$0: function() {
+    var t1 = $.get$geng();
+    t1.set$screen(t1, new X.ConfigSetting(B.RenderList$(), new B.ButtonList(null), null, null, null, null));
+  },
+  $is_void_: true
+},
+
+StageSelect_onStart_closure2: {"": "Closure;bgColor_0,borderColor_1",
+  call$1: function(canvas) {
+    var t1, img, t2, t3, t4, t5;
+    t1 = $.get$geng().imageMap.map;
+    img = t1.$index(t1, "title");
+    canvas.get$c().drawImage(img, 0, 0, 570, 570);
+    canvas.c.beginPath();
+    canvas.roundRect$5(100, 150, 370, 360, 18);
+    canvas.c.closePath();
+    t1 = this.bgColor_0;
+    t2 = canvas.c;
+    t3 = t1.red;
+    t4 = t1.green;
+    t5 = t1.blue;
+    t1 = t1.alpha;
+    t2.toString;
+    t2.fillStyle = "rgba(" + H.S(t3) + ", " + H.S(t4) + ", " + H.S(t5) + ", " + H.S(t1) + ")";
+    canvas.c.fill();
+    t1 = this.borderColor_1;
+    t5 = canvas.c;
+    t4 = t1.red;
+    t3 = t1.green;
+    t2 = t1.blue;
+    t1 = t1.alpha;
+    t5.toString;
+    t5.strokeStyle = "rgba(" + H.S(t4) + ", " + H.S(t3) + ", " + H.S(t2) + ", " + H.S(t1) + ")";
+    canvas.c.lineWidth = 4;
+    canvas.c.stroke();
+  },
+  $is_args1: true
+},
+
+ConfigSetting: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
   onStart$0: function() {
     var sound, t1, clearData, retbtn;
     $.get$geng().objlist.disposeAll$0();
@@ -9297,7 +9062,7 @@ ConfigSetting_onStart_closure0: {"": "Closure;",
 ConfigSetting_onStart_closure1: {"": "Closure;",
   call$0: function() {
     var t1 = $.get$geng();
-    t1.set$screen(t1, new X.Title(B.RenderList$(), new B.ButtonList(null), null, null, null));
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
@@ -9309,24 +9074,29 @@ ConfigSetting_onStart_closure2: {"": "Closure;",
   $is_args1: true
 },
 
-TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onMoveOut",
+TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
   onStart$0: function() {
-    var t1, t2, ground, firebtn, startLogo;
+    var t1, t2, t3, endOfStage, ground, firebtn, startLogo;
+    t1 = {};
     $.get$geng().objlist.disposeAll$0();
-    t1 = new X.Tank(1, null, new U.Vector(0, 0), new U.Vector(0, 0), 0, null, null, false);
-    t2 = t1.pos;
-    t2.x = 200;
-    t2.y = 430;
-    t2 = $.stageData;
-    t1.speed.x = t2.$index(t2, "speed");
-    $.tank = t1;
-    t1 = $.get$geng().objlist;
-    t2 = $.tank;
-    t1._addObjlist.push(t2);
-    t2.onInit$0();
+    t2 = new X.Tank(1, null, new U.Vector(0, 0), new U.Vector(0, 0), 0, null, null, false);
+    t3 = t2.pos;
+    t3.x = 200;
+    t3.y = 430;
+    t3 = $.stageData;
+    t2.speed.x = t3.$index(t3, "speed");
+    $.tank = t2;
+    t2 = $.get$geng().objlist;
+    t3 = $.tank;
+    t2._addObjlist.push(t3);
+    t3.onInit$0();
     $.score = 0;
-    t2 = $.stageData;
-    J.forEach$1$ax(t2.$index(t2, "map"), new X.TankGame_onStart_closure());
+    $.numberOfHit = 0;
+    $.numberOfFire = 0;
+    t1.prex_0 = 0;
+    t3 = $.stageData;
+    J.forEach$1$ax(t3.$index(t3, "map"), new X.TankGame_onStart_closure(t1));
+    endOfStage = J.$add$ns(t1.prex_0, 400);
     ground = new X.Ground(P.List_List(null, null), P.List_List(null, null), 0, 0, 50, 0, null, null, false);
     $.get$geng().objlist._addObjlist.push(ground);
     ground.onInit$0();
@@ -9335,24 +9105,46 @@ TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onMoveOut",
     firebtn = X.FireButton$();
     $.get$geng().objlist._addObjlist.push(firebtn);
     firebtn.onInit$0();
-    t2 = this.btnList;
-    t2.add$1(t2, firebtn);
+    t1 = this.btnList;
+    t1.add$1(t1, firebtn);
     startLogo = new X.GameStartLogo(false);
     $.get$geng().objlist._addObjlist.push(startLogo);
     startLogo.onInit$0();
-    this.onProcess = new X.TankGame_onStart_closure1(this, ground, firebtn);
+    this.onProcess = new X.TankGame_onStart_closure1(this, endOfStage, ground, firebtn);
     P.Timer_Timer(C.Duration_2000000, new X.TankGame_onStart_closure2(startLogo));
+  },
+  onEndOfStage$0: function() {
+    var t1, _numberOfHit, _numberOfFire, score, levelText;
+    t1 = {};
+    _numberOfHit = $.numberOfHit;
+    _numberOfFire = $.numberOfFire;
+    score = X.resultToScore(_numberOfHit, _numberOfFire, $.stageData);
+    levelText = X.resultToLevelText(score);
+    t1.rank_0 = -1;
+    t1.drawMeichu_1 = null;
+    t1.text02_2 = null;
+    t1.drawLevel_3 = null;
+    t1.scoreList_4 = null;
+    this.onFrontRender = new X.TankGame_onEndOfStage_closure(t1);
+    P.Timer_Timer(P.Duration$(0, 0, 0, 1000, 0, 0), new X.TankGame_onEndOfStage_closure0(t1, _numberOfHit, score === 100));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 2000, 0, 0), new X.TankGame_onEndOfStage_closure1(t1, _numberOfFire));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 3000, 0, 0), new X.TankGame_onEndOfStage_closure2(t1, score, levelText));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure3(t1));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure4(this));
+    this.onProcess = new X.TankGame_onEndOfStage_closure5();
   }
 },
 
-TankGame_onStart_closure: {"": "Closure;",
+TankGame_onStart_closure: {"": "Closure;box_0",
   call$1: function(d) {
-    var t1, t, t2;
+    var t1, t, t2, t3;
     t1 = J.getInterceptor$asx(d);
     t = X.Target$fromType(t1.$index(d, 2));
     t2 = t.pos;
-    t2.x = J.toDouble$0$n(t1.$index(d, 0));
+    t3 = this.box_0;
+    t2.x = J.$add$ns(t3.prex_0, J.toDouble$0$n(t1.$index(d, 0)));
     t2.y = J.toDouble$0$n(t1.$index(d, 1));
+    t3.prex_0 = t2.x;
     $.get$geng().objlist._addObjlist.push(t);
     t.onInit$0();
   },
@@ -9361,87 +9153,171 @@ TankGame_onStart_closure: {"": "Closure;",
 
 TankGame_onStart_closure0: {"": "Closure;",
   call$1: function(c) {
-    c.drawTexts$4($.get$scoretren(), ["SCORE: " + H.S($.score)], 5, 5);
+    c.drawTexts$4($.get$scoretren(), ["\u3081\u3044\u3061\u3085\u3046\u3057\u305f\u304b\u305a: " + H.S($.numberOfHit) + "\u3053"], 5, 5);
   },
   $is_args1: true
 },
 
-TankGame_onStart_closure1: {"": "Closure;this_1,ground_2,firebtn_3",
+TankGame_onStart_closure1: {"": "Closure;this_1,endOfStage_2,ground_3,firebtn_4",
   call$0: function() {
-    var t1, t2, t3, exception, t4;
-    t1 = {};
-    t2 = $.tank;
-    t3 = t2.pos;
-    t2 = t2.speed;
-    t3.x = J.$add$ns(t3.x, t2.x);
-    t3.y = J.$add$ns(t3.y, t2.y);
+    var t1, t2;
+    t1 = $.tank;
+    t2 = t1.pos;
+    t1 = t1.speed;
+    t2.x = J.$add$ns(t2.x, t1.x);
+    t2.y = J.$add$ns(t2.y, t1.y);
     $.offset_x = P.max(0, J.$sub$n($.tank.pos.x, 285));
-    t2 = $.offset_x;
-    this.ground_2.translateX = t2;
-    t3 = $.stageData;
-    t3 = t3.$index(t3, "length");
-    if (typeof t3 !== "number")
-      throw H.iae(t3);
-    if (t2 >= t3) {
-      t2 = this.firebtn_3;
-      t2.onDispose$0();
-      t2._isDisposed = true;
-      t1.rank_0 = -1;
-      try {
-        t2 = $.get$geng().hiscoreManager;
-        t3 = $.stageData;
-        t1.rank_0 = t2.addNewRecord$2(t3.$index(t3, "id"), $.score);
-      } catch (exception) {
-        H.unwrapException(exception);
-      }
-
-      t2 = this.this_1;
-      P.Timer_Timer(P.Duration$(0, 0, 0, 1000, 0, 0), new X.TankGame_onStart__closure(t2));
-      t3 = $.get$geng().hiscoreManager;
-      t4 = $.stageData;
-      t2.onFrontRender = new X.TankGame_onStart__closure0(t1, t3.getScoreTexts$1(t4.$index(t4, "id")));
-      t2.onProcess = new X.TankGame_onStart__closure1();
+    this.ground_3.translateX = $.offset_x;
+    t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+    t1 = $.offset_x;
+    t2 = this.endOfStage_2;
+    if (typeof t2 !== "number")
+      throw H.iae(t2);
+    if (t1 >= t2) {
+      t1 = this.firebtn_4;
+      t1.onDispose$0();
+      t1._isDisposed = true;
+      this.this_1.onEndOfStage$0();
     }
   },
   $is_void_: true
 },
 
-TankGame_onStart__closure: {"": "Closure;this_4",
+TankGame_onStart_closure2: {"": "Closure;startLogo_5",
+  call$0: function() {
+    var t1 = this.startLogo_5;
+    t1.onDispose$0();
+    t1._isDisposed = true;
+    t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage_closure: {"": "Closure;box_0",
+  call$1: function(c) {
+    var t1, t2;
+    c.drawTexts$4($.get$trenScore(), ["- \u30b2\u30fc\u30e0 \u3057\u3085\u3046\u308a\u3087\u3046! -"], 285, 60);
+    t1 = this.box_0;
+    t2 = t1.drawMeichu_1;
+    if (t2 != null)
+      t2.call$2(c, 125);
+    if (t1.text02_2 != null)
+      c.drawTexts$4($.get$trenScore(), t1.text02_2, 285, 185);
+    t2 = t1.drawLevel_3;
+    if (t2 != null)
+      t2.call$2(c, 240);
+    t2 = t1.scoreList_4;
+    if (t2 != null)
+      X.drawHiScore(c, t2, 330, t1.rank_0);
+  },
+  $is_args1: true
+},
+
+TankGame_onEndOfStage_closure0: {"": "Closure;box_0,_numberOfHit_1,isPerfect_2",
+  call$0: function() {
+    this.box_0.drawMeichu_1 = new X.TankGame_onEndOfStage__closure1(this._numberOfHit_1, this.isPerfect_2);
+    var t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+    t1 = $.get$geng().soundManager;
+    t1.play$1(t1, "bell");
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage__closure1: {"": "Closure;_numberOfHit_3,isPerfect_4",
+  call$2: function(c, y) {
+    c.drawTexts$4($.get$trenScore(), ["\u3081\u3044\u3061\u3085\u3046\u3057\u305f\u304b\u305a: " + H.S(this._numberOfHit_3) + "\u3053"], 285, y);
+    if (this.isPerfect_4)
+      c.drawTexts$4($.get$trenScore(), ["\u30d1\u30fc\u30d5\u30a7\u30af\u30c8\uff01"], 285, J.$add$ns(y, 25));
+  },
+  $is_args2: true
+},
+
+TankGame_onEndOfStage_closure1: {"": "Closure;box_0,_numberOfFire_5",
+  call$0: function() {
+    this.box_0.text02_2 = ["\u306a\u3052\u305f\u3086\u304d\u3060\u307e: " + H.S(this._numberOfFire_5) + "\u3053"];
+    var t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+    t1 = $.get$geng().soundManager;
+    t1.play$1(t1, "bell");
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage_closure2: {"": "Closure;box_0,score_6,levelText_7",
+  call$0: function() {
+    var t1, t2, t3, exception;
+    t1 = this.box_0;
+    t1.drawLevel_3 = new X.TankGame_onEndOfStage__closure0(this.levelText_7);
+    try {
+      t2 = $.get$geng().hiscoreManager;
+      t3 = $.stageData;
+      t1.rank_0 = t2.addNewRecord$2(t3.$index(t3, "id"), this.score_6);
+    } catch (exception) {
+      H.unwrapException(exception);
+    }
+
+    t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+    t1 = $.get$geng().soundManager;
+    t1.play$1(t1, "bell");
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage__closure0: {"": "Closure;levelText_8",
+  call$2: function(c, y) {
+    c.drawTexts$4($.get$trenScore(), ["\u30ad\u30df\u306e\u3046\u3067\u307e\u3048\u306f"], 285, y);
+    c.drawTexts$4($.get$trenScore(), ["\u301c " + H.S(this.levelText_8) + " \u30ec\u30d9\u30eb \u301c"], 285, J.$add$ns(y, 30));
+  },
+  $is_args2: true
+},
+
+TankGame_onEndOfStage_closure3: {"": "Closure;box_0",
+  call$0: function() {
+    var t1, t2, scoreList;
+    t1 = $.get$geng().hiscoreManager;
+    t2 = $.stageData;
+    t2 = t2.$index(t2, "id");
+    scoreList = J.containsKey$1$x(t1._scoresMap, t2) ? J.$index$asx(t1._scoresMap, t2) : t1.defaultScores;
+    this.box_0.scoreList_4 = scoreList;
+    t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage_closure4: {"": "Closure;this_9",
   call$0: function() {
     var retBtn, t1;
     retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
-    retBtn.onPress = new X.TankGame_onStart___closure();
-    retBtn.text = "\u623b\u308b";
+    retBtn.onPress = new X.TankGame_onEndOfStage__closure();
+    retBtn.text = "\u304a\u3057\u307e\u3044";
     retBtn.x = 285;
     retBtn.y = 500;
     retBtn.width = 100;
     retBtn.height = 40;
     $.get$geng().objlist._addObjlist.push(retBtn);
     retBtn.onInit$0();
-    t1 = this.this_4.btnList;
+    t1 = this.this_9.btnList;
     t1.add$1(t1, retBtn);
+    t1 = $.get$geng();
+    t1._repaintCount = t1._repaintCount + 1;
   },
   $is_void_: true
 },
 
-TankGame_onStart___closure: {"": "Closure;",
+TankGame_onEndOfStage__closure: {"": "Closure;",
   call$0: function() {
     var t1 = $.get$geng();
-    t1.set$screen(t1, new X.Title(B.RenderList$(), new B.ButtonList(null), null, null, null));
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
 
-TankGame_onStart__closure0: {"": "Closure;box_0,scoreList_5",
-  call$1: function(c) {
-    c.drawTexts$4($.get$trenScore(), ["- \u30b2\u30fc\u30e0 \u3057\u3085\u3046\u308a\u3087\u3046! -"], 285, 100);
-    c.drawTexts$4($.get$trenScore(), ["\u3068\u304f\u3066\u3093: " + H.S($.score)], 285, 180);
-    X.drawHiScore(c, this.scoreList_5, 270, this.box_0.rank_0);
-  },
-  $is_args1: true
-},
-
-TankGame_onStart__closure1: {"": "Closure;",
+TankGame_onEndOfStage_closure5: {"": "Closure;",
   call$0: function() {
     var t1, t2;
     t1 = $.tank;
@@ -9449,131 +9325,62 @@ TankGame_onStart__closure1: {"": "Closure;",
     t1 = t1.speed;
     t2.x = J.$add$ns(t2.x, t1.x);
     t2.y = J.$add$ns(t2.y, t1.y);
-  },
-  $is_void_: true
-},
-
-TankGame_onStart_closure2: {"": "Closure;startLogo_6",
-  call$0: function() {
-    var t1 = this.startLogo_6;
-    t1.onDispose$0();
-    t1._isDisposed = true;
-  },
-  $is_void_: true
-},
-
-TankGamePracticely: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onMoveOut",
-  onStart$0: function() {
-    var t1, t2, ground, firebtn, startLogo;
-    $.get$geng().objlist.disposeAll$0();
-    t1 = new X.Tank(1, null, new U.Vector(0, 0), new U.Vector(0, 0), 0, null, null, false);
-    t2 = t1.pos;
-    t2.x = 200;
-    t2.y = 430;
-    t2 = $.stageData;
-    t1.speed.x = t2.$index(t2, "speed");
-    $.tank = t1;
-    t1 = $.get$geng().objlist;
-    t2 = $.tank;
-    t1._addObjlist.push(t2);
-    t2.onInit$0();
-    $.score = 0;
-    t2 = $.stageData;
-    J.forEach$1$ax(t2.$index(t2, "map"), new X.TankGamePracticely_onStart_closure());
-    ground = new X.Ground(P.List_List(null, null), P.List_List(null, null), 0, 0, 50, 0, null, null, false);
-    $.get$geng().objlist._addObjlist.push(ground);
-    ground.onInit$0();
-    $.offset_x = 0;
-    firebtn = X.FireButton$();
-    $.get$geng().objlist._addObjlist.push(firebtn);
-    firebtn.onInit$0();
-    t2 = this.btnList;
-    t2.add$1(t2, firebtn);
-    startLogo = new X.GameStartLogo(false);
-    $.get$geng().objlist._addObjlist.push(startLogo);
-    startLogo.onInit$0();
-    this.onProcess = new X.TankGamePracticely_onStart_closure0(this, ground, firebtn);
-    P.Timer_Timer(C.Duration_2000000, new X.TankGamePracticely_onStart_closure1(startLogo));
-  }
-},
-
-TankGamePracticely_onStart_closure: {"": "Closure;",
-  call$1: function(d) {
-    var t1, t, t2;
-    t1 = J.getInterceptor$asx(d);
-    t = X.Target$fromType(t1.$index(d, 2));
-    t2 = t.pos;
-    t2.x = J.toDouble$0$n(t1.$index(d, 0));
-    t2.y = J.toDouble$0$n(t1.$index(d, 1));
-    $.get$geng().objlist._addObjlist.push(t);
-    t.onInit$0();
-  },
-  $is_args1: true
-},
-
-TankGamePracticely_onStart_closure0: {"": "Closure;this_1,ground_2,firebtn_3",
-  call$0: function() {
-    var t1, t2, t3, retBtn;
-    t1 = {};
-    t2 = $.tank;
-    t3 = t2.pos;
-    t2 = t2.speed;
-    t3.x = J.$add$ns(t3.x, t2.x);
-    t3.y = J.$add$ns(t3.y, t2.y);
-    $.offset_x = P.max(0, J.$sub$n($.tank.pos.x, 285));
-    t2 = $.offset_x;
-    this.ground_2.translateX = t2;
-    t3 = $.stageData;
-    t3 = t3.$index(t3, "length");
-    if (typeof t3 !== "number")
-      throw H.iae(t3);
-    if (t2 >= t3) {
-      t2 = this.firebtn_3;
-      t2.onDispose$0();
-      t2._isDisposed = true;
-      t1.message_0 = null;
-      t2 = $.score;
-      if (typeof t2 !== "number")
-        throw t2.$le();
-      if (t2 <= 50)
-        t1.message_0 = ["\u307e\u3060\u307e\u3060 \u304b\u306a\uff1f", "\u3082\u3046\u3061\u3087\u3063\u3068 \u308c\u3093\u3057\u3085\u3046\u3057\u3066\u307f\u3088\u3046\uff01"];
-      else
-        t1.message_0 = ["\u306a\u304b\u306a\u304b\u3084\u308b\u306d\uff01", "\u3064\u304e\u306f \u307b\u3093\u3070\u3093 \u306b \u3061\u3087\u3046\u305b\u3093\u3057\u3066\u307f\u3088\u3046\uff01"];
-      t2 = this.this_1;
-      t2.onFrontRender = new X.TankGamePracticely_onStart__closure(t1);
-      retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
-      retBtn.onPress = new X.TankGamePracticely_onStart__closure0();
-      retBtn.text = "\u623b\u308b";
-      retBtn.x = 285;
-      retBtn.y = 400;
-      retBtn.width = 100;
-      retBtn.height = 40;
-      $.get$geng().objlist._addObjlist.push(retBtn);
-      retBtn.onInit$0();
-      t1 = t2.btnList;
-      t1.add$1(t1, retBtn);
-      t2.onProcess = new X.TankGamePracticely_onStart__closure1();
+    t1 = J.$sub$n($.tank.pos.x, $.offset_x);
+    if (typeof t1 !== "number")
+      throw H.iae(t1);
+    if (570 < t1) {
+      t1 = $.tank;
+      t1.onDispose$0();
+      t1._isDisposed = true;
     }
   },
   $is_void_: true
 },
 
-TankGamePracticely_onStart__closure: {"": "Closure;box_0",
+TankGamePracticely: {"": "TankGame;_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
+  onEndOfStage$0: function() {
+    var t1, t2, retBtn;
+    t1 = {};
+    t1.message_0 = null;
+    t2 = $.score;
+    if (typeof t2 !== "number")
+      throw t2.$le();
+    if (t2 <= 50)
+      t1.message_0 = ["\u307e\u3060\u307e\u3060 \u304b\u306a\uff1f", "\u3082\u3046\u3061\u3087\u3063\u3068 \u308c\u3093\u3057\u3085\u3046\u3057\u3066\u307f\u3088\u3046\uff01"];
+    else
+      t1.message_0 = ["\u306a\u304b\u306a\u304b\u3084\u308b\u306d\uff01", "\u3064\u304e\u306f \u307b\u3093\u3070\u3093 \u306b \u3061\u3087\u3046\u305b\u3093\u3057\u3066\u307f\u3088\u3046\uff01"];
+    this.onFrontRender = new X.TankGamePracticely_onEndOfStage_closure(t1);
+    retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+    retBtn.onPress = new X.TankGamePracticely_onEndOfStage_closure0();
+    retBtn.text = "\u623b\u308b";
+    retBtn.x = 285;
+    retBtn.y = 400;
+    retBtn.width = 100;
+    retBtn.height = 40;
+    $.get$geng().objlist._addObjlist.push(retBtn);
+    retBtn.onInit$0();
+    t1 = this.btnList;
+    t1.add$1(t1, retBtn);
+    this.onProcess = new X.TankGamePracticely_onEndOfStage_closure1();
+  }
+},
+
+TankGamePracticely_onEndOfStage_closure: {"": "Closure;box_0",
   call$1: function(c) {
     c.drawTexts$4($.get$trenMessage(), this.box_0.message_0, 285, 200);
   },
   $is_args1: true
 },
 
-TankGamePracticely_onStart__closure0: {"": "Closure;",
+TankGamePracticely_onEndOfStage_closure0: {"": "Closure;",
   call$0: function() {
     var t1 = $.get$geng();
-    t1.set$screen(t1, new X.Title(B.RenderList$(), new B.ButtonList(null), null, null, null));
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
 
-TankGamePracticely_onStart__closure1: {"": "Closure;",
+TankGamePracticely_onEndOfStage_closure1: {"": "Closure;",
   call$0: function() {
     var t1, t2;
     t1 = $.tank;
@@ -9581,15 +9388,6 @@ TankGamePracticely_onStart__closure1: {"": "Closure;",
     t1 = t1.speed;
     t2.x = J.$add$ns(t2.x, t1.x);
     t2.y = J.$add$ns(t2.y, t1.y);
-  },
-  $is_void_: true
-},
-
-TankGamePracticely_onStart_closure1: {"": "Closure;startLogo_4",
-  call$0: function() {
-    var t1 = this.startLogo_4;
-    t1.onDispose$0();
-    t1._isDisposed = true;
   },
   $is_void_: true
 },
@@ -9602,7 +9400,11 @@ FireButton: {"": "GButton;power,x,y,width,height,z,onPress,onRelease,isOn,isPres
     H.setRuntimeTypeInfo(t2, [null]);
     t1.fire$1(t2);
     this.power = 0;
-    P.Timer_Timer(C.Duration_200000, new X.FireButton_fire_closure(this));
+    t2 = $.numberOfFire;
+    if (typeof t2 !== "number")
+      throw t2.$add();
+    $.numberOfFire = t2 + 1;
+    P.Timer_Timer(C.Duration_100000, new X.FireButton_fire_closure(this));
   },
   get$fire: function() {
     return new P.BoundClosure$0(this, X.FireButton.prototype.fire$0, null, "fire$0");
@@ -9645,11 +9447,11 @@ FireButton: {"": "GButton;power,x,y,width,height,z,onPress,onRelease,isOn,isPres
     canvas.c.restore();
   },
   get$render: function() {
-    return new P.BoundClosure$20(this, X.FireButton.prototype.render$2, null, "render$2");
+    return new B.BoundClosure$20(this, X.FireButton.prototype.render$2, null, "render$2");
   },
   FireButton$0: function() {
     this.renderer = this.get$render();
-    this.text = "\u3046\u3064!";
+    this.text = "\u306a\u3052\u308b!";
     this.x = 480;
     this.y = 500;
     this.width = 140;
@@ -9697,15 +9499,17 @@ FireButton_startCharge__closure: {"": "Closure;this_1",
 GameStartLogo: {"": "GObj;_isDisposed",
   onInit$0: function() {
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
+  },
+  onPrepareRender$1: function(renderList) {
     var t1 = renderList._list;
-    t1.$indexSet(t1, 100, new X.GameStartLogo_onProcess_closure());
+    t1.$indexSet(t1, 100, new X.GameStartLogo_onPrepareRender_closure());
   },
   onDispose$0: function() {
   }
 },
 
-GameStartLogo_onProcess_closure: {"": "Closure;",
+GameStartLogo_onPrepareRender_closure: {"": "Closure;",
   call$1: function(canvas) {
     canvas.drawTexts$4($.get$trenScore(), ["GAME START"], 285, 200);
   },
@@ -9724,7 +9528,7 @@ Tank: {"": "GObj;delta_x,sp2,speed,pos,count,anime,animeTimer,_isDisposed",
     t1.imgIndex_0 = 0;
     this.animeTimer = P.Timer_Timer$periodic(C.Duration_400000, new X.Tank_onInit_closure(t1, this, imgs));
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
     var t1, t2, smk;
     t1 = this.sp2;
     t2 = this.pos;
@@ -9733,8 +9537,6 @@ Tank: {"": "GObj;delta_x,sp2,speed,pos,count,anime,animeTimer,_isDisposed",
     t1 = this.sp2;
     t1._y = t2.y;
     t1._rect = null;
-    t1 = renderList._list;
-    t1.$indexSet(t1, 10, this.sp2.get$render());
     t1 = this.count + 1;
     this.count = t1;
     if (t1 === 20) {
@@ -9748,6 +9550,10 @@ Tank: {"": "GObj;delta_x,sp2,speed,pos,count,anime,animeTimer,_isDisposed",
       $.get$geng().objlist._addObjlist.push(smk);
       smk.onInit$0();
     }
+  },
+  onPrepareRender$1: function(renderList) {
+    var t1 = renderList._list;
+    t1.$indexSet(t1, 10, this.sp2.get$render());
   },
   fire$1: function(target) {
     var t1, cannonSpeed, b, t2, t3, sm;
@@ -9823,7 +9629,7 @@ Cannonball: {"": "GObj;oldpos,pos,speed,delta,sp,size,distance,_isDisposed",
     this.sp = B.ImageSprite$(t1, null, "tama", t1);
     this.sp.offsety = 0;
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
     var t1, t2, t3, r, exception;
     t1 = this.pos;
     this.oldpos.set$1(t1);
@@ -9860,7 +9666,9 @@ Cannonball: {"": "GObj;oldpos,pos,speed,delta,sp,size,distance,_isDisposed",
         throw exception;
     }
 
-    t1 = renderList._list;
+  },
+  onPrepareRender$1: function(renderList) {
+    var t1 = renderList._list;
     t1.$indexSet(t1, 10, this.sp.get$render());
   },
   onDispose$0: function() {
@@ -9893,7 +9701,7 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
   },
   onInit$0: function() {
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
     var t1, t2;
     t1 = this.sp;
     t2 = this.pos;
@@ -9902,11 +9710,13 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
     t1 = this.sp;
     t1._y = t2.y;
     t1._rect = null;
-    t1 = renderList._list;
-    t1.$indexSet(t1, 5, new X.Target_onProcess_closure(this));
+  },
+  onPrepareRender$1: function(renderList) {
+    var t1 = renderList._list;
+    t1.$indexSet(t1, 5, new X.Target_onPrepareRender_closure(this));
   },
   bomb$1: function(ball) {
-    var t1, dx, s, t2, pop, bomb;
+    var t1, dx, s, t2, bomb;
     t1 = this.pos;
     dx = X.getDeltaXonH(t1, ball.oldpos, ball.pos);
     if (dx == null)
@@ -9920,13 +9730,6 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
       if (typeof s !== "number")
         throw H.iae(s);
       $.score = t2 + s;
-      pop = new X.ScorePopup(new U.Vector(0, 0), new U.Vector(0, 0), new U.Vector(0, 0), 60, [""], false);
-      t2 = pop.pos;
-      t2.x = J.$add$ns(t1.x, this._hitdx);
-      t2.y = t1.y;
-      pop.texts[0] = C.JSNumber_methods.toString$0(s);
-      $.get$geng().objlist._addObjlist.push(pop);
-      pop.onInit$0();
       for (t2 = this.bombTypes, t2 = new H.ListIterator(t2, t2.length, 0, null); t2.moveNext$0();) {
         bomb = X.Bomb$(t2._current, -1.5707963267948966, 0.7853981633974483);
         bomb.pos.set$1(t1);
@@ -9937,6 +9740,10 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,_getScore,bombTypes,_isDisposed",
       this._isDisposed = true;
       t1 = $.get$geng().soundManager;
       t1.play$1(t1, "bomb");
+      t1 = $.numberOfHit;
+      if (typeof t1 !== "number")
+        throw t1.$add();
+      $.numberOfHit = t1 + 1;
       return true;
     } else
       return false;
@@ -9984,7 +9791,7 @@ Target$fromType_closure0: {"": "Closure;",
   $is_args1: true
 },
 
-Target_onProcess_closure: {"": "Closure;this_0",
+Target_onPrepareRender_closure: {"": "Closure;this_0",
   call$1: function(canvas) {
     var t1, t2, hx;
     t1 = this.this_0;
@@ -10004,7 +9811,7 @@ Bomb: {"": "GObj;sp,pos,speed,delta,dRotate,size,count,_isDisposed",
     this.sp.rotate = 0;
     P.Timer_Timer(C.Duration_1500000, new X.Bomb_onInit_closure(this));
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
     var t1, t2, t3, t4;
     t1 = this.pos;
     t2 = this.speed;
@@ -10027,8 +9834,12 @@ Bomb: {"": "GObj;sp,pos,speed,delta,dRotate,size,count,_isDisposed",
     t4 = this.sp;
     t4._y = t1.y;
     t4._rect = null;
-    t4 = renderList._list;
-    t4.$indexSet(t4, 5, this.sp.get$render());
+    t4 = $.get$geng();
+    t4._repaintCount = t4._repaintCount + 1;
+  },
+  onPrepareRender$1: function(renderList) {
+    var t1 = renderList._list;
+    t1.$indexSet(t1, 5, this.sp.get$render());
   },
   onDispose$0: function() {
   },
@@ -10099,9 +9910,11 @@ Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width,height,_
     this.points01 = [[79, 10], [477, 30], [150, 200], [427, 239], [18, 306], [384, 290]];
     this.points02 = [[193, 50], [607, 60], [292, 162], [559, 110], [252, 252], [635, 325]];
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
+  },
+  onPrepareRender$1: function(renderList) {
     var t1 = renderList._list;
-    t1.$indexSet(t1, this.z, new X.Ground_onProcess_closure(this));
+    t1.$indexSet(t1, this.z, new X.Ground_onPrepareRender_closure(this));
   },
   onDispose$0: function() {
     C.JSArray_methods.set$length(this.points01, 0);
@@ -10109,7 +9922,7 @@ Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width,height,_
   }
 },
 
-Ground_onProcess_closure: {"": "Closure;this_0",
+Ground_onPrepareRender_closure: {"": "Closure;this_0",
   call$1: function(c) {
     var t1, img01, img02;
     t1 = $.get$geng().imageMap.map;
@@ -10119,14 +9932,14 @@ Ground_onProcess_closure: {"": "Closure;this_0",
     c.get$c().save();
     t1 = this.this_0;
     c.c.translate(-t1.marginH, 0);
-    H.IterableMixinWorkaround_forEach(t1.points01, new X.Ground_onProcess__closure(t1, c, img01));
-    H.IterableMixinWorkaround_forEach(t1.points02, new X.Ground_onProcess__closure0(t1, c, img02));
+    H.IterableMixinWorkaround_forEach(t1.points01, new X.Ground_onPrepareRender__closure(t1, c, img01));
+    H.IterableMixinWorkaround_forEach(t1.points02, new X.Ground_onPrepareRender__closure0(t1, c, img02));
     c.c.restore();
   },
   $is_args1: true
 },
 
-Ground_onProcess__closure: {"": "Closure;this_1,c_2,img01_3",
+Ground_onPrepareRender__closure: {"": "Closure;this_1,c_2,img01_3",
   call$1: function(p) {
     var t1, t2, x, y;
     t1 = J.getInterceptor$asx(p);
@@ -10150,7 +9963,7 @@ Ground_onProcess__closure: {"": "Closure;this_1,c_2,img01_3",
   $is_args1: true
 },
 
-Ground_onProcess__closure0: {"": "Closure;this_4,c_5,img02_6",
+Ground_onPrepareRender__closure0: {"": "Closure;this_4,c_5,img02_6",
   call$1: function(p) {
     var t1, t2, x, y;
     t1 = J.getInterceptor$asx(p);
@@ -10174,47 +9987,6 @@ Ground_onProcess__closure0: {"": "Closure;this_4,c_5,img02_6",
   $is_args1: true
 },
 
-ScorePopup: {"": "GObj;pos,speed,delta,z,texts,_isDisposed",
-  onInit$0: function() {
-    this.speed.y = -4;
-    this.delta.y = 0.1;
-    P.Timer_Timer(C.Duration_1000000, new X.ScorePopup_onInit_closure(this));
-  },
-  onProcess$1: function(renderList) {
-    var t1, t2, t3, x, y;
-    t1 = this.pos;
-    t2 = this.speed;
-    t1.x = J.$add$ns(t1.x, t2.x);
-    t1.y = J.$add$ns(t1.y, t2.y);
-    t3 = this.delta;
-    t2.x = J.$add$ns(t2.x, t3.x);
-    t2.y = J.$add$ns(t2.y, t3.y);
-    x = J.$sub$n(t1.x, $.offset_x);
-    y = t1.y;
-    t1 = renderList._list;
-    t1.$indexSet(t1, this.z, new X.ScorePopup_onProcess_closure(this, x, y));
-  },
-  onDispose$0: function() {
-  }
-},
-
-ScorePopup_onInit_closure: {"": "Closure;this_0",
-  call$0: function() {
-    var t1 = this.this_0;
-    t1.onDispose$0();
-    t1._isDisposed = true;
-    return;
-  },
-  $is_void_: true
-},
-
-ScorePopup_onProcess_closure: {"": "Closure;this_0,x_1,y_2",
-  call$1: function(canvas) {
-    canvas.drawTexts$4($.get$trenScore(), this.this_0.texts, this.x_1, this.y_2);
-  },
-  $is_args1: true
-},
-
 Smoke: {"": "GObj;z,dOpcity,dScale,life,sp,speed,pos,_isDisposed",
   wobble$2: function(angle1, angle2) {
     var t1, r;
@@ -10229,7 +10001,7 @@ Smoke: {"": "GObj;z,dOpcity,dScale,life,sp,speed,pos,_isDisposed",
   },
   onInit$0: function() {
   },
-  onProcess$1: function(renderList) {
+  onProcess$1: function(handle) {
     var t1, t2, t3, t4;
     t1 = this.pos;
     t2 = this.speed;
@@ -10271,9 +10043,13 @@ Smoke: {"": "GObj;z,dOpcity,dScale,life,sp,speed,pos,_isDisposed",
       t2 = this.sp;
       t2._y = t1.y;
       t2._rect = null;
-      t2 = renderList._list;
-      t2.$indexSet(t2, 50, this.sp.get$render());
+      t2 = $.get$geng();
+      t2._repaintCount = t2._repaintCount + 1;
     }
+  },
+  onPrepareRender$1: function(renderList) {
+    var t1 = renderList._list;
+    t1.$indexSet(t1, 50, this.sp.get$render());
   },
   onDispose$0: function() {
   },
@@ -10440,8 +10216,8 @@ P.StreamSubscription.$isStreamSubscription = true;
 P.StreamSubscription.$isObject = true;
 B.PressEvent.$isPressEvent = true;
 B.PressEvent.$isObject = true;
-B.RenderList.$isRenderList = true;
-B.RenderList.$isObject = true;
+B.GPInfo.$isGPInfo = true;
+B.GPInfo.$isObject = true;
 P.Point.$isPoint = true;
 P.Point.$isObject = true;
 P.Iterable.$isIterable = true;
@@ -10538,10 +10314,8 @@ C.C__RootZone = new P._RootZone();
 C.CssStyleDeclaration_methods = W.CssStyleDeclaration.prototype;
 C.Duration_0 = new P.Duration(0);
 C.Duration_100000 = new P.Duration(100000);
-C.Duration_1000000 = new P.Duration(1000000);
 C.Duration_1500000 = new P.Duration(1500000);
 C.Duration_20000 = new P.Duration(20000);
-C.Duration_200000 = new P.Duration(200000);
 C.Duration_2000000 = new P.Duration(2000000);
 C.Duration_400000 = new P.Duration(400000);
 C.Duration_50000 = new P.Duration(50000);
@@ -10706,6 +10480,8 @@ $.itemData = null;
 $.stageData = null;
 $.tank = null;
 $.score = null;
+$.numberOfHit = null;
+$.numberOfFire = null;
 $.offset_x = 0;
 J.$add$ns = function(receiver, a0) {
   if (typeof receiver == "number" && typeof a0 == "number")
@@ -10781,9 +10557,6 @@ J.createGain$0$x = function(receiver) {
 J.decodeAudioData$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).decodeAudioData$1(receiver, a0);
 };
-J.elementAt$1$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).elementAt$1(receiver, a0);
-};
 J.fillText$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).fillText$3(receiver, a0, a1, a2);
 };
@@ -10814,9 +10587,6 @@ J.get$length$asx = function(receiver) {
 J.get$values$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$values(receiver);
 };
-J.map$1$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).map$1(receiver, a0);
-};
 J.preventDefault$0$x = function(receiver) {
   return J.getInterceptor$x(receiver).preventDefault$0(receiver);
 };
@@ -10843,9 +10613,6 @@ J.toInt$0$n = function(receiver) {
 };
 J.toList$0$ax = function(receiver) {
   return J.getInterceptor$ax(receiver).toList$0(receiver);
-};
-J.toList$1$growable$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).toList$1$growable(receiver, a0);
 };
 J.toString$0 = function(receiver) {
   return J.getInterceptor(receiver).toString$0(receiver);
@@ -10919,9 +10686,6 @@ Isolate.$lazy($, "Red", "Color_Red", "get$Color_Red", function() {
 Isolate.$lazy($, "Black", "Color_Black", "get$Color_Black", function() {
   return B.Color$fromString("#000000");
 });
-Isolate.$lazy($, "Yellow", "Color_Yellow", "get$Color_Yellow", function() {
-  return B.Color$fromString("#FFFF00");
-});
 Isolate.$lazy($, "Gray", "Color_Gray", "get$Color_Gray", function() {
   return B.Color$fromString("#808080");
 });
@@ -10945,32 +10709,16 @@ Isolate.$lazy($, "defaultButtonRenderer", "defaultButtonRenderer", "get$defaultB
   return new B.DefaultButtonRender(t1, t2, t3, t4, t5, t6);
 });
 Isolate.$lazy($, "geng", "geng", "get$geng", function() {
-  return new B.GEng(null, null, new B.GObjList(P.List_List(null, null), P.List_List(null, null)), null, null, new B.ImageMap(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), Q.SoundManager$(), new B.HiScoreManager(null, 5, [500, 400, 300, 200, 100]), 1, new B.FrameTimer(new P.Stopwatch(null, null), null, null, null), new B.FPSCounter(new P.Stopwatch(null, null), 0, 0, 0, 0, 0, 0), C.C__Random);
+  return new B.GEng(null, null, new B.GObjList(P.List_List(null, null), P.List_List(null, null)), null, null, new B.ImageMap(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), Q.SoundManager$(), new B.HiScoreManager(null, 5, [10, 10, 10, 10, 10]), 1, new B.FrameTimer(new P.Stopwatch(null, null), null, null, null), new B.FPSCounter(new P.Stopwatch(null, null), 0, 0, 0, 0, 0, 0), C.C__Random, 0);
 });
 Isolate.$lazy($, "stageList", "stageList", "get$stageList", function() {
-  return [H.fillLiteralMap(["id", "stage0", "name", "Stage0", "caption", "\u8a66\u3057\u6253\u3061\u3053\u3061\u3089", "speed", 3, "length", 3800, "map", [[900, 150, "large"], [1400, 150, "large"], [1900, 150, "large"], [2400, 150, "small"], [2900, 150, "small"], [3400, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "name", "Stage1", "caption", "\u306d\u3089\u304810\u9023\u30b3\u30f3\u30dc\uff01\u96c6\u4e2d\u529b\u30b9\u30c6\u30fc\u30b8", "speed", 3, "length", 6000, "map", [[900, 200, "large"], [1300, 270, "small"], [1700, 130, "large"], [1950, 150, "small"], [2300, 260, "large"], [2550, 100, "small"], [2800, 270, "large"], [3100, 150, "small"], [3400, 100, "large"], [3800, 100, "small"], [4500, 280, "large"], [4650, 280, "large"], [4800, 280, "large"], [4950, 280, "large"], [5070, 100, "small"], [5220, 100, "small"], [5370, 100, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
+  return [H.fillLiteralMap(["id", "stage0", "name", "Stage0", "caption", "\u8a66\u3057\u6253\u3061\u3053\u3061\u3089", "speed", 3, "length", 3800, "map", [[900, 150, "large"], [1400, 150, "large"], [1900, 150, "large"], [2400, 150, "small"], [2900, 150, "small"], [3400, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 130, "large"], [250, 150, "small"], [350, 260, "large"], [250, 100, "small"], [250, 270, "large"], [300, 150, "small"], [300, 100, "large"], [400, 100, "small"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [120, 100, "small"], [150, 100, "small"], [150, 100, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "itemList", "itemList", "get$itemList", function() {
   return [H.fillLiteralMap(["id", "nom001", "obtained", true, "price", 0, "cannonSize", 20, "cannonSpeed", 6, "text", "\u307e\u3081\u7832\u5f3e"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "gamePointManager", "gamePointManager", "get$gamePointManager", function() {
   return new X.GamePointManager(null, P.HashSet_HashSet(null, null, null, null), H.fillLiteralMap(["stage0", 0, "stage1", 0, "stage2", 1000, "stage3", 5000, "nom001", 0, "big001", 2000, "fast001", 3000], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-});
-Isolate.$lazy($, "trenLogo", "trenLogo", "get$trenLogo", function() {
-  var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
-  t1.set$fontFamily(t1, "\"\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4 Pro W3\", \"Hiragino Kaku Gothic Pro\", Meiryo, \"\u30e1\u30a4\u30ea\u30aa\", \"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\", Verdana, Geneva, Arial, Helvetica");
-  t1.set$fontSize(t1, "28pt");
-  t1.textAlign = "center";
-  t1.textBaseline = "middle";
-  t1.lineWidth = 1;
-  t1.lineHeight = 35;
-  t1.strokeColor = $.get$Color_Black();
-  t1.fillColor = $.get$Color_Yellow();
-  t1.shadowColor = B.Color$fromAlpha(0.5);
-  t1.shadowOffsetX = 5;
-  t1.shadowOffsetY = 5;
-  t1.shadowBlur = 10;
-  return t1;
 });
 Isolate.$lazy($, "trenTitle", "trenTitle", "get$trenTitle", function() {
   var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
@@ -11008,14 +10756,25 @@ Isolate.$lazy($, "trenButton", "trenButton", "get$trenButton", function() {
   t1.lineWidth = 1;
   return t1;
 });
-Isolate.$lazy($, "scoretren", "scoretren", "get$scoretren", function() {
+Isolate.$lazy($, "trenScore", "trenScore", "get$trenScore", function() {
   var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
-  t1.set$fontFamily(t1, "'Press Start 2P', cursive");
+  t1.set$fontFamily(t1, "\"\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4 Pro W3\", \"Hiragino Kaku Gothic Pro\", Meiryo, \"\u30e1\u30a4\u30ea\u30aa\", \"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\", Verdana, Geneva, Arial, Helvetica");
   t1.set$fontSize(t1, "12pt");
-  t1.textAlign = "left";
-  t1.textBaseline = "top";
+  t1.textAlign = "center";
+  t1.textBaseline = "middle";
   t1.fillColor = $.get$Color_Black();
   t1.strokeColor = null;
+  t1.shadowColor = $.get$Color_White();
+  t1.shadowOffsetX = 2;
+  t1.shadowOffsetY = 2;
+  t1.shadowBlur = 0;
+  return t1;
+});
+Isolate.$lazy($, "scoretren", "scoretren", "get$scoretren", function() {
+  var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
+  t1.set$1($.get$trenScore());
+  t1.textAlign = "left";
+  t1.textBaseline = "top";
   return t1;
 });
 Isolate.$lazy($, "trenHiscore", "trenHiscore", "get$trenHiscore", function() {
@@ -11047,20 +10806,6 @@ Isolate.$lazy($, "trenOff", "FireButton_trenOff", "get$FireButton_trenOff", func
   t1.textBaseline = "middle";
   t1.fillColor = B.Color$fromString("#a64040");
   t1.strokeColor = null;
-  return t1;
-});
-Isolate.$lazy($, "trenScore", "trenScore", "get$trenScore", function() {
-  var t1 = new B.TextRender("24pt", "serif", "24pt serif", null, $.get$Color_Black(), null, 2, 2, 2, 1, 10, "left", "ideographic");
-  t1.set$fontFamily(t1, "'Press Start 2P', cursive");
-  t1.set$fontSize(t1, "12pt");
-  t1.textAlign = "center";
-  t1.textBaseline = "middle";
-  t1.fillColor = $.get$Color_Black();
-  t1.strokeColor = null;
-  t1.shadowColor = $.get$Color_White();
-  t1.shadowOffsetX = 2;
-  t1.shadowOffsetY = 2;
-  t1.shadowBlur = 0;
   return t1;
 });
 // Native classes

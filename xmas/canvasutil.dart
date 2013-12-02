@@ -236,7 +236,34 @@ class GCanvas2D {
   }
 }
 
+class ImageButtonRender {
+  
+  ImageElement  img;
+  
+  ImageButtonRender( ImageElement img ) : this.img = img;
+  
+  void render( GCanvas2D canvas, GButton btn ) {
+    
+    var status = btn.status;
+    var left = btn.left;
+    var top = btn.top;
+    var width = btn.width;
+    var height= btn.height;
+    
+    var c = canvas.c;
+    
+    c.save();
+    
+    // 表面
+    if( status==GButton.PRESSED )
+      c.translate(0,4);
+    
+    c.drawImageScaled(img, left, top, width, height);
+    
+    c.restore();
+  }
 
+}
 
 class DefaultButtonRender {
   

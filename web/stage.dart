@@ -18,27 +18,26 @@ List  stageList = [
                             ]
                    },
    // Stage1
-   { 'id':'stage1', 'name':"Stage1",
-     "caption" : "ねらえ10連コンボ！集中力ステージ",
-     'speed':3.0, 'length':6000,
+   { 'id':'stage1',
+     'speed':3.0,
      'map':[
          [ 900, 200, "large" ],
-         [ 1300, 270, "small" ],
-         [ 1700, 130, "large" ],
-         [ 1950, 150, "small" ],
-         [ 2300, 260, "large" ],
-         [ 2550, 100, "small" ],
-         [ 2800, 270, "large" ],
-         [ 3100, 150, "small" ],
-         [ 3400, 100, "large" ],
-         [ 3800, 100, "small" ],
-         [ 4500, 280, "large" ],
-         [ 4650, 280, "large" ],
-         [ 4800, 280, "large" ],
-         [ 4950, 280, "large" ],
-         [ 5070, 100, "small" ],
-         [ 5220, 100, "small" ],
-         [ 5370, 100, "small" ],
+         [ 400, 270, "small" ],
+         [ 400, 130, "large" ],
+         [ 250, 150, "small" ],
+         [ 350, 260, "large" ],
+         [ 250, 100, "small" ],
+         [ 250, 270, "large" ],
+         [ 300, 150, "small" ],
+         [ 300, 100, "large" ],
+         [ 400, 100, "small" ],
+         [ 700, 280, "large" ],
+         [ 150, 280, "large" ],
+         [ 150, 280, "large" ],
+         [ 150, 280, "large" ],
+         [ 120, 100, "small" ],
+         [ 150, 100, "small" ],
+         [ 150, 100, "small" ],
      ]
    },
 ];
@@ -59,7 +58,42 @@ List  itemList = [
                   },
 ];
 
+int resultToScore( int hit, int fire, var stage ) {
+  
+  // 撃墜率
+  var Krate = hit / stage['map'].length;
+  // 命中率
+  var Arate = hit / fire;
+  
+  print("K=$Krate A=$Arate");
+  
+  if( Krate > 0.99 && Arate > 0.99 ) {
+    return 100;
+  } else if( Krate > 0.99 && Arate > 0.80 ) {
+    return 90;
+  } else if( Krate > 0.90 && Arate > 0.80 ) {
+    return 70;
+  } else if( Krate > 0.85 && Arate > 0.70 ) {
+    return 50;
+  } else if( Krate > 0.70 && Arate > 0.50 ) {
+    return 30;
+  }
+  
+  return 10;
+}
 
+String resultToLevelText( int score ) {
+  
+  var map = {
+    100 : "かみさま",
+    90 : "たつじん",
+    70 : "せんせい",
+    50 : "せんぱい",
+    30 : "いちねんせい",
+    10 : "あかちゃん",
+  };
+  return map[score];
+}
 
 class GamePointManager {
   

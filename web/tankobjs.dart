@@ -2,19 +2,6 @@ part of tankgame;
 
 
 
-/** 共通で使用するテキストレンダー:通常の文字表示 */
-var trenScore = new TextRender()
-..fontFamily = scoreFont
-..fontSize = "12pt"
-..textAlign = "center"
-..textBaseline = "middle"
-..fillColor = Color.Black
-..strokeColor = null
-..shadowColor = Color.White
-..shadowOffset = 2
-..shadowBlur = 0;
-
-
 /**
  * GameStartの表示
  */
@@ -274,11 +261,11 @@ class Target extends GObj {
       num s = _getScore(dx);
       score += s;
       // ポップアップ
-      var pop = new ScorePopup()
-      ..pos.x = pos.x + _hitdx
-      ..pos.y = pos.y
-      ..texts[0] = s.toString();
-      geng.objlist.add( pop );
+//      var pop = new ScorePopup()
+//      ..pos.x = pos.x + _hitdx
+//      ..pos.y = pos.y
+//      ..texts[0] = s.toString();
+//      geng.objlist.add( pop );
       
       // 爆発を配置
       var range = R90 * 0.5;
@@ -291,6 +278,9 @@ class Target extends GObj {
       dispose();
       
       geng.soundManager.play("bomb");
+      
+      // ヒット数Increment
+      numberOfHit++;
       
       return true;
     } else {

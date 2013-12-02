@@ -646,7 +646,11 @@ class HiScoreManager {
     return list.map((e)=>e.toString()).toList(growable:false);
   }
   
-  var defaultScores=[ 500, 400, 300, 200, 100 ]; 
+  List<int> getScores( String kind ) {
+    return (_scoresMap.containsKey(kind)) ? _scoresMap[kind] : defaultScores;
+  }
+  
+  var defaultScores=[ 10, 10, 10, 10, 10 ]; 
   /**
    * 新しいスコアを登録する
    * 戻りは登録された順位です（0始まり）

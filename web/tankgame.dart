@@ -56,8 +56,8 @@ void main() {
     geng.soundManager.soundOn = sound;
     
     // Canvas
-    num scale = isMobileDevice() ? 0.5 : 1;
-    geng.initField( width:570, height:570, scale:scale );
+//    num scale = isMobileDevice() ? 0.5 : 1;
+    geng.initField( width:570, height:570, scale:1 );
     
     querySelector("#place").append( geng.canvas );
     

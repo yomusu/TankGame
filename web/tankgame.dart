@@ -38,7 +38,9 @@ void main() {
       ..put("smoke", "./img/kemuri.png")
       ..put("tama", "./img/yuki01.png")
       ..put("star01", "./img/star01.png")
-      ..put("ball01", "./img/ball01.png");
+      ..put("ball01", "./img/ball01.png")
+      ..put("gamestart", "./img/gamestart.png")
+      ;
     
     // サウンド読み込み
     geng.soundManager.put("bell","./sound/xmasbell.ogg");

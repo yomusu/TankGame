@@ -14,7 +14,10 @@ class GameStartLogo extends GObj {
   }
   void onPrepareRender(RenderList renderList) {
     renderList.add( 100, (canvas) {
-      canvas.drawTexts(trenScore, ["GAME START"], 285, 200);
+      var img = geng.imageMap["gamestart"];
+      var w = 600 / 2;
+      var h = 83 / 2;
+      canvas.c.drawImageScaled(img, 285-(w/2), 270-(h/2), w, h);
     });
   }
   

@@ -217,7 +217,7 @@ class Target extends GObj {
   Target.fromType( String type ) {
     switch( type ) {
       case 'small':
-        _width = 25;
+        _width = 30;
         sp = new ImageSprite( imgKey:"targetS", width:60, height:120 );
         bombTypes = [0,1,3,4,3,4];
         break;

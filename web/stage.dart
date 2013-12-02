@@ -28,15 +28,32 @@ List  stageList = [
          [ 250, 100, "small" ],
          [ 250, 270, "large" ],
          [ 300, 150, "small" ],
-         [ 300, 100, "large" ],
-         [ 400, 100, "small" ],
+         [ 250, 100, "large" ],
+         [ 200, 150, "small" ],
+         [ 180, 100, "small" ],
+         // 7連鎖
          [ 700, 280, "large" ],
          [ 150, 280, "large" ],
          [ 150, 280, "large" ],
          [ 150, 280, "large" ],
-         [ 120, 100, "small" ],
+         [ 125, 100, "small" ],
          [ 150, 100, "small" ],
-         [ 150, 100, "small" ],
+         [ 150, 100, "small" ], // 18
+         // 階段
+         [ 250, 280, "small" ],
+         [ 180, 240, "small" ],
+         [ 180, 200, "small" ],
+         [ 180, 160, "small" ],
+         [ 180, 120, "small" ],
+         [ 180,  90, "small" ], // 24
+         // ジグザグ
+         [ 250,  90, "large" ],
+         [ 180, 280, "small" ],
+         [ 180,  90, "large" ],
+         [ 180, 280, "small" ],
+         [ 180,  90, "large" ],
+         
+         [ 250,  50, "small" ],
      ]
    },
 ];
@@ -66,6 +83,10 @@ int resultToScore( int hit, int fire, var stage ) {
   
   print("K=$Krate A=$Arate");
   
+  // サーロイン判定
+  if( hit==29 && Arate > 0.99 )
+    return 80;
+  
   if( Krate > 0.99 && Arate > 0.99 ) {
     return 100;
   } else if( Krate > 0.99 && Arate > 0.80 ) {
@@ -86,6 +107,7 @@ String resultToLevelText( int score ) {
   var map = {
     100 : "かみさま",
     90 : "たつじん",
+    80 : "サーロイン",
     70 : "せんせい",
     50 : "せんぱい",
     30 : "いちねんせい",

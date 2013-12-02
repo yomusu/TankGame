@@ -537,9 +537,11 @@ class TankGamePracticely extends TankGame {
   
   void onEndOfStage() {
     
+    var score = resultToScore( numberOfHit, numberOfFire, stageData );
+    
     // メッセージ表示
     var message;
-    if( score<=50 ) {
+    if( score <= 70 ) {
       message = ["まだまだ かな？",
                  "もうちょっと れんしゅうしてみよう！"];
     } else {

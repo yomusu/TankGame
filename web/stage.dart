@@ -4,17 +4,16 @@ part of tankgame;
  * ステージデータ
  */
 List  stageList = [
-                 // Stage1
-                 { 'id':'stage0', 'name':"Stage0",
-                     "caption" : "試し打ちこちら",
-                     'speed':3.0, 'length':3800,
+                 // れんしゅうStage
+                 { 'id':'stage0',
+                     'speed':3.0,
                      'map':[
                             [ 900, 150, "large" ],
-                            [ 1400, 150, "large" ],
-                            [ 1900, 150, "large" ],
-                            [ 2400, 150, "small" ],
-                            [ 2900, 150, "small" ],
-                            [ 3400, 150, "small" ],
+                            [ 500, 150, "large" ],
+                            [ 500, 150, "large" ],
+                            [ 500, 150, "small" ],
+                            [ 500, 150, "small" ],
+                            [ 500, 150, "small" ],
                             ]
                    },
    // Stage1

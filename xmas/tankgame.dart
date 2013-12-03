@@ -43,9 +43,9 @@ void main() {
       ;
     
     // サウンド読み込み
-    geng.soundManager.put("bell","./sound/xmasbell.ogg");
-    geng.soundManager.put("fire","./sound/bag.ogg");
-    geng.soundManager.put("bomb","./sound/pyo.ogg");
+    geng.soundManager.put("bell","./sound/xmasbell");
+    geng.soundManager.put("fire","./sound/bag");
+    geng.soundManager.put("bomb","./sound/pyo");
     
     // ハイスコアデータ読み込み
     geng.hiscoreManager.init();

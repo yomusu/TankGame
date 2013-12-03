@@ -251,7 +251,7 @@ Interceptor: {"": "Object;",
   toString$0: function(receiver) {
     return H.Primitives_objectToString(receiver);
   },
-  "%": "ArrayBuffer|Blob|CanvasGradient|CanvasPattern|DOMError|File|FileError|MediaError|MediaKeyError|Navigator|NavigatorUserMediaError|PositionError|SQLError|SVGAnimatedLength|SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList"
+  "%": "CanvasGradient|CanvasPattern|DOMError|FileError|MediaError|MediaKeyError|Navigator|NavigatorUserMediaError|PositionError|SQLError|SVGAnimatedLength|SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList"
 },
 
 JSBool: {"": "bool/Interceptor;",
@@ -692,7 +692,7 @@ IsolateNatives__processWorkerMessage: function(sender, e) {
       break;
     case "message":
       if (t1.$index(msg, "port") != null)
-        J.send$1$x(t1.$index(msg, "port"), t1.$index(msg, "msg"));
+        t1.$index(msg, "port").send$1(t1.$index(msg, "msg"));
       $globalState.topEventLoop.run$0();
       break;
     case "close":
@@ -744,7 +744,7 @@ IsolateNatives__startIsolate: function(topLevel, args, message, isSpawnUri, repl
   $.lazyPort = H.ReceivePortImpl$();
   t1 = $.lazyPort;
   t1.toString;
-  J.send$1$x(replyTo, ["spawned", new H._NativeJsSendPort(t1, $globalState.currentContext.id)]);
+  replyTo.send$1(["spawned", new H._NativeJsSendPort(t1, $globalState.currentContext.id)]);
   if (isSpawnUri !== true)
     topLevel.call$1(message);
   else {
@@ -1003,7 +1003,7 @@ IsolateNatives__processWorkerMessage_closure: {"": "Closure;entryPoint_0,args_1,
 _BaseSendPort: {"": "Object;", $isSendPort: true},
 
 _NativeJsSendPort: {"": "_BaseSendPort;_receivePort,_isolateId",
-  send$1: function(_, message) {
+  send$1: function(message) {
     H._waitForPendingPorts(message, new H._NativeJsSendPort_send_closure(this, message));
   },
   $eq: function(_, other) {
@@ -1064,7 +1064,7 @@ _NativeJsSendPort_send__closure: {"": "Closure;box_0,this_3,shouldSerialize_4",
 },
 
 _WorkerSendPort: {"": "_BaseSendPort;_workerId,_receivePortId,_isolateId",
-  send$1: function(_, message) {
+  send$1: function(message) {
     H._waitForPendingPorts(message, new H._WorkerSendPort_send_closure(this, message));
   },
   $eq: function(_, other) {
@@ -1737,40 +1737,6 @@ Primitives_stringFromCharCodes: function(charCodes) {
       return H.Primitives_stringFromCodePoints(charCodes);
   }
   return H.Primitives__fromCharCodeApply(charCodes);
-},
-
-Primitives_lazyAsJsDate: function(receiver) {
-  if (receiver.date === void 0)
-    receiver.date = new Date(receiver.millisecondsSinceEpoch);
-  return receiver.date;
-},
-
-Primitives_getYear: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCFullYear() + 0 : H.Primitives_lazyAsJsDate(receiver).getFullYear() + 0;
-},
-
-Primitives_getMonth: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMonth() + 1 : H.Primitives_lazyAsJsDate(receiver).getMonth() + 1;
-},
-
-Primitives_getDay: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCDate() + 0 : H.Primitives_lazyAsJsDate(receiver).getDate() + 0;
-},
-
-Primitives_getHours: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCHours() + 0 : H.Primitives_lazyAsJsDate(receiver).getHours() + 0;
-},
-
-Primitives_getMinutes: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMinutes() + 0 : H.Primitives_lazyAsJsDate(receiver).getMinutes() + 0;
-},
-
-Primitives_getSeconds: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getSeconds() + 0;
-},
-
-Primitives_getMilliseconds: function(receiver) {
-  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMilliseconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getMilliseconds() + 0;
 },
 
 Primitives_getProperty: function(object, key) {
@@ -2638,6 +2604,20 @@ initHooks_closure1: {"": "Closure;prototypeForTag_2",
     return this.prototypeForTag_2(tag);
   },
   $is_args1: true
+},
+
+JSSyntaxRegExp: {"": "Object;_nativeRegExp,_nativeGlobalRegExp,_nativeAnchoredRegExp", static: {
+JSSyntaxRegExp_makeNative: function(pattern, multiLine, caseSensitive, global) {
+  var m, i, g, regexp, errorMessage;
+  m = multiLine ? "m" : "";
+  i = caseSensitive ? "" : "i";
+  g = global ? "g" : "";
+  regexp = (function() {try {return new RegExp(pattern, m + i + g);} catch (e) {return e;}})();
+  if (regexp instanceof RegExp)
+    return regexp;
+  errorMessage = String(regexp);
+  throw H.wrapException(P.FormatException$("Illegal RegExp pattern: " + pattern + ", " + errorMessage));
+}}
 }}],
 ["dart._collection.dev", "dart:_collection-dev", , H, {
 Arrays_copy: function(src, srcStart, dst, dstStart, count) {
@@ -3240,19 +3220,6 @@ _Future: {"": "Object;_state,_zone<,_resultOrListeners,_nextListener<,_onValueCa
     return new P.BoundClosure$2(this, P._Future.prototype._completeError$2, null, "_completeError$2");
   },
   _asyncComplete$1: function(value) {
-    var t1, t2;
-    t1 = J.getInterceptor(value);
-    t2 = typeof value === "object" && value !== null && !!t1.$isFuture;
-    if (t2)
-      ;
-    if (t2)
-      t1 = typeof value !== "object" || value === null || !t1.$is_Future || value._state < 4;
-    else
-      t1 = false;
-    if (t1) {
-      this._complete$1(value);
-      return;
-    }
     if (this._state !== 0)
       H.throwExpression(P.StateError$("Future already completed"));
     this._state = 1;
@@ -6106,89 +6073,6 @@ NoSuchMethodError_toString_closure: {"": "Closure;box_0",
 
 Comparable: {"": "Object;"},
 
-DateTime: {"": "Object;millisecondsSinceEpoch<,isUtc",
-  $eq: function(_, other) {
-    var t1;
-    if (other == null)
-      return false;
-    t1 = J.getInterceptor(other);
-    if (typeof other !== "object" || other === null || !t1.$isDateTime)
-      return false;
-    return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && this.isUtc === other.isUtc;
-  },
-  compareTo$1: function(_, other) {
-    return C.JSInt_methods.compareTo$1(this.millisecondsSinceEpoch, other.get$millisecondsSinceEpoch());
-  },
-  get$hashCode: function(_) {
-    return this.millisecondsSinceEpoch;
-  },
-  toString$0: function(_) {
-    var t1, y, m, d, h, min, sec, ms;
-    t1 = new P.DateTime_toString_twoDigits();
-    y = new P.DateTime_toString_fourDigits().call$1(H.Primitives_getYear(this));
-    m = t1.call$1(H.Primitives_getMonth(this));
-    d = t1.call$1(H.Primitives_getDay(this));
-    h = t1.call$1(H.Primitives_getHours(this));
-    min = t1.call$1(H.Primitives_getMinutes(this));
-    sec = t1.call$1(H.Primitives_getSeconds(this));
-    ms = new P.DateTime_toString_threeDigits().call$1(H.Primitives_getMilliseconds(this));
-    if (this.isUtc)
-      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms) + "Z";
-    else
-      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms);
-  },
-  DateTime$fromMillisecondsSinceEpoch$2$isUtc: function(millisecondsSinceEpoch, isUtc) {
-    if (Math.abs(millisecondsSinceEpoch) > 8640000000000000)
-      throw H.wrapException(new P.ArgumentError(millisecondsSinceEpoch));
-  },
-  $isDateTime: true,
-  static: {
-"": "DateTime_MONDAY,DateTime_TUESDAY,DateTime_WEDNESDAY,DateTime_THURSDAY,DateTime_FRIDAY,DateTime_SATURDAY,DateTime_SUNDAY,DateTime_DAYS_PER_WEEK,DateTime_JANUARY,DateTime_FEBRUARY,DateTime_MARCH,DateTime_APRIL,DateTime_MAY,DateTime_JUNE,DateTime_JULY,DateTime_AUGUST,DateTime_SEPTEMBER,DateTime_OCTOBER,DateTime_NOVEMBER,DateTime_DECEMBER,DateTime_MONTHS_PER_YEAR,DateTime__MAX_MILLISECONDS_SINCE_EPOCH",
-DateTime$fromMillisecondsSinceEpoch: function(millisecondsSinceEpoch, isUtc) {
-  var t1 = new P.DateTime(millisecondsSinceEpoch, isUtc);
-  t1.DateTime$fromMillisecondsSinceEpoch$2$isUtc(millisecondsSinceEpoch, isUtc);
-  return t1;
-}}
-
-},
-
-DateTime_toString_fourDigits: {"": "Closure;",
-  call$1: function(n) {
-    var absN, sign;
-    absN = J.abs$0$n(n);
-    sign = n < 0 ? "-" : "";
-    if (absN >= 1000)
-      return H.S(n);
-    if (absN >= 100)
-      return sign + "0" + H.S(absN);
-    if (absN >= 10)
-      return sign + "00" + H.S(absN);
-    return sign + "000" + H.S(absN);
-  },
-  $is_args1: true
-},
-
-DateTime_toString_threeDigits: {"": "Closure;",
-  call$1: function(n) {
-    var t1 = J.getInterceptor$n(n);
-    if (t1.$ge(n, 100))
-      return H.S(n);
-    if (t1.$ge(n, 10))
-      return "0" + H.S(n);
-    return "00" + H.S(n);
-  },
-  $is_args1: true
-},
-
-DateTime_toString_twoDigits: {"": "Closure;",
-  call$1: function(n) {
-    if (J.$ge$n(n, 10))
-      return H.S(n);
-    return "0" + H.S(n);
-  },
-  $is_args1: true
-},
-
 Duration: {"": "Object;_duration<",
   $add: function(_, other) {
     return P.Duration$(0, 0, this._duration + other.get$_duration(), 0, 0, 0);
@@ -6583,6 +6467,10 @@ StringBuffer$: function($content) {
 
 Symbol: {"": "Object;"}}],
 ["dart.dom.html", "dart:html", , W, {
+AudioElement_AudioElement: function(src) {
+  return new Audio(src);
+},
+
 CanvasElement_CanvasElement: function(height, width) {
   var e = document.createElement("canvas", null);
   J.set$width$x(e, width);
@@ -6593,13 +6481,6 @@ CanvasElement_CanvasElement: function(height, width) {
 ImageElement_ImageElement: function(height, src, width) {
   var e = document.createElement("img", null);
   return e;
-},
-
-_convertNativeToDart_XHR_Response: function(o) {
-  var t1 = J.getInterceptor(o);
-  if (typeof o === "object" && o !== null && !!t1.$isDocument)
-    return o;
-  return P.convertNativeToDart_AcceptStructuredClone(o, true);
 },
 
 _wrapZone: function(callback) {
@@ -6620,7 +6501,7 @@ AnchorElement: {"": "HtmlElement;",
 
 BodyElement: {"": "HtmlElement;",
   get$onLoad: function(receiver) {
-    var t1 = new W._ElementEventStreamImpl(receiver, C.EventStreamProvider_load0._eventType, false);
+    var t1 = new W._ElementEventStreamImpl(receiver, C.EventStreamProvider_load._eventType, false);
     H.setRuntimeTypeInfo(t1, [null]);
     return t1;
   },
@@ -6668,8 +6549,6 @@ CssStyleDeclaration: {"": "Interceptor_CssStyleDeclarationBase;length=",
   "%": "CSS2Properties|CSSStyleDeclaration|MSStyleCSSProperties"
 },
 
-Document: {"": "Node;", $isDocument: true, "%": "Document|HTMLDocument|SVGDocument"},
-
 DomException: {"": "Interceptor;",
   toString$0: function(receiver) {
     return receiver.toString();
@@ -6687,7 +6566,7 @@ Element: {"": "Node;",
     return receiver.localName;
   },
   get$onLoad: function(receiver) {
-    var t1 = new W._ElementEventStreamImpl(receiver, C.EventStreamProvider_load0._eventType, false);
+    var t1 = new W._ElementEventStreamImpl(receiver, C.EventStreamProvider_load._eventType, false);
     H.setRuntimeTypeInfo(t1, [null]);
     return t1;
   },
@@ -6703,7 +6582,7 @@ Event: {"": "Interceptor;",
     return receiver.preventDefault();
   },
   $isEvent: true,
-  "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyEvent|MediaKeyMessageEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SecurityPolicyViolationEvent|SpeechInputEvent|SpeechRecognitionEvent|SpeechSynthesisEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;Event"
+  "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyEvent|MediaKeyMessageEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|ProgressEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|ResourceProgressEvent|SecurityPolicyViolationEvent|SpeechInputEvent|SpeechRecognitionEvent|SpeechSynthesisEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent|XMLHttpRequestProgressEvent;Event"
 },
 
 EventTarget: {"": "Interceptor;",
@@ -6718,28 +6597,18 @@ EventTarget: {"": "Interceptor;",
 
 FormElement: {"": "HtmlElement;length=", "%": "HTMLFormElement"},
 
-HttpRequest: {"": "HttpRequestEventTarget;status=",
-  open$5$async$password$user: function(receiver, method, url, async, password, user) {
-    return receiver.open(method, url, async, user, password);
-  },
-  open$2: function($receiver, method, url) {
-    return $receiver.open(method, url);
-  },
-  send$1: function(receiver, data) {
-    return receiver.send(data);
-  },
-  "%": "XMLHttpRequest"
-},
-
-HttpRequestEventTarget: {"": "EventTarget;", "%": ";XMLHttpRequestEventTarget"},
-
 IFrameElement: {"": "HtmlElement;height},src},width}", "%": "HTMLIFrameElement"},
 
 ImageElement: {"": "HtmlElement;height},src},width}", "%": "HTMLImageElement"},
 
 InputElement: {"": "HtmlElement;height},src},width}", "%": "HTMLInputElement"},
 
-MediaElement: {"": "HtmlElement;error=,src}", "%": "HTMLAudioElement;HTMLMediaElement"},
+MediaElement: {"": "HtmlElement;error=,src}",
+  play$0: function(receiver) {
+    return receiver.play();
+  },
+  "%": "HTMLAudioElement;HTMLMediaElement"
+},
 
 MouseEvent: {"": "UIEvent;",
   get$client: function(receiver) {
@@ -6756,12 +6625,10 @@ Node: {"": "EventTarget;",
     var t1 = receiver.nodeValue;
     return t1 == null ? J.Interceptor.prototype.toString$0.call(this, receiver) : t1;
   },
-  "%": "Attr|DocumentFragment|DocumentType|Entity|Notation|ShadowRoot;Node"
+  "%": "Attr|Document|DocumentFragment|DocumentType|Entity|HTMLDocument|Notation|SVGDocument|ShadowRoot;Node"
 },
 
 ObjectElement: {"": "HtmlElement;height},width}", "%": "HTMLObjectElement"},
-
-ProgressEvent: {"": "Event;", $isProgressEvent: true, "%": "ProgressEvent|ResourceProgressEvent|XMLHttpRequestProgressEvent"},
 
 ScriptElement: {"": "HtmlElement;src}", "%": "HTMLScriptElement"},
 
@@ -6902,7 +6769,7 @@ Interceptor_ListMixin_ImmutableListMixin: {"": "Interceptor_ListMixin+ImmutableL
 
 EventStreamProvider: {"": "Object;_eventType"},
 
-_EventStream: {"": "Stream;_target,_eventType,_useCapture",
+_EventStream: {"": "Stream;",
   listen$4$cancelOnError$onDone$onError: function(onData, cancelOnError, onDone, onError) {
     var t1 = new W._EventStreamSubscription(0, this._target, this._eventType, W._wrapZone(onData), this._useCapture);
     H.setRuntimeTypeInfo(t1, [H.getRuntimeTypeArgument(this, "_EventStream", 0)]);
@@ -7039,63 +6906,6 @@ TextContentElement: {"": "GraphicsElement;", "%": "SVGTextPathElement;SVGTextCon
 TextPositioningElement: {"": "TextContentElement;x=,y=", "%": "SVGAltGlyphElement|SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"},
 
 UseElement: {"": "GraphicsElement;x=,y=", "%": "SVGUseElement"}}],
-["dart.dom.web_audio", "dart:web_audio", , P, {
-AudioBuffer: {"": "Interceptor;length=", $isAudioBuffer: true, "%": "AudioBuffer"},
-
-AudioBufferSourceNode: {"": "AudioSourceNode;",
-  start$3: function(receiver, when, grainOffset, grainDuration) {
-    if (!!receiver.start)
-      receiver.start(when);
-    else
-      receiver.noteOn(when);
-  },
-  start$1: function($receiver, when) {
-    return this.start$3($receiver, when, null, null);
-  },
-  "%": "AudioBufferSourceNode"
-},
-
-AudioContext: {"": "EventTarget;",
-  _decodeAudioData$3: function(receiver, audioData, successCallback, errorCallback) {
-    return receiver.decodeAudioData(audioData, H.convertDartClosureToJS(successCallback, 1), H.convertDartClosureToJS(errorCallback, 1));
-  },
-  decodeAudioData$1: function(receiver, audioData) {
-    var t1, completer;
-    t1 = P.AudioBuffer;
-    completer = new P._AsyncCompleter(P._Future$(t1));
-    H.setRuntimeTypeInfo(completer, [t1]);
-    this._decodeAudioData$3(receiver, audioData, new P.AudioContext_decodeAudioData_closure(completer), new P.AudioContext_decodeAudioData_closure0(completer));
-    return completer.future;
-  },
-  createGain$0: function(receiver) {
-    if (receiver.createGain !== undefined)
-      return receiver.createGain();
-    else
-      return receiver.createGainNode();
-  },
-  "%": "AudioContext|OfflineAudioContext|webkitAudioContext"
-},
-
-AudioNode: {"": "EventTarget;", "%": "AudioDestinationNode|AudioGainNode|GainNode;AudioNode"},
-
-AudioSourceNode: {"": "AudioNode;", "%": ";AudioSourceNode"},
-
-AudioContext_decodeAudioData_closure: {"": "Closure;completer_0",
-  call$1: function(value) {
-    var t1 = this.completer_0.future;
-    if (t1._state !== 0)
-      H.throwExpression(P.StateError$("Future already completed"));
-    t1._asyncComplete$1(value);
-  },
-  $is_args1: true
-},
-
-AudioContext_decodeAudioData_closure0: {"": "Closure;completer_1",
-  call$1: function(error) {
-    this.completer_1.completeError$1(error);
-  },
-  $is_args1: true
-}}],
 ["dart.isolate", "dart:isolate", , P, {
 ReceivePort: {"": "Object;", $isReceivePort: true}}],
 ["dart.math", "dart:math", , P, {
@@ -8446,211 +8256,78 @@ Sprite: {"": "Object;_x,_y,_w,_h,_rect,_alpha,_scale,offsetx,offsety,rotate,isSh
     return this._rect;
   }
 }}],
-["html_common", "dart:html_common", , P, {
-convertNativeToDart_DateTime: function(date) {
-  return P.DateTime$fromMillisecondsSinceEpoch(date.getTime(), true);
-},
-
-convertNativeToDart_AcceptStructuredClone: function(object, mustCopy) {
-  var copies = [];
-  return new P.convertNativeToDart_AcceptStructuredClone_walk(mustCopy, new P.convertNativeToDart_AcceptStructuredClone_findSlot([], copies), new P.convertNativeToDart_AcceptStructuredClone_readSlot(copies), new P.convertNativeToDart_AcceptStructuredClone_writeSlot(copies)).call$1(object);
-},
-
-convertNativeToDart_AcceptStructuredClone_findSlot: {"": "Closure;values_0,copies_1",
-  call$1: function(value) {
-    var t1, $length, i, t2;
-    t1 = this.values_0;
-    $length = t1.length;
-    for (i = 0; i < $length; ++i) {
-      t2 = t1[i];
-      if (t2 == null ? value == null : t2 === value)
-        return i;
-    }
-    t1.push(value);
-    this.copies_1.push(null);
-    return $length;
-  },
-  $is_args1: true
-},
-
-convertNativeToDart_AcceptStructuredClone_readSlot: {"": "Closure;copies_2",
-  call$1: function(i) {
-    var t1 = this.copies_2;
-    if (i >>> 0 !== i || i >= t1.length)
-      throw H.ioore(t1, i);
-    return t1[i];
-  },
-  $is_args1: true
-},
-
-convertNativeToDart_AcceptStructuredClone_writeSlot: {"": "Closure;copies_3",
-  call$2: function(i, x) {
-    var t1 = this.copies_3;
-    if (i >>> 0 !== i || i >= t1.length)
-      throw H.ioore(t1, i);
-    t1[i] = x;
-  },
-  $is_args2: true
-},
-
-convertNativeToDart_AcceptStructuredClone_walk: {"": "Closure;mustCopy_4,findSlot_5,readSlot_6,writeSlot_7",
-  call$1: function(e) {
-    var slot, copy, t1, key, $length, t2, i;
-    if (e == null)
-      return e;
-    if (typeof e === "boolean")
-      return e;
-    if (typeof e === "number")
-      return e;
-    if (typeof e === "string")
-      return e;
-    if (e instanceof Date)
-      return P.convertNativeToDart_DateTime(e);
-    if (e instanceof RegExp)
-      throw H.wrapException(P.UnimplementedError$("structured clone of RegExp"));
-    if (Object.getPrototypeOf(e) === Object.prototype) {
-      slot = this.findSlot_5.call$1(e);
-      copy = this.readSlot_6.call$1(slot);
-      if (copy != null)
-        return copy;
-      copy = H.fillLiteralMap([], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
-      this.writeSlot_7.call$2(slot, copy);
-      for (t1 = Object.keys(e), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        key = t1._current;
-        copy.$indexSet(copy, key, this.call$1(e[key]));
-      }
-      return copy;
-    }
-    if (e instanceof Array) {
-      slot = this.findSlot_5.call$1(e);
-      copy = this.readSlot_6.call$1(slot);
-      if (copy != null)
-        return copy;
-      t1 = J.getInterceptor$asx(e);
-      $length = t1.get$length(e);
-      copy = this.mustCopy_4 ? new Array($length) : e;
-      this.writeSlot_7.call$2(slot, copy);
-      if (typeof $length !== "number")
-        throw H.iae($length);
-      t2 = J.getInterceptor$ax(copy);
-      i = 0;
-      for (; i < $length; ++i)
-        t2.$indexSet(copy, i, this.call$1(t1.$index(e, i)));
-      return copy;
-    }
-    return e;
-  },
-  $is_args1: true
-}}],
 ["sound", "sound.dart", , Q, {
-SoundManager: {"": "Object;_audioContext,_gainNode,_map,soundOn",
+SoundManager: {"": "Object;_map,soundOn,mediaType",
   put$2: function(key, filename) {
-    var t1, comp, xhr, t2;
-    t1 = null;
-    comp = new P._AsyncCompleter(P._Future$(t1));
-    H.setRuntimeTypeInfo(comp, [t1]);
-    if (this._audioContext != null) {
-      xhr = new XMLHttpRequest();
-      C.HttpRequest_methods.open$2(xhr, "GET", filename);
-      xhr.responseType = "arraybuffer";
-      t1 = new W._EventStream(xhr, C.EventStreamProvider_load._eventType, false);
-      H.setRuntimeTypeInfo(t1, [null]);
-      t2 = new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new Q.SoundManager_put_closure(this, key, filename, comp, xhr)), t1._useCapture);
-      H.setRuntimeTypeInfo(t2, [H.getRuntimeTypeArgument(t1, "_EventStream", 0)]);
-      t2._tryResume$0();
-      t2 = new W._EventStream(xhr, C.EventStreamProvider_error._eventType, false);
-      H.setRuntimeTypeInfo(t2, [null]);
-      t1 = new W._EventStreamSubscription(0, t2._target, t2._eventType, W._wrapZone(new Q.SoundManager_put_closure0(comp)), t2._useCapture);
-      H.setRuntimeTypeInfo(t1, [H.getRuntimeTypeArgument(t2, "_EventStream", 0)]);
-      t1._tryResume$0();
-      xhr.send();
-    } else
-      P.Timer_Timer(C.Duration_0, new Q.SoundManager_put_closure1(key, comp));
+    var t1, t2, comp, audio;
+    t1 = {};
+    t1.filename_0 = filename;
+    t1.filename_0 = t1.filename_0 + "." + this.mediaType;
+    t2 = null;
+    comp = new P._AsyncCompleter(P._Future$(t2));
+    H.setRuntimeTypeInfo(comp, [t2]);
+    audio = W.AudioElement_AudioElement(t1.filename_0);
+    t2 = new W._ElementEventStreamImpl(audio, C.EventStreamProvider_loadeddata._eventType, false);
+    H.setRuntimeTypeInfo(t2, [null]);
+    t1 = new W._EventStreamSubscription(0, t2._target, t2._eventType, W._wrapZone(new Q.SoundManager_put_closure(t1, key, comp)), t2._useCapture);
+    H.setRuntimeTypeInfo(t1, [H.getRuntimeTypeArgument(t2, "_EventStream", 0)]);
+    t1._tryResume$0();
+    t1 = this._map;
+    t1.$indexSet(t1, key, audio);
     return comp.future;
   },
   play$1: function(_, key) {
-    var source, t1, exception;
-    if (this.soundOn && this._audioContext != null)
-      try {
-        source = this._audioContext.createBufferSource();
-        source.connect(this._gainNode, 0, 0);
-        t1 = this._map;
-        source.buffer = t1.$index(t1, key);
-        C.AudioBufferSourceNode_methods.start$1(source, 0);
-      } catch (exception) {
-        H.unwrapException(exception);
-        this._audioContext = null;
-      }
-
+    var t1;
+    if (this.soundOn && this.mediaType != null) {
+      t1 = this._map;
+      J.play$0$x(t1.$index(t1, key));
+    }
   },
   SoundManager$0: function() {
-    var exception;
-    try {
-      this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      this._gainNode = J.createGain$0$x(this._audioContext);
-      this._gainNode.connect(this._audioContext.destination, 0, 0);
-    } catch (exception) {
-      H.unwrapException(exception);
-      P.print("SoundManager : This browser is unsupported AudioContext.");
+    var t1, a, t2;
+    t1 = H.JSSyntaxRegExp_makeNative("(probably|maybe)", false, true, false);
+    a = W.AudioElement_AudioElement("");
+    t2 = a.canPlayType("audio/ogg");
+    t1 = new H.JSSyntaxRegExp(t1, null, null)._nativeRegExp;
+    if (typeof t2 !== "string")
+      H.throwExpression(new P.ArgumentError(t2));
+    if (t1.test(t2))
+      this.mediaType = "ogg";
+    else {
+      t2 = a.canPlayType("audio/mp3");
+      if (typeof t2 !== "string")
+        H.throwExpression(new P.ArgumentError(t2));
+      if (t1.test(t2))
+        this.mediaType = "mp3";
     }
-
+    P.print("SoundMediaType is " + this.mediaType);
   },
   static: {
 SoundManager$: function() {
-  var t1 = new Q.SoundManager(null, null, P.LinkedHashMap_LinkedHashMap(null, null, null, null, null), false);
+  var t1 = new Q.SoundManager(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null), false, null);
   t1.SoundManager$0();
   return t1;
 }}
 
 },
 
-SoundManager_put_closure: {"": "Closure;this_0,key_1,filename_2,comp_3,xhr_4",
+SoundManager_put_closure: {"": "Closure;box_0,key_1,comp_2",
   call$1: function(e) {
-    var t1, t2;
-    t1 = this.this_0;
-    t2 = this.comp_3;
-    J.decodeAudioData$1$x(t1._audioContext, W._convertNativeToDart_XHR_Response(this.xhr_4.response)).then$1(new Q.SoundManager_put__closure(t1, this.key_1, this.filename_2, t2)).catchError$1(new Q.SoundManager_put__closure0(t2));
-  },
-  $is_args1: true
-},
-
-SoundManager_put__closure: {"": "Closure;this_5,key_6,filename_7,comp_8",
-  call$1: function(buffer) {
-    var t1, t2;
-    t1 = this.this_5._map;
-    t2 = this.key_6;
-    t1.$indexSet(t1, t2, buffer);
-    P.print("loaded " + this.filename_7);
-    t1 = this.comp_8.future;
+    var t1;
+    P.print("loaded " + this.box_0.filename_0);
+    t1 = this.comp_2.future;
     if (t1._state !== 0)
       H.throwExpression(P.StateError$("Future already completed"));
-    t1._asyncComplete$1(t2);
+    t1._asyncComplete$1(this.key_1);
   },
   $is_args1: true
 },
 
-SoundManager_put__closure0: {"": "Closure;comp_9",
-  call$1: function(error) {
-    this.comp_9.completeError$1(error);
-  },
-  $is_args1: true
-},
-
-SoundManager_put_closure0: {"": "Closure;comp_10",
+SoundManager_put_closure0: {"": "Closure;comp_3",
   call$1: function(e) {
-    return this.comp_10.completeError$1(e);
+    this.comp_3.completeError$1(e);
   },
   $is_args1: true
-},
-
-SoundManager_put_closure1: {"": "Closure;key_11,comp_12",
-  call$0: function() {
-    var t1 = this.comp_12.future;
-    if (t1._state !== 0)
-      H.throwExpression(P.StateError$("Future already completed"));
-    t1._asyncComplete$1(this.key_11);
-  },
-  $is_void_: true
 }}],
 ["tankgame", "tankgame.dart", , X, {
 resultToScore: function(hit, fire, stage) {
@@ -8782,9 +8459,9 @@ main_closure: {"": "Closure;",
     t1.put$2("star01", "./img/star01.png");
     t1.put$2("ball01", "./img/ball01.png");
     t1.put$2("gamestart", "./img/gamestart.png");
-    $.get$geng().soundManager.put$2("bell", "./sound/xmasbell.ogg");
-    $.get$geng().soundManager.put$2("fire", "./sound/bag.ogg");
-    $.get$geng().soundManager.put$2("bomb", "./sound/pyo.ogg");
+    $.get$geng().soundManager.put$2("bell", "./sound/xmasbell");
+    $.get$geng().soundManager.put$2("fire", "./sound/bag");
+    $.get$geng().soundManager.put$2("bomb", "./sound/pyo");
     $.get$geng().hiscoreManager.init$0();
     $.get$gamePointManager().init$0();
     sound = window.localStorage.getItem("sound") == null || window.localStorage.getItem("sound") === "true";
@@ -8977,7 +8654,7 @@ ConfigSetting: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackR
     sound.onInit$0();
     t1 = this.btnList;
     t1.add$1(t1, sound);
-    if ($.get$geng().soundManager._audioContext == null) {
+    if ($.get$geng().soundManager.mediaType == null) {
       sound.text = "\u30b5\u30a6\u30f3\u30c9\u975e\u5bfe\u5fdc\u30d6\u30e9\u30a6\u30b6";
       sound.isEnable = false;
     }
@@ -10142,9 +9819,6 @@ J.JSNumber.$asComparable = [J.JSNumber];
 J.JSNumber.$isObject = true;
 P.Object.$isObject = true;
 P._SplayTreeNode.$isObject = true;
-W.ProgressEvent.$isObject = true;
-P.AudioBuffer.$isAudioBuffer = true;
-P.AudioBuffer.$isObject = true;
 W.Event.$isObject = true;
 W.MouseEvent.$isMouseEvent = true;
 W.MouseEvent.$isObject = true;
@@ -10276,7 +9950,6 @@ J.getInterceptor$x = function(receiver) {
     return receiver;
   return J.getNativeInterceptor(receiver);
 };
-C.AudioBufferSourceNode_methods = P.AudioBufferSourceNode.prototype;
 C.C__DelayedDone = new P._DelayedDone();
 C.C__Random = new P._Random();
 C.C__RootZone = new P._RootZone();
@@ -10289,9 +9962,8 @@ C.Duration_2000000 = new P.Duration(2000000);
 C.Duration_400000 = new P.Duration(400000);
 C.Duration_50000 = new P.Duration(50000);
 C.Duration_500000 = new P.Duration(500000);
-C.EventStreamProvider_error = new W.EventStreamProvider("error");
 C.EventStreamProvider_load = new W.EventStreamProvider("load");
-C.EventStreamProvider_load0 = new W.EventStreamProvider("load");
+C.EventStreamProvider_loadeddata = new W.EventStreamProvider("loadeddata");
 C.EventStreamProvider_mousedown = new W.EventStreamProvider("mousedown");
 C.EventStreamProvider_mousemove = new W.EventStreamProvider("mousemove");
 C.EventStreamProvider_mouseout = new W.EventStreamProvider("mouseout");
@@ -10299,7 +9971,6 @@ C.EventStreamProvider_mouseup = new W.EventStreamProvider("mouseup");
 C.EventStreamProvider_touchend = new W.EventStreamProvider("touchend");
 C.EventStreamProvider_touchmove = new W.EventStreamProvider("touchmove");
 C.EventStreamProvider_touchstart = new W.EventStreamProvider("touchstart");
-C.HttpRequest_methods = W.HttpRequest.prototype;
 C.JSArray_methods = J.JSArray.prototype;
 C.JSInt_methods = J.JSInt.prototype;
 C.JSNumber_methods = J.JSNumber.prototype;
@@ -10520,12 +10191,6 @@ J.compareTo$1$ns = function(receiver, a0) {
 J.containsKey$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).containsKey$1(receiver, a0);
 };
-J.createGain$0$x = function(receiver) {
-  return J.getInterceptor$x(receiver).createGain$0(receiver);
-};
-J.decodeAudioData$1$x = function(receiver, a0) {
-  return J.getInterceptor$x(receiver).decodeAudioData$1(receiver, a0);
-};
 J.fillText$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).fillText$3(receiver, a0, a1, a2);
 };
@@ -10556,6 +10221,9 @@ J.get$length$asx = function(receiver) {
 J.get$values$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$values(receiver);
 };
+J.play$0$x = function(receiver) {
+  return J.getInterceptor$x(receiver).play$0(receiver);
+};
 J.preventDefault$0$x = function(receiver) {
   return J.getInterceptor$x(receiver).preventDefault$0(receiver);
 };
@@ -10564,9 +10232,6 @@ J.remove$1$ax = function(receiver, a0) {
 };
 J.removeEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).removeEventListener$3(receiver, a0, a1, a2);
-};
-J.send$1$x = function(receiver, a0) {
-  return J.getInterceptor$x(receiver).send$1(receiver, a0);
 };
 J.set$height$x = function(receiver, value) {
   return J.getInterceptor$x(receiver).set$height(receiver, value);
@@ -11183,15 +10848,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   BeforeUnloadEvent.prototype = $desc;
-  function Blob() {
-  }
-  Blob.builtin$cls = "Blob";
-  if (!"name" in Blob)
-    Blob.name = "Blob";
-  $desc = $collectedClasses.Blob;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Blob.prototype = $desc;
   function BodyElement() {
   }
   BodyElement.builtin$cls = "BodyElement";
@@ -11522,15 +11178,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FieldSetElement.prototype = $desc;
-  function File() {
-  }
-  File.builtin$cls = "File";
-  if (!"name" in File)
-    File.name = "File";
-  $desc = $collectedClasses.File;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  File.prototype = $desc;
   function FileError() {
   }
   FileError.builtin$cls = "FileError";
@@ -11615,27 +11262,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   HtmlHtmlElement.prototype = $desc;
-  function HttpRequest() {
-  }
-  HttpRequest.builtin$cls = "HttpRequest";
-  if (!"name" in HttpRequest)
-    HttpRequest.name = "HttpRequest";
-  $desc = $collectedClasses.HttpRequest;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequest.prototype = $desc;
-  HttpRequest.prototype.get$status = function(receiver) {
-    return receiver.status;
-  };
-  function HttpRequestEventTarget() {
-  }
-  HttpRequestEventTarget.builtin$cls = "HttpRequestEventTarget";
-  if (!"name" in HttpRequestEventTarget)
-    HttpRequestEventTarget.name = "HttpRequestEventTarget";
-  $desc = $collectedClasses.HttpRequestEventTarget;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequestEventTarget.prototype = $desc;
   function IFrameElement() {
   }
   IFrameElement.builtin$cls = "IFrameElement";
@@ -13592,54 +13218,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _SVGVKernElement.prototype = $desc;
-  function AudioBuffer() {
-  }
-  AudioBuffer.builtin$cls = "AudioBuffer";
-  if (!"name" in AudioBuffer)
-    AudioBuffer.name = "AudioBuffer";
-  $desc = $collectedClasses.AudioBuffer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioBuffer.prototype = $desc;
-  AudioBuffer.prototype.get$length = function(receiver) {
-    return receiver.length;
-  };
-  function AudioBufferSourceNode() {
-  }
-  AudioBufferSourceNode.builtin$cls = "AudioBufferSourceNode";
-  if (!"name" in AudioBufferSourceNode)
-    AudioBufferSourceNode.name = "AudioBufferSourceNode";
-  $desc = $collectedClasses.AudioBufferSourceNode;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioBufferSourceNode.prototype = $desc;
-  function AudioContext() {
-  }
-  AudioContext.builtin$cls = "AudioContext";
-  if (!"name" in AudioContext)
-    AudioContext.name = "AudioContext";
-  $desc = $collectedClasses.AudioContext;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioContext.prototype = $desc;
-  function AudioDestinationNode() {
-  }
-  AudioDestinationNode.builtin$cls = "AudioDestinationNode";
-  if (!"name" in AudioDestinationNode)
-    AudioDestinationNode.name = "AudioDestinationNode";
-  $desc = $collectedClasses.AudioDestinationNode;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioDestinationNode.prototype = $desc;
-  function AudioNode() {
-  }
-  AudioNode.builtin$cls = "AudioNode";
-  if (!"name" in AudioNode)
-    AudioNode.name = "AudioNode";
-  $desc = $collectedClasses.AudioNode;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioNode.prototype = $desc;
   function AudioProcessingEvent() {
   }
   AudioProcessingEvent.builtin$cls = "AudioProcessingEvent";
@@ -13649,24 +13227,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   AudioProcessingEvent.prototype = $desc;
-  function AudioSourceNode() {
-  }
-  AudioSourceNode.builtin$cls = "AudioSourceNode";
-  if (!"name" in AudioSourceNode)
-    AudioSourceNode.name = "AudioSourceNode";
-  $desc = $collectedClasses.AudioSourceNode;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioSourceNode.prototype = $desc;
-  function GainNode() {
-  }
-  GainNode.builtin$cls = "GainNode";
-  if (!"name" in GainNode)
-    GainNode.name = "GainNode";
-  $desc = $collectedClasses.GainNode;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GainNode.prototype = $desc;
   function OfflineAudioCompletionEvent() {
   }
   OfflineAudioCompletionEvent.builtin$cls = "OfflineAudioCompletionEvent";
@@ -13676,15 +13236,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   OfflineAudioCompletionEvent.prototype = $desc;
-  function OfflineAudioContext() {
-  }
-  OfflineAudioContext.builtin$cls = "OfflineAudioContext";
-  if (!"name" in OfflineAudioContext)
-    OfflineAudioContext.name = "OfflineAudioContext";
-  $desc = $collectedClasses.OfflineAudioContext;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OfflineAudioContext.prototype = $desc;
   function ContextEvent() {
   }
   ContextEvent.builtin$cls = "ContextEvent";
@@ -13703,15 +13254,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SqlError.prototype = $desc;
-  function ByteBuffer() {
-  }
-  ByteBuffer.builtin$cls = "ByteBuffer";
-  if (!"name" in ByteBuffer)
-    ByteBuffer.name = "ByteBuffer";
-  $desc = $collectedClasses.ByteBuffer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ByteBuffer.prototype = $desc;
   function TypedData() {
   }
   TypedData.builtin$cls = "TypedData";
@@ -14438,6 +13980,18 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   initHooks_closure1.prototype = $desc;
+  function JSSyntaxRegExp(_nativeRegExp, _nativeGlobalRegExp, _nativeAnchoredRegExp) {
+    this._nativeRegExp = _nativeRegExp;
+    this._nativeGlobalRegExp = _nativeGlobalRegExp;
+    this._nativeAnchoredRegExp = _nativeAnchoredRegExp;
+  }
+  JSSyntaxRegExp.builtin$cls = "JSSyntaxRegExp";
+  if (!"name" in JSSyntaxRegExp)
+    JSSyntaxRegExp.name = "JSSyntaxRegExp";
+  $desc = $collectedClasses.JSSyntaxRegExp;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  JSSyntaxRegExp.prototype = $desc;
   function ListIterator(_iterable, _dev$_length, _index, _current) {
     this._iterable = _iterable;
     this._dev$_length = _dev$_length;
@@ -15655,47 +15209,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Comparable.prototype = $desc;
-  function DateTime(millisecondsSinceEpoch, isUtc) {
-    this.millisecondsSinceEpoch = millisecondsSinceEpoch;
-    this.isUtc = isUtc;
-  }
-  DateTime.builtin$cls = "DateTime";
-  if (!"name" in DateTime)
-    DateTime.name = "DateTime";
-  $desc = $collectedClasses.DateTime;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DateTime.prototype = $desc;
-  DateTime.prototype.get$millisecondsSinceEpoch = function() {
-    return this.millisecondsSinceEpoch;
-  };
-  function DateTime_toString_fourDigits() {
-  }
-  DateTime_toString_fourDigits.builtin$cls = "DateTime_toString_fourDigits";
-  if (!"name" in DateTime_toString_fourDigits)
-    DateTime_toString_fourDigits.name = "DateTime_toString_fourDigits";
-  $desc = $collectedClasses.DateTime_toString_fourDigits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DateTime_toString_fourDigits.prototype = $desc;
-  function DateTime_toString_threeDigits() {
-  }
-  DateTime_toString_threeDigits.builtin$cls = "DateTime_toString_threeDigits";
-  if (!"name" in DateTime_toString_threeDigits)
-    DateTime_toString_threeDigits.name = "DateTime_toString_threeDigits";
-  $desc = $collectedClasses.DateTime_toString_threeDigits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DateTime_toString_threeDigits.prototype = $desc;
-  function DateTime_toString_twoDigits() {
-  }
-  DateTime_toString_twoDigits.builtin$cls = "DateTime_toString_twoDigits";
-  if (!"name" in DateTime_toString_twoDigits)
-    DateTime_toString_twoDigits.name = "DateTime_toString_twoDigits";
-  $desc = $collectedClasses.DateTime_toString_twoDigits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DateTime_toString_twoDigits.prototype = $desc;
   function Duration(_duration) {
     this._duration = _duration;
   }
@@ -16016,10 +15529,7 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   EventStreamProvider.prototype = $desc;
-  function _EventStream(_target, _eventType, _useCapture) {
-    this._target = _target;
-    this._eventType = _eventType;
-    this._useCapture = _useCapture;
+  function _EventStream() {
   }
   _EventStream.builtin$cls = "_EventStream";
   if (!"name" in _EventStream)
@@ -16076,26 +15586,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FixedSizeListIterator.prototype = $desc;
-  function AudioContext_decodeAudioData_closure(completer_0) {
-    this.completer_0 = completer_0;
-  }
-  AudioContext_decodeAudioData_closure.builtin$cls = "AudioContext_decodeAudioData_closure";
-  if (!"name" in AudioContext_decodeAudioData_closure)
-    AudioContext_decodeAudioData_closure.name = "AudioContext_decodeAudioData_closure";
-  $desc = $collectedClasses.AudioContext_decodeAudioData_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioContext_decodeAudioData_closure.prototype = $desc;
-  function AudioContext_decodeAudioData_closure0(completer_1) {
-    this.completer_1 = completer_1;
-  }
-  AudioContext_decodeAudioData_closure0.builtin$cls = "AudioContext_decodeAudioData_closure0";
-  if (!"name" in AudioContext_decodeAudioData_closure0)
-    AudioContext_decodeAudioData_closure0.name = "AudioContext_decodeAudioData_closure0";
-  $desc = $collectedClasses.AudioContext_decodeAudioData_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioContext_decodeAudioData_closure0.prototype = $desc;
   function ReceivePort() {
   }
   ReceivePort.builtin$cls = "ReceivePort";
@@ -16810,55 +16300,10 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Sprite.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_findSlot(values_0, copies_1) {
-    this.values_0 = values_0;
-    this.copies_1 = copies_1;
-  }
-  convertNativeToDart_AcceptStructuredClone_findSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_findSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_findSlot)
-    convertNativeToDart_AcceptStructuredClone_findSlot.name = "convertNativeToDart_AcceptStructuredClone_findSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_findSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_findSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_readSlot(copies_2) {
-    this.copies_2 = copies_2;
-  }
-  convertNativeToDart_AcceptStructuredClone_readSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_readSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_readSlot)
-    convertNativeToDart_AcceptStructuredClone_readSlot.name = "convertNativeToDart_AcceptStructuredClone_readSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_readSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_readSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_writeSlot(copies_3) {
-    this.copies_3 = copies_3;
-  }
-  convertNativeToDart_AcceptStructuredClone_writeSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_writeSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_writeSlot)
-    convertNativeToDart_AcceptStructuredClone_writeSlot.name = "convertNativeToDart_AcceptStructuredClone_writeSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_writeSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_writeSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_walk(mustCopy_4, findSlot_5, readSlot_6, writeSlot_7) {
-    this.mustCopy_4 = mustCopy_4;
-    this.findSlot_5 = findSlot_5;
-    this.readSlot_6 = readSlot_6;
-    this.writeSlot_7 = writeSlot_7;
-  }
-  convertNativeToDart_AcceptStructuredClone_walk.builtin$cls = "convertNativeToDart_AcceptStructuredClone_walk";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_walk)
-    convertNativeToDart_AcceptStructuredClone_walk.name = "convertNativeToDart_AcceptStructuredClone_walk";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_walk;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_walk.prototype = $desc;
-  function SoundManager(_audioContext, _gainNode, _map, soundOn) {
-    this._audioContext = _audioContext;
-    this._gainNode = _gainNode;
+  function SoundManager(_map, soundOn, mediaType) {
     this._map = _map;
     this.soundOn = soundOn;
+    this.mediaType = mediaType;
   }
   SoundManager.builtin$cls = "SoundManager";
   if (!"name" in SoundManager)
@@ -16867,12 +16312,10 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SoundManager.prototype = $desc;
-  function SoundManager_put_closure(this_0, key_1, filename_2, comp_3, xhr_4) {
-    this.this_0 = this_0;
+  function SoundManager_put_closure(box_0, key_1, comp_2) {
+    this.box_0 = box_0;
     this.key_1 = key_1;
-    this.filename_2 = filename_2;
-    this.comp_3 = comp_3;
-    this.xhr_4 = xhr_4;
+    this.comp_2 = comp_2;
   }
   SoundManager_put_closure.builtin$cls = "SoundManager_put_closure";
   if (!"name" in SoundManager_put_closure)
@@ -16881,31 +16324,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SoundManager_put_closure.prototype = $desc;
-  function SoundManager_put__closure(this_5, key_6, filename_7, comp_8) {
-    this.this_5 = this_5;
-    this.key_6 = key_6;
-    this.filename_7 = filename_7;
-    this.comp_8 = comp_8;
-  }
-  SoundManager_put__closure.builtin$cls = "SoundManager_put__closure";
-  if (!"name" in SoundManager_put__closure)
-    SoundManager_put__closure.name = "SoundManager_put__closure";
-  $desc = $collectedClasses.SoundManager_put__closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SoundManager_put__closure.prototype = $desc;
-  function SoundManager_put__closure0(comp_9) {
-    this.comp_9 = comp_9;
-  }
-  SoundManager_put__closure0.builtin$cls = "SoundManager_put__closure0";
-  if (!"name" in SoundManager_put__closure0)
-    SoundManager_put__closure0.name = "SoundManager_put__closure0";
-  $desc = $collectedClasses.SoundManager_put__closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SoundManager_put__closure0.prototype = $desc;
-  function SoundManager_put_closure0(comp_10) {
-    this.comp_10 = comp_10;
+  function SoundManager_put_closure0(comp_3) {
+    this.comp_3 = comp_3;
   }
   SoundManager_put_closure0.builtin$cls = "SoundManager_put_closure0";
   if (!"name" in SoundManager_put_closure0)
@@ -16914,17 +16334,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SoundManager_put_closure0.prototype = $desc;
-  function SoundManager_put_closure1(key_11, comp_12) {
-    this.key_11 = key_11;
-    this.comp_12 = comp_12;
-  }
-  SoundManager_put_closure1.builtin$cls = "SoundManager_put_closure1";
-  if (!"name" in SoundManager_put_closure1)
-    SoundManager_put_closure1.name = "SoundManager_put_closure1";
-  $desc = $collectedClasses.SoundManager_put_closure1;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SoundManager_put_closure1.prototype = $desc;
   function GamePointManager(_point, _unlocked, unlockPoints) {
     this._point = _point;
     this._unlocked = _unlocked;
@@ -17662,5 +17071,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Closure$21.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CanvasGradient, CanvasPattern, CanvasRenderingContext, CanvasRenderingContext2D, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DocumentType, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, Storage, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, Touch, TouchEvent, TouchList, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _Entity, _HTMLAppletElement, _HTMLBaseFontElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioBuffer, AudioBufferSourceNode, AudioContext, AudioDestinationNode, AudioNode, AudioProcessingEvent, AudioSourceNode, GainNode, OfflineAudioCompletionEvent, OfflineAudioContext, ContextEvent, SqlError, ByteBuffer, TypedData, Uint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _NativeJsSendPort_send__closure, _WorkerSendPort, _WorkerSendPort_send_closure, ReceivePortImpl, BoundClosure$i0, _waitForPendingPorts_closure, _PendingSendPortFinder, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, BoundClosure$1, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, TimerImpl$periodic_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, BoundClosure, CastErrorImplementation, initHooks_closure, initHooks_closure0, initHooks_closure1, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, FixedLengthListMixin, _AsyncError, Future, Future_wait_handleError, Future_wait_closure, _Completer, _AsyncCompleter, _Future, BoundClosure$2, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_closure, _Future__propagateToListeners_closure0, _Future__propagateToListeners__closure, _Future__propagateToListeners__closure0, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, BoundClosure$0, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _SplayTreeNode, _SplayTreeMapNode, _SplayTree, SplayTreeMap, SplayTreeMap_closure, _SplayTreeIterator, _SplayTreeKeyIterable, _SplayTreeValueIterable, _SplayTreeKeyIterator, _SplayTreeValueIterator, _SplayTreeNodeIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Converter, JsonUnsupportedObjectError, JsonCyclicError, JsonEncoder, JsonDecoder, _JsonStringifier, _JsonStringifier_stringifyJsonValue_closure, NoSuchMethodError_toString_closure, Comparable, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, Iterable, Iterator, Null, Object, StackTrace, Stopwatch, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Storage_keys_closure, Storage_values_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, AudioContext_decodeAudioData_closure, AudioContext_decodeAudioData_closure0, ReceivePort, _Random, Point, _RectangleBase, Rectangle, TypedData_ListMixin, TypedData_ListMixin_FixedLengthListMixin, TextRender, Color, GCanvas2D, GCanvas2D_drawTexts_closure, GCanvas2D_drawTexts_closure0, GCanvas2D_drawTexts_closure1, GCanvas2D_drawTexts_closure2, DefaultButtonRender, BoundClosure$20, GPInfo, GObj, GButton, GButton_onPrepareRender_closure, ButtonList, ButtonList_onPress_closure, ButtonList_onPress_closure0, ButtonList_onRelease_closure, ButtonList_onRelease_closure0, ButtonList_onMouseMove_closure, ButtonList_onMouseMove_closure0, GScreen, PressEvent, RenderList, RenderList_closure, RenderList_renderAll_closure, ImageMap, ImageMap_put_closure, GObjList, GObjList_gcObj_closure, GObjList_disposeAll_closure, GObjList_processAll_closure, GObjList_prepareRenderAll_closure, GObjList_where_closure, GObjList_where_closure0, GEng, GEng_screen_closure, GEng_initField_closure, GEng_initField_closure0, GEng_initField_closure1, GEng_initField_closure2, GEng_initField_closure3, GEng_initField_closure4, GEng_initField_closure5, GEng_startTimer_closure, HiScoreManager, FrameTimer, FrameTimer_start_closure, FrameTimer_next_closure, FPSCounter, ImageSprite, ImageSprite_closure, Sprite, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, SoundManager, SoundManager_put_closure, SoundManager_put__closure, SoundManager_put__closure0, SoundManager_put_closure0, SoundManager_put_closure1, GamePointManager, GamePointManager__updateUnlockSet_closure, main_closure, Title, Title_onStart_closure, Title_onStart_closure0, Title_onStart_closure1, Title_onStart_closure2, StageSelect, StageSelect_onStart_closure, StageSelect_onStart__closure0, StageSelect_onStart_closure0, StageSelect_onStart__closure, StageSelect_onStart_closure1, StageSelect_onStart_closure2, ConfigSetting, ConfigSetting_onStart_closure, ConfigSetting_onStart_closure0, ConfigSetting_onStart_closure1, ConfigSetting_onStart_closure2, TankGame, TankGame_onStart_closure, TankGame_onStart_closure0, TankGame_onStart_closure1, TankGame_onStart_closure2, TankGame_onEndOfStage_closure, TankGame_onEndOfStage_closure0, TankGame_onEndOfStage__closure1, TankGame_onEndOfStage_closure1, TankGame_onEndOfStage_closure2, TankGame_onEndOfStage__closure0, TankGame_onEndOfStage_closure3, TankGame_onEndOfStage_closure4, TankGame_onEndOfStage__closure, TankGame_onEndOfStage_closure5, TankGamePracticely, TankGamePracticely_onEndOfStage_closure, TankGamePracticely_onEndOfStage_closure0, TankGamePracticely_onEndOfStage_closure1, FireButton, FireButton_fire_closure, FireButton_startCharge_closure, FireButton_startCharge__closure, GameStartLogo, GameStartLogo_onPrepareRender_closure, Tank, Tank_onInit_closure, Cannonball, Cannonball_onProcess_closure, Cannonball_onProcess_closure0, Target, Target_onPrepareRender_closure, Bomb, Bomb_onInit_closure, Ground, Ground_onPrepareRender_closure, Ground_onPrepareRender__closure, Ground_onPrepareRender__closure0, Smoke, Vector, Closure$2, Closure$1, Closure$0, Closure$7, Closure$21];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CanvasGradient, CanvasPattern, CanvasRenderingContext, CanvasRenderingContext2D, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DocumentType, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, Storage, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, Touch, TouchEvent, TouchList, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _Entity, _HTMLAppletElement, _HTMLBaseFontElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, TypedData, Uint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _NativeJsSendPort_send__closure, _WorkerSendPort, _WorkerSendPort_send_closure, ReceivePortImpl, BoundClosure$i0, _waitForPendingPorts_closure, _PendingSendPortFinder, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, BoundClosure$1, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, TimerImpl$periodic_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, BoundClosure, CastErrorImplementation, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, FixedLengthListMixin, _AsyncError, Future, Future_wait_handleError, Future_wait_closure, _Completer, _AsyncCompleter, _Future, BoundClosure$2, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_closure, _Future__propagateToListeners_closure0, _Future__propagateToListeners__closure, _Future__propagateToListeners__closure0, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, BoundClosure$0, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _SplayTreeNode, _SplayTreeMapNode, _SplayTree, SplayTreeMap, SplayTreeMap_closure, _SplayTreeIterator, _SplayTreeKeyIterable, _SplayTreeValueIterable, _SplayTreeKeyIterator, _SplayTreeValueIterator, _SplayTreeNodeIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Converter, JsonUnsupportedObjectError, JsonCyclicError, JsonEncoder, JsonDecoder, _JsonStringifier, _JsonStringifier_stringifyJsonValue_closure, NoSuchMethodError_toString_closure, Comparable, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, Iterable, Iterator, Null, Object, StackTrace, Stopwatch, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Storage_keys_closure, Storage_values_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, ReceivePort, _Random, Point, _RectangleBase, Rectangle, TypedData_ListMixin, TypedData_ListMixin_FixedLengthListMixin, TextRender, Color, GCanvas2D, GCanvas2D_drawTexts_closure, GCanvas2D_drawTexts_closure0, GCanvas2D_drawTexts_closure1, GCanvas2D_drawTexts_closure2, DefaultButtonRender, BoundClosure$20, GPInfo, GObj, GButton, GButton_onPrepareRender_closure, ButtonList, ButtonList_onPress_closure, ButtonList_onPress_closure0, ButtonList_onRelease_closure, ButtonList_onRelease_closure0, ButtonList_onMouseMove_closure, ButtonList_onMouseMove_closure0, GScreen, PressEvent, RenderList, RenderList_closure, RenderList_renderAll_closure, ImageMap, ImageMap_put_closure, GObjList, GObjList_gcObj_closure, GObjList_disposeAll_closure, GObjList_processAll_closure, GObjList_prepareRenderAll_closure, GObjList_where_closure, GObjList_where_closure0, GEng, GEng_screen_closure, GEng_initField_closure, GEng_initField_closure0, GEng_initField_closure1, GEng_initField_closure2, GEng_initField_closure3, GEng_initField_closure4, GEng_initField_closure5, GEng_startTimer_closure, HiScoreManager, FrameTimer, FrameTimer_start_closure, FrameTimer_next_closure, FPSCounter, ImageSprite, ImageSprite_closure, Sprite, SoundManager, SoundManager_put_closure, SoundManager_put_closure0, GamePointManager, GamePointManager__updateUnlockSet_closure, main_closure, Title, Title_onStart_closure, Title_onStart_closure0, Title_onStart_closure1, Title_onStart_closure2, StageSelect, StageSelect_onStart_closure, StageSelect_onStart__closure0, StageSelect_onStart_closure0, StageSelect_onStart__closure, StageSelect_onStart_closure1, StageSelect_onStart_closure2, ConfigSetting, ConfigSetting_onStart_closure, ConfigSetting_onStart_closure0, ConfigSetting_onStart_closure1, ConfigSetting_onStart_closure2, TankGame, TankGame_onStart_closure, TankGame_onStart_closure0, TankGame_onStart_closure1, TankGame_onStart_closure2, TankGame_onEndOfStage_closure, TankGame_onEndOfStage_closure0, TankGame_onEndOfStage__closure1, TankGame_onEndOfStage_closure1, TankGame_onEndOfStage_closure2, TankGame_onEndOfStage__closure0, TankGame_onEndOfStage_closure3, TankGame_onEndOfStage_closure4, TankGame_onEndOfStage__closure, TankGame_onEndOfStage_closure5, TankGamePracticely, TankGamePracticely_onEndOfStage_closure, TankGamePracticely_onEndOfStage_closure0, TankGamePracticely_onEndOfStage_closure1, FireButton, FireButton_fire_closure, FireButton_startCharge_closure, FireButton_startCharge__closure, GameStartLogo, GameStartLogo_onPrepareRender_closure, Tank, Tank_onInit_closure, Cannonball, Cannonball_onProcess_closure, Cannonball_onProcess_closure0, Target, Target_onPrepareRender_closure, Bomb, Bomb_onInit_closure, Ground, Ground_onPrepareRender_closure, Ground_onPrepareRender__closure, Ground_onPrepareRender__closure0, Smoke, Vector, Closure$2, Closure$1, Closure$0, Closure$7, Closure$21];
 }

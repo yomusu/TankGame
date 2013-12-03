@@ -2,7 +2,6 @@ library sound;
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:web_audio';
 
 
 /**
@@ -12,24 +11,26 @@ import 'dart:web_audio';
  */
 class SoundManager {
   
-  AudioContext _audioContext = null;
-  GainNode _gainNode = null;
-  
-  Map<String,AudioBuffer> _map = new Map();
+  Map<String,AudioElement> _map = new Map();
   
   /** サウンドを有効にするかどうか */
   bool  soundOn = false;
   /** BrowserがAudioサポートしているかどうか */
-  bool  get isSupport => _audioContext!=null;
+  bool  get isSupport => mediaType!=null;
+  
+  String  mediaType = null;
   
   SoundManager() {
-    try {
-      _audioContext = new AudioContext();
-      _gainNode = _audioContext.createGain();
-      _gainNode.connectNode(_audioContext.destination, 0, 0);
-    } catch( e ) {
-      print("SoundManager : This browser is unsupported AudioContext.");
-    }
+    
+    RegExp  exp = new RegExp(r"(probably|maybe)");
+    
+    AudioElement  a = new AudioElement("");
+    if( exp.hasMatch(a.canPlayType("audio/ogg")) )
+      mediaType = "ogg";
+    else if( exp.hasMatch(a.canPlayType("audio/mp3")) )
+      mediaType = "mp3";
+    
+    print("SoundMediaType is $mediaType");
   }
   
   /**
@@ -37,33 +38,18 @@ class SoundManager {
    */
   Future<String> put( String key, String filename ) {
     
+    filename = "$filename.$mediaType";
     var comp = new Completer();
     
-    if( _audioContext!=null ) {
-      // 対応ブラウザの場合、読み込み
-      HttpRequest xhr = new HttpRequest()
-      ..open("GET", filename)
-      ..responseType = "arraybuffer";
+    AudioElement  audio = new AudioElement(filename);
+    audio.onLoadedData.listen( (e){
+      print("loaded ${filename}");
+      comp.complete(key);
+    }, onError: (e) {
+      comp.completeError(e);
+    });
+    _map[key] = audio;
     
-      xhr.onLoad.listen((e) {
-        // 音声データのデコード
-        _audioContext.decodeAudioData(xhr.response)
-          .then( (AudioBuffer buffer) {
-            _map[key] = buffer;
-            print("loaded ${filename}");
-            comp.complete(key);
-          })
-            .catchError( (error) {
-              comp.completeError(error);
-            });
-      });
-      xhr.onError.listen((e)=> comp.completeError(e));
-      xhr.send();
-      
-    } else {
-      // 非対応ブラウザの場合、無視
-      Timer.run( (){ comp.complete(key); } );
-    }
     return comp.future;
   }
   
@@ -72,14 +58,7 @@ class SoundManager {
    */
   void play( String key ) {
     if( soundOn && isSupport ) {
-      try {
-        AudioBufferSourceNode source = _audioContext.createBufferSource()
-            ..connectNode(_gainNode, 0, 0)
-              ..buffer = _map[key]
-        ..start(0);
-      } catch(e) {
-        _audioContext = null;
-      }
+      _map[key].play();
     }
   }
 }

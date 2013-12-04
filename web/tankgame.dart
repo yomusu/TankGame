@@ -51,6 +51,7 @@ void main() {
     
     // サウンド読み込み
     geng.soundManager.put("bell","./sound/xmasbell");
+    geng.soundManager.put("bell2","./sound/xmasbell");
     geng.soundManager.put("fire","./sound/bag");
     geng.soundManager.put("bomb","./sound/pyo");
     
@@ -493,7 +494,7 @@ class TankGame extends GScreen {
     delay( 2000, (){
       text02 = ["なげたゆきだま: ${_numberOfFire}こ"];
       geng.repaint();
-      geng.soundManager.play("bell");
+      geng.soundManager.play("bell2");
     } );
     delay( 3000, (){
       drawLevel = ( GCanvas2D c, int  y ) {
@@ -665,7 +666,7 @@ class FireButton extends GButton {
   
   void startCharge() {
     new Timer.periodic( const Duration(milliseconds:50), (t) {
-      power += 0.15;
+      power += 0.18;
       if( power >= 1.0 ) {
         power = 1.0;
         t.cancel();

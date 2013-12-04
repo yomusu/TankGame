@@ -84,7 +84,7 @@ int resultToScore( int hit, int fire, var stage ) {
   print("K=$Krate A=$Arate");
   
   // サーロイン判定
-  if( hit==29 && Arate > 0.99 )
+  if( hit==29 && Arate > 0.80 )
     return 80;
   
   if( Krate > 0.99 && Arate > 0.99 ) {
@@ -114,6 +114,23 @@ String resultToLevelText( int score ) {
     10 : "あかちゃん",
   };
   return map[score];
+}
+
+List<int> getScoreHistory() {
+  const key = "scoreHistory";
+  if( window.localStorage.containsKey(key) ) {
+    String  json = window.localStorage[key];
+    return JSON.decode(json) as List<int>;
+  } else {
+    return [];
+  }
+}
+
+void saveScoreToHistory( int score ) {
+  const key = "scoreHistory";
+  var list = getScoreHistory();
+  list.add(score);
+  window.localStorage[key] = JSON.encode(list);
 }
 
 class GamePointManager {

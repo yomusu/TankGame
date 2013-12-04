@@ -8474,7 +8474,7 @@ resultToScore: function(hit, fire, stage) {
     throw H.iae(fire);
   Arate = hit / fire;
   P.print("K=" + Krate + " A=" + Arate);
-  if (hit === 29 && Arate > 0.99)
+  if (hit === 29 && Arate > 0.8)
     return 80;
   t1 = Krate > 0.99;
   if (t1 && Arate > 0.99)

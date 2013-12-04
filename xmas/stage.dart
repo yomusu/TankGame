@@ -84,7 +84,7 @@ int resultToScore( int hit, int fire, var stage ) {
   print("K=$Krate A=$Arate");
   
   // サーロイン判定
-  if( hit==29 && Arate > 0.99 )
+  if( hit==29 && Arate > 0.80 )
     return 80;
   
   if( Krate > 0.99 && Arate > 0.99 ) {

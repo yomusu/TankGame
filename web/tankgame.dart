@@ -41,6 +41,13 @@ void main() {
       ..put("ball01", "./img/ball01.png")
       ..put("gamestart", "./img/gamestart.png")
       ;
+    // ご褒美画面用の画像
+    geng.imageMap
+      ..put("p100", "./present/p100.png")
+      ..put("p90", "./present/p90.png")
+      ..put("p80", "./present/p80.png")
+      ..put("p70", "./present/p70.png")
+      ;
     
     // サウンド読み込み
     geng.soundManager.put("bell","./sound/xmasbell");
@@ -72,7 +79,6 @@ void main() {
 Map   itemData;
 Map   stageData;
 Tank  tank;
-int score;
 int numberOfHit;
 int numberOfFire;
 double  offset_x = 0.0;
@@ -372,7 +378,6 @@ class TankGame extends GScreen {
     geng.objlist.add( tank );
     
     // スコアをクリア
-    score = 0;
     numberOfHit = 0;
     numberOfFire = 0;
     
@@ -448,11 +453,11 @@ class TankGame extends GScreen {
   void onEndOfStage() {
     
     // この時点での得点をバックアップ
-    var _numberOfHit = numberOfHit;
-    var _numberOfFire = numberOfFire;
-    var score = resultToScore( numberOfHit, numberOfFire, stageData);
-    var isPerfect = score==100;
-    var levelText = resultToLevelText(score);
+    final _numberOfHit = numberOfHit;
+    final _numberOfFire = numberOfFire;
+    final score = resultToScore( numberOfHit, numberOfFire, stageData);
+    final isPerfect = score==100;
+    final levelText = resultToLevelText(score);
     
     // Hi-Score登録
     int rank = -1;
@@ -511,13 +516,28 @@ class TankGame extends GScreen {
     
     // 戻るボタン配置
     delay( 4000, () {
-      var retBtn = new GButton()
-      ..onPress = () { geng.screen = new Title(); }
-      ..text = "おしまい"
-          ..x = 285 ..y = 500
-          ..width = 100 ..height= 40;
-      geng.objlist.add( retBtn );
-      btnList.add( retBtn );
+      final pscreen = new PresentScreen(score);
+      if( pscreen.img != null ) {
+        // ご褒美画面あり
+        var retBtn = new GButton()
+        ..onPress = () { geng.screen = pscreen; }
+        ..text = "つぎへ"
+            ..x = 285 ..y = 500
+            ..width = 150 ..height= 40;
+        geng.objlist.add( retBtn );
+        btnList.add( retBtn );
+        
+      } else {
+        
+        // ご褒美画面なし
+        var retBtn = new GButton()
+        ..onPress = () { geng.screen = new Title(); }
+        ..text = "おしまい"
+            ..x = 285 ..y = 500
+            ..width = 150 ..height= 40;
+        geng.objlist.add( retBtn );
+        btnList.add( retBtn );
+      }
       geng.repaint();
     });
     
@@ -527,8 +547,55 @@ class TankGame extends GScreen {
         tank.dispose();
     };
   }
-
 }
+
+const ScreenWidth = 570;
+const ScreenHeight= 570;
+
+/***
+ * ご褒美画面を表示する画面
+ */
+class PresentScreen extends GScreen {
+  
+  final int _score;
+  final ImageElement  img;
+  
+  PresentScreen( int score ) :
+    _score = score,
+    img = geng.imageMap["p$score"]
+  ;
+  
+  void onStart() {
+    geng.objlist.disposeAll();
+    
+    // 表示すべき日付を求める
+    var now = new DateTime.now();
+    String  nowText = "${now.year}/${now.month}/${now.day} ${now.hour}:${now.minute}";
+    
+    List  info = ["$nowText ${resultToLevelText(_score)}"];
+
+    // ご褒美画像の描画部分
+    onFrontRender = ( GCanvas2D c ) {
+      if( img!=null ) {
+        var x = (ScreenWidth - img.width) ~/ 2;
+        var y = (ScreenHeight - img.height) ~/ 2;
+        c.c.drawImage( img, x, y-15 );
+      }
+      // 日時の描画
+      c.drawTexts(scoretren, info, 5, 5 );
+    };
+    
+    // 戻るボタン作成
+    var retBtn = new GButton()
+    ..onPress = () { geng.screen = new Title(); }
+    ..text = "タイトル画面に戻る"
+        ..x = 285 ..y = 540
+        ..width = 250 ..height= 40;
+    geng.objlist.add( retBtn );
+    btnList.add( retBtn );
+  }  
+}
+
 
 /***********
  * 

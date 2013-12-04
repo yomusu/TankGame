@@ -1739,6 +1739,40 @@ Primitives_stringFromCharCodes: function(charCodes) {
   return H.Primitives__fromCharCodeApply(charCodes);
 },
 
+Primitives_lazyAsJsDate: function(receiver) {
+  if (receiver.date === void 0)
+    receiver.date = new Date(receiver.millisecondsSinceEpoch);
+  return receiver.date;
+},
+
+Primitives_getYear: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCFullYear() + 0 : H.Primitives_lazyAsJsDate(receiver).getFullYear() + 0;
+},
+
+Primitives_getMonth: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMonth() + 1 : H.Primitives_lazyAsJsDate(receiver).getMonth() + 1;
+},
+
+Primitives_getDay: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCDate() + 0 : H.Primitives_lazyAsJsDate(receiver).getDate() + 0;
+},
+
+Primitives_getHours: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCHours() + 0 : H.Primitives_lazyAsJsDate(receiver).getHours() + 0;
+},
+
+Primitives_getMinutes: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMinutes() + 0 : H.Primitives_lazyAsJsDate(receiver).getMinutes() + 0;
+},
+
+Primitives_getSeconds: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getSeconds() + 0;
+},
+
+Primitives_getMilliseconds: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMilliseconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getMilliseconds() + 0;
+},
+
 Primitives_getProperty: function(object, key) {
   if (object == null || typeof object === "boolean" || typeof object === "number" || typeof object === "string")
     throw H.wrapException(new P.ArgumentError(object));
@@ -6073,6 +6107,88 @@ NoSuchMethodError_toString_closure: {"": "Closure;box_0",
 
 Comparable: {"": "Object;"},
 
+DateTime: {"": "Object;millisecondsSinceEpoch<,isUtc",
+  $eq: function(_, other) {
+    var t1;
+    if (other == null)
+      return false;
+    t1 = J.getInterceptor(other);
+    if (typeof other !== "object" || other === null || !t1.$isDateTime)
+      return false;
+    return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && this.isUtc === other.isUtc;
+  },
+  compareTo$1: function(_, other) {
+    return C.JSNumber_methods.compareTo$1(this.millisecondsSinceEpoch, other.get$millisecondsSinceEpoch());
+  },
+  get$hashCode: function(_) {
+    return this.millisecondsSinceEpoch;
+  },
+  toString$0: function(_) {
+    var t1, y, m, d, h, min, sec, ms;
+    t1 = new P.DateTime_toString_twoDigits();
+    y = new P.DateTime_toString_fourDigits().call$1(H.Primitives_getYear(this));
+    m = t1.call$1(H.Primitives_getMonth(this));
+    d = t1.call$1(H.Primitives_getDay(this));
+    h = t1.call$1(H.Primitives_getHours(this));
+    min = t1.call$1(H.Primitives_getMinutes(this));
+    sec = t1.call$1(H.Primitives_getSeconds(this));
+    ms = new P.DateTime_toString_threeDigits().call$1(H.Primitives_getMilliseconds(this));
+    if (this.isUtc)
+      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms) + "Z";
+    else
+      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms);
+  },
+  DateTime$_now$0: function() {
+    H.Primitives_lazyAsJsDate(this);
+  },
+  $isDateTime: true,
+  static: {
+"": "DateTime_MONDAY,DateTime_TUESDAY,DateTime_WEDNESDAY,DateTime_THURSDAY,DateTime_FRIDAY,DateTime_SATURDAY,DateTime_SUNDAY,DateTime_DAYS_PER_WEEK,DateTime_JANUARY,DateTime_FEBRUARY,DateTime_MARCH,DateTime_APRIL,DateTime_MAY,DateTime_JUNE,DateTime_JULY,DateTime_AUGUST,DateTime_SEPTEMBER,DateTime_OCTOBER,DateTime_NOVEMBER,DateTime_DECEMBER,DateTime_MONTHS_PER_YEAR,DateTime__MAX_MILLISECONDS_SINCE_EPOCH",
+DateTime$_now: function() {
+  var t1 = new P.DateTime(Date.now(), false);
+  t1.DateTime$_now$0();
+  return t1;
+}}
+
+},
+
+DateTime_toString_fourDigits: {"": "Closure;",
+  call$1: function(n) {
+    var absN, sign;
+    absN = J.abs$0$n(n);
+    sign = n < 0 ? "-" : "";
+    if (absN >= 1000)
+      return H.S(n);
+    if (absN >= 100)
+      return sign + "0" + H.S(absN);
+    if (absN >= 10)
+      return sign + "00" + H.S(absN);
+    return sign + "000" + H.S(absN);
+  },
+  $is_args1: true
+},
+
+DateTime_toString_threeDigits: {"": "Closure;",
+  call$1: function(n) {
+    var t1 = J.getInterceptor$n(n);
+    if (t1.$ge(n, 100))
+      return H.S(n);
+    if (t1.$ge(n, 10))
+      return "0" + H.S(n);
+    return "00" + H.S(n);
+  },
+  $is_args1: true
+},
+
+DateTime_toString_twoDigits: {"": "Closure;",
+  call$1: function(n) {
+    if (J.$ge$n(n, 10))
+      return H.S(n);
+    return "0" + H.S(n);
+  },
+  $is_args1: true
+},
+
 Duration: {"": "Object;_duration<",
   $add: function(_, other) {
     return P.Duration$(0, 0, this._duration + other.get$_duration(), 0, 0, 0);
@@ -6508,7 +6624,7 @@ BodyElement: {"": "HtmlElement;",
   "%": "HTMLBodyElement"
 },
 
-CanvasElement: {"": "HtmlElement;height},width}",
+CanvasElement: {"": "HtmlElement;height%,width%",
   get$context2D: function(receiver) {
     return receiver.getContext("2d");
   },
@@ -6533,6 +6649,10 @@ CanvasRenderingContext2D: {"": "CanvasRenderingContext;",
 CharacterData: {"": "Node;length=", "%": "CDATASection|CharacterData|Comment|ProcessingInstruction|Text"},
 
 CssStyleDeclaration: {"": "Interceptor_CssStyleDeclarationBase;length=",
+  getPropertyValue$1: function(receiver, propertyName) {
+    var propValue = receiver.getPropertyValue(propertyName);
+    return propValue != null ? propValue : "";
+  },
   setProperty$3: function(receiver, propertyName, value, priority) {
     var exception;
     try {
@@ -6573,7 +6693,7 @@ Element: {"": "Node;",
   "%": ";Element"
 },
 
-EmbedElement: {"": "HtmlElement;height},src},width}", "%": "HTMLEmbedElement"},
+EmbedElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLEmbedElement"},
 
 ErrorEvent: {"": "Event;error=", "%": "ErrorEvent"},
 
@@ -6597,11 +6717,11 @@ EventTarget: {"": "Interceptor;",
 
 FormElement: {"": "HtmlElement;length=", "%": "HTMLFormElement"},
 
-IFrameElement: {"": "HtmlElement;height},src},width}", "%": "HTMLIFrameElement"},
+IFrameElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLIFrameElement"},
 
-ImageElement: {"": "HtmlElement;height},src},width}", "%": "HTMLImageElement"},
+ImageElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLImageElement"},
 
-InputElement: {"": "HtmlElement;height},src},width}", "%": "HTMLInputElement"},
+InputElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLInputElement"},
 
 MediaElement: {"": "HtmlElement;error=,src}",
   play$0: function(receiver) {
@@ -6628,7 +6748,7 @@ Node: {"": "EventTarget;",
   "%": "Attr|Document|DocumentFragment|DocumentType|Entity|HTMLDocument|Notation|SVGDocument|ShadowRoot;Node"
 },
 
-ObjectElement: {"": "HtmlElement;height},width}", "%": "HTMLObjectElement"},
+ObjectElement: {"": "HtmlElement;height%,width%", "%": "HTMLObjectElement"},
 
 ScriptElement: {"": "HtmlElement;src}", "%": "HTMLScriptElement"},
 
@@ -6729,7 +6849,7 @@ TrackElement: {"": "HtmlElement;src}", "%": "HTMLTrackElement"},
 
 UIEvent: {"": "Event;", "%": "CompositionEvent|FocusEvent|KeyboardEvent|SVGZoomEvent|TextEvent;UIEvent"},
 
-VideoElement: {"": "MediaElement;height},width}", "%": "HTMLVideoElement"},
+VideoElement: {"": "MediaElement;height%,width%", "%": "HTMLVideoElement"},
 
 Window: {"": "EventTarget;status=",
   toString$0: function(receiver) {
@@ -6741,8 +6861,14 @@ Window: {"": "EventTarget;status=",
 Interceptor_CssStyleDeclarationBase: {"": "Interceptor+CssStyleDeclarationBase;"},
 
 CssStyleDeclarationBase: {"": "Object;",
+  get$height: function(receiver) {
+    return this.getPropertyValue$1(receiver, "height");
+  },
   set$height: function(receiver, value) {
     this.setProperty$3(receiver, "height", value, "");
+  },
+  get$width: function(receiver) {
+    return this.getPropertyValue$1(receiver, "width");
   },
   set$width: function(receiver, value) {
     this.setProperty$3(receiver, "width", value, "");
@@ -6847,65 +6973,65 @@ FixedSizeListIterator$: function(array) {
 
 }}],
 ["dart.dom.svg", "dart:svg", , P, {
-FEBlendElement: {"": "SvgElement;x=,y=", "%": "SVGFEBlendElement"},
+FEBlendElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEBlendElement"},
 
-FEColorMatrixElement: {"": "SvgElement;x=,y=", "%": "SVGFEColorMatrixElement"},
+FEColorMatrixElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEColorMatrixElement"},
 
-FEComponentTransferElement: {"": "SvgElement;x=,y=", "%": "SVGFEComponentTransferElement"},
+FEComponentTransferElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEComponentTransferElement"},
 
-FECompositeElement: {"": "SvgElement;x=,y=", "%": "SVGFECompositeElement"},
+FECompositeElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFECompositeElement"},
 
-FEConvolveMatrixElement: {"": "SvgElement;x=,y=", "%": "SVGFEConvolveMatrixElement"},
+FEConvolveMatrixElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEConvolveMatrixElement"},
 
-FEDiffuseLightingElement: {"": "SvgElement;x=,y=", "%": "SVGFEDiffuseLightingElement"},
+FEDiffuseLightingElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEDiffuseLightingElement"},
 
-FEDisplacementMapElement: {"": "SvgElement;x=,y=", "%": "SVGFEDisplacementMapElement"},
+FEDisplacementMapElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEDisplacementMapElement"},
 
-FEFloodElement: {"": "SvgElement;x=,y=", "%": "SVGFEFloodElement"},
+FEFloodElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEFloodElement"},
 
-FEGaussianBlurElement: {"": "SvgElement;x=,y=", "%": "SVGFEGaussianBlurElement"},
+FEGaussianBlurElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEGaussianBlurElement"},
 
-FEImageElement: {"": "SvgElement;x=,y=", "%": "SVGFEImageElement"},
+FEImageElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEImageElement"},
 
-FEMergeElement: {"": "SvgElement;x=,y=", "%": "SVGFEMergeElement"},
+FEMergeElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEMergeElement"},
 
-FEMorphologyElement: {"": "SvgElement;x=,y=", "%": "SVGFEMorphologyElement"},
+FEMorphologyElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEMorphologyElement"},
 
-FEOffsetElement: {"": "SvgElement;x=,y=", "%": "SVGFEOffsetElement"},
+FEOffsetElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEOffsetElement"},
 
 FEPointLightElement: {"": "SvgElement;x=,y=", "%": "SVGFEPointLightElement"},
 
-FESpecularLightingElement: {"": "SvgElement;x=,y=", "%": "SVGFESpecularLightingElement"},
+FESpecularLightingElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFESpecularLightingElement"},
 
 FESpotLightElement: {"": "SvgElement;x=,y=", "%": "SVGFESpotLightElement"},
 
-FETileElement: {"": "SvgElement;x=,y=", "%": "SVGFETileElement"},
+FETileElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFETileElement"},
 
-FETurbulenceElement: {"": "SvgElement;x=,y=", "%": "SVGFETurbulenceElement"},
+FETurbulenceElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFETurbulenceElement"},
 
-FilterElement: {"": "SvgElement;x=,y=", "%": "SVGFilterElement"},
+FilterElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFilterElement"},
 
-ForeignObjectElement: {"": "GraphicsElement;x=,y=", "%": "SVGForeignObjectElement"},
+ForeignObjectElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGForeignObjectElement"},
 
 GraphicsElement: {"": "SvgElement;", "%": "SVGAElement|SVGCircleElement|SVGClipPathElement|SVGDefsElement|SVGEllipseElement|SVGGElement|SVGLineElement|SVGPathElement|SVGPolygonElement|SVGPolylineElement|SVGSwitchElement;SVGGraphicsElement"},
 
-ImageElement0: {"": "GraphicsElement;x=,y=", "%": "SVGImageElement"},
+ImageElement0: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGImageElement"},
 
-MaskElement: {"": "SvgElement;x=,y=", "%": "SVGMaskElement"},
+MaskElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGMaskElement"},
 
-PatternElement: {"": "SvgElement;x=,y=", "%": "SVGPatternElement"},
+PatternElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGPatternElement"},
 
-RectElement: {"": "GraphicsElement;x=,y=", "%": "SVGRectElement"},
+RectElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGRectElement"},
 
 SvgElement: {"": "Element;", "%": "SVGAltGlyphDefElement|SVGAltGlyphItemElement|SVGAnimateColorElement|SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGComponentTransferFunctionElement|SVGCursorElement|SVGDescElement|SVGFEDistantLightElement|SVGFEDropShadowElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFontElement|SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement|SVGGlyphElement|SVGGlyphRefElement|SVGGradientElement|SVGHKernElement|SVGLinearGradientElement|SVGMPathElement|SVGMarkerElement|SVGMetadataElement|SVGMissingGlyphElement|SVGRadialGradientElement|SVGScriptElement|SVGSetElement|SVGStopElement|SVGStyleElement|SVGSymbolElement|SVGTitleElement|SVGVKernElement|SVGViewElement;SVGElement"},
 
-SvgSvgElement: {"": "GraphicsElement;x=,y=", "%": "SVGSVGElement"},
+SvgSvgElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGSVGElement"},
 
 TextContentElement: {"": "GraphicsElement;", "%": "SVGTextPathElement;SVGTextContentElement"},
 
 TextPositioningElement: {"": "TextContentElement;x=,y=", "%": "SVGAltGlyphElement|SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"},
 
-UseElement: {"": "GraphicsElement;x=,y=", "%": "SVGUseElement"}}],
+UseElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGUseElement"}}],
 ["dart.isolate", "dart:isolate", , P, {
 ReceivePort: {"": "Object;", $isReceivePort: true}}],
 ["dart.math", "dart:math", , P, {
@@ -7086,7 +7212,7 @@ _RectangleBase: {"": "Object;",
   }
 },
 
-Rectangle: {"": "_RectangleBase;left>,top,width,height", $isRectangle: true, $as_RectangleBase: null}}],
+Rectangle: {"": "_RectangleBase;left>,top,width>,height>", $isRectangle: true, $as_RectangleBase: null}}],
 ["dart.typed_data", "dart:typed_data", , P, {
 TypedData: {"": "Interceptor;",
   _invalidIndex$2: function(receiver, index, $length) {
@@ -7401,7 +7527,7 @@ GObj: {"": "Object;",
   }
 },
 
-GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn<,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
+GButton: {"": "GObj;x>,y>,width>,height>,z,onPress,onRelease<,isOn<,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
   get$left: function(_) {
     return this.x - this.width / 2;
   },
@@ -8240,6 +8366,12 @@ Sprite: {"": "Object;_x,_y,_w,_h,_rect,_alpha,_scale,offsetx,offsety,rotate,isSh
   get$render: function() {
     return new H.BoundClosure$1(this, B.Sprite.prototype.render$1, null, "render$1");
   },
+  get$width: function(_) {
+    return this._w;
+  },
+  get$height: function(_) {
+    return this._h;
+  },
   get$x: function(_) {
     return this._x;
   },
@@ -8459,7 +8591,13 @@ main_closure: {"": "Closure;",
     t1.put$2("star01", "./img/star01.png");
     t1.put$2("ball01", "./img/ball01.png");
     t1.put$2("gamestart", "./img/gamestart.png");
+    t1 = $.get$geng().imageMap;
+    t1.put$2("p100", "./present/p100.png");
+    t1.put$2("p90", "./present/p90.png");
+    t1.put$2("p80", "./present/p80.png");
+    t1.put$2("p70", "./present/p70.png");
     $.get$geng().soundManager.put$2("bell", "./sound/xmasbell");
+    $.get$geng().soundManager.put$2("bell2", "./sound/xmasbell");
     $.get$geng().soundManager.put$2("fire", "./sound/bag");
     $.get$geng().soundManager.put$2("bomb", "./sound/pyo");
     $.get$geng().hiscoreManager.init$0();
@@ -8761,7 +8899,6 @@ TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender
     t3 = $.tank;
     t2._addObjlist.push(t3);
     t3.onInit$0();
-    $.score = 0;
     $.numberOfHit = 0;
     $.numberOfFire = 0;
     t1.prex_0 = 0;
@@ -8801,7 +8938,7 @@ TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender
     P.Timer_Timer(P.Duration$(0, 0, 0, 2000, 0, 0), new X.TankGame_onEndOfStage_closure1(t1, _numberOfFire));
     P.Timer_Timer(P.Duration$(0, 0, 0, 3000, 0, 0), new X.TankGame_onEndOfStage_closure2(t1, score, levelText));
     P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure3(t1));
-    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure4(this));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure4(this, score));
     this.onProcess = new X.TankGame_onEndOfStage_closure5();
   }
 },
@@ -8888,7 +9025,7 @@ TankGame_onEndOfStage_closure: {"": "Closure;box_0",
 
 TankGame_onEndOfStage_closure0: {"": "Closure;box_0,_numberOfHit_1,isPerfect_2",
   call$0: function() {
-    this.box_0.drawMeichu_1 = new X.TankGame_onEndOfStage__closure1(this._numberOfHit_1, this.isPerfect_2);
+    this.box_0.drawMeichu_1 = new X.TankGame_onEndOfStage__closure2(this._numberOfHit_1, this.isPerfect_2);
     var t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
     t1 = $.get$geng().soundManager;
@@ -8897,7 +9034,7 @@ TankGame_onEndOfStage_closure0: {"": "Closure;box_0,_numberOfHit_1,isPerfect_2",
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure1: {"": "Closure;_numberOfHit_3,isPerfect_4",
+TankGame_onEndOfStage__closure2: {"": "Closure;_numberOfHit_3,isPerfect_4",
   call$2: function(c, y) {
     c.drawTexts$4($.get$trenScore(), ["\u3081\u3044\u3061\u3085\u3046\u3057\u305f\u304b\u305a: " + H.S(this._numberOfHit_3) + "\u3053"], 285, y);
     if (this.isPerfect_4)
@@ -8912,7 +9049,7 @@ TankGame_onEndOfStage_closure1: {"": "Closure;box_0,_numberOfFire_5",
     var t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
     t1 = $.get$geng().soundManager;
-    t1.play$1(t1, "bell");
+    t1.play$1(t1, "bell2");
   },
   $is_void_: true
 },
@@ -8921,7 +9058,7 @@ TankGame_onEndOfStage_closure2: {"": "Closure;box_0,score_6,levelText_7",
   call$0: function() {
     var t1, t2, t3, exception;
     t1 = this.box_0;
-    t1.drawLevel_3 = new X.TankGame_onEndOfStage__closure0(this.levelText_7);
+    t1.drawLevel_3 = new X.TankGame_onEndOfStage__closure1(this.levelText_7);
     try {
       t2 = $.get$geng().hiscoreManager;
       t3 = $.stageData;
@@ -8938,7 +9075,7 @@ TankGame_onEndOfStage_closure2: {"": "Closure;box_0,score_6,levelText_7",
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure0: {"": "Closure;levelText_8",
+TankGame_onEndOfStage__closure1: {"": "Closure;levelText_8",
   call$2: function(c, y) {
     c.drawTexts$4($.get$trenScore(), ["\u30ad\u30df\u306e\u3046\u3067\u307e\u3048\u306f"], 285, y);
     c.drawTexts$4($.get$trenScore(), ["\u301c " + H.S(this.levelText_8) + " \u30ec\u30d9\u30eb \u301c"], 285, J.$add$ns(y, 30));
@@ -8960,27 +9097,51 @@ TankGame_onEndOfStage_closure3: {"": "Closure;box_0",
   $is_void_: true
 },
 
-TankGame_onEndOfStage_closure4: {"": "Closure;this_9",
+TankGame_onEndOfStage_closure4: {"": "Closure;this_9,score_10",
   call$0: function() {
-    var retBtn, t1;
-    retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
-    retBtn.onPress = new X.TankGame_onEndOfStage__closure();
-    retBtn.text = "\u304a\u3057\u307e\u3044";
-    retBtn.x = 285;
-    retBtn.y = 500;
-    retBtn.width = 100;
-    retBtn.height = 40;
-    $.get$geng().objlist._addObjlist.push(retBtn);
-    retBtn.onInit$0();
-    t1 = this.this_9.btnList;
-    t1.add$1(t1, retBtn);
+    var pscreen, t1, retBtn;
+    pscreen = X.PresentScreen$(this.score_10);
+    t1 = this.this_9;
+    if (pscreen.img != null) {
+      retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+      retBtn.onPress = new X.TankGame_onEndOfStage__closure(pscreen);
+      retBtn.text = "\u3064\u304e\u3078";
+      retBtn.x = 285;
+      retBtn.y = 500;
+      retBtn.width = 150;
+      retBtn.height = 40;
+      $.get$geng().objlist._addObjlist.push(retBtn);
+      retBtn.onInit$0();
+      t1 = t1.btnList;
+      t1.add$1(t1, retBtn);
+    } else {
+      retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+      retBtn.onPress = new X.TankGame_onEndOfStage__closure0();
+      retBtn.text = "\u304a\u3057\u307e\u3044";
+      retBtn.x = 285;
+      retBtn.y = 500;
+      retBtn.width = 150;
+      retBtn.height = 40;
+      $.get$geng().objlist._addObjlist.push(retBtn);
+      retBtn.onInit$0();
+      t1 = t1.btnList;
+      t1.add$1(t1, retBtn);
+    }
     t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
   },
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure: {"": "Closure;",
+TankGame_onEndOfStage__closure: {"": "Closure;pscreen_11",
+  call$0: function() {
+    var t1 = $.get$geng();
+    t1.set$screen(t1, this.pscreen_11);
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage__closure0: {"": "Closure;",
   call$0: function() {
     var t1 = $.get$geng();
     t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
@@ -9004,6 +9165,62 @@ TankGame_onEndOfStage_closure5: {"": "Closure;",
       t1.onDispose$0();
       t1._isDisposed = true;
     }
+  },
+  $is_void_: true
+},
+
+PresentScreen: {"": "GScreen;_score,img,_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
+  onStart$0: function() {
+    var now, retBtn, t1;
+    $.get$geng().objlist.disposeAll$0();
+    now = P.DateTime$_now();
+    this.onFrontRender = new X.PresentScreen_onStart_closure(this, ["" + H.Primitives_getYear(now) + "/" + H.Primitives_getMonth(now) + "/" + H.Primitives_getDay(now) + " " + H.Primitives_getHours(now) + ":" + H.Primitives_getMinutes(now) + " " + H.S(X.resultToLevelText(this._score))]);
+    retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+    retBtn.onPress = new X.PresentScreen_onStart_closure0();
+    retBtn.text = "\u30bf\u30a4\u30c8\u30eb\u753b\u9762\u306b\u623b\u308b";
+    retBtn.x = 285;
+    retBtn.y = 540;
+    retBtn.width = 250;
+    retBtn.height = 40;
+    $.get$geng().objlist._addObjlist.push(retBtn);
+    retBtn.onInit$0();
+    t1 = this.btnList;
+    t1.add$1(t1, retBtn);
+  },
+  static: {
+PresentScreen$: function(score) {
+  var t1 = $.get$geng().imageMap;
+  t1 = t1.map;
+  return new X.PresentScreen(score, t1.$index(t1, "p" + score), B.RenderList$(), new B.ButtonList(null), null, null, null, null);
+}}
+
+},
+
+PresentScreen_onStart_closure: {"": "Closure;this_0,info_1",
+  call$1: function(c) {
+    var t1, t2, t3, x, y;
+    t1 = this.this_0.img;
+    if (t1 != null) {
+      t2 = J.getInterceptor$x(t1);
+      t3 = t2.get$width(t1);
+      if (typeof t3 !== "number")
+        throw H.iae(t3);
+      x = C.JSNumber_methods.$tdiv(570 - t3, 2);
+      t2 = t2.get$height(t1);
+      if (typeof t2 !== "number")
+        throw H.iae(t2);
+      y = C.JSNumber_methods.$tdiv(570 - t2, 2);
+      c.get$c().drawImage(t1, x, y - 15);
+    }
+    c.drawTexts$4($.get$scoretren(), this.info_1, 5, 5);
+  },
+  $is_args1: true
+},
+
+PresentScreen_onStart_closure0: {"": "Closure;",
+  call$0: function() {
+    var t1 = $.get$geng();
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
@@ -9147,7 +9364,7 @@ FireButton_fire_closure: {"": "Closure;this_0",
 FireButton_startCharge_closure: {"": "Closure;this_0",
   call$1: function(t) {
     var t1 = this.this_0;
-    t1.power = t1.power + 0.15;
+    t1.power = t1.power + 0.18;
     if (t1.power >= 1) {
       t1.power = 1;
       t.cancel$0();
@@ -9415,7 +9632,7 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,bombTypes,_isDisposed",
   Target$fromType$1: function(type) {
     switch (type) {
       case "small":
-        this._width = 30;
+        this._width = 40;
         this.sp = B.ImageSprite$(120, null, "targetS", 60);
         this.bombTypes = [0, 1, 3, 4, 3, 4];
         break;
@@ -9543,7 +9760,7 @@ Bomb_onInit_closure: {"": "Closure;this_0",
   $is_void_: true
 },
 
-Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width,height,_isDisposed",
+Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width>,height>,_isDisposed",
   onInit$0: function() {
     var t1 = $.get$geng()._rect.width;
     if (typeof t1 !== "number")
@@ -10119,7 +10336,6 @@ $.Device__isWebKit = null;
 $.itemData = null;
 $.stageData = null;
 $.tank = null;
-$.score = null;
 $.numberOfHit = null;
 $.numberOfFire = null;
 $.offset_x = 0;
@@ -10346,7 +10562,7 @@ Isolate.$lazy($, "geng", "geng", "get$geng", function() {
   return new B.GEng(null, null, new B.GObjList(P.List_List(null, null), P.List_List(null, null)), null, null, new B.ImageMap(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), Q.SoundManager$(), new B.HiScoreManager(null, 5, [10, 10, 10, 10, 10]), 1, new B.FrameTimer(new P.Stopwatch(null, null), null, null, null), new B.FPSCounter(new P.Stopwatch(null, null), 0, 0, 0, 0, 0, 0), C.C__Random, 0);
 });
 Isolate.$lazy($, "stageList", "stageList", "get$stageList", function() {
-  return [H.fillLiteralMap(["id", "stage0", "speed", 3, "map", [[900, 150, "large"], [500, 150, "large"], [500, 150, "large"], [500, 150, "small"], [500, 150, "small"], [500, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 130, "large"], [250, 150, "small"], [350, 260, "large"], [250, 100, "small"], [250, 270, "large"], [300, 150, "small"], [250, 100, "large"], [200, 150, "small"], [180, 100, "small"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [125, 100, "small"], [150, 100, "small"], [150, 100, "small"], [250, 280, "small"], [180, 240, "small"], [180, 200, "small"], [180, 160, "small"], [180, 120, "small"], [180, 90, "small"], [250, 90, "large"], [180, 280, "small"], [180, 90, "large"], [180, 280, "small"], [180, 90, "large"], [250, 50, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
+  return [H.fillLiteralMap(["id", "stage0", "speed", 3, "map", [[900, 180, "large"], [500, 180, "large"], [500, 180, "large"], [500, 180, "small"], [500, 180, "small"], [500, 180, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 150, "large"], [250, 180, "small"], [350, 260, "large"], [250, 200, "small"], [250, 270, "large"], [300, 180, "small"], [250, 130, "large"], [200, 170, "small"], [180, 130, "large"], [350, 280, "small"], [180, 240, "small"], [180, 200, "small"], [180, 160, "small"], [180, 120, "small"], [300, 90, "large"], [180, 280, "small"], [180, 90, "large"], [180, 280, "small"], [180, 90, "large"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 100, "small"], [150, 100, "small"], [150, 100, "small"], [450, 50, "small"], [150, 50, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "itemList", "itemList", "get$itemList", function() {
   return [H.fillLiteralMap(["id", "nom001", "obtained", true, "price", 0, "cannonSize", 20, "cannonSpeed", 6, "text", "\u307e\u3081\u7832\u5f3e"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];

@@ -1739,6 +1739,40 @@ Primitives_stringFromCharCodes: function(charCodes) {
   return H.Primitives__fromCharCodeApply(charCodes);
 },
 
+Primitives_lazyAsJsDate: function(receiver) {
+  if (receiver.date === void 0)
+    receiver.date = new Date(receiver.millisecondsSinceEpoch);
+  return receiver.date;
+},
+
+Primitives_getYear: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCFullYear() + 0 : H.Primitives_lazyAsJsDate(receiver).getFullYear() + 0;
+},
+
+Primitives_getMonth: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMonth() + 1 : H.Primitives_lazyAsJsDate(receiver).getMonth() + 1;
+},
+
+Primitives_getDay: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCDate() + 0 : H.Primitives_lazyAsJsDate(receiver).getDate() + 0;
+},
+
+Primitives_getHours: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCHours() + 0 : H.Primitives_lazyAsJsDate(receiver).getHours() + 0;
+},
+
+Primitives_getMinutes: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMinutes() + 0 : H.Primitives_lazyAsJsDate(receiver).getMinutes() + 0;
+},
+
+Primitives_getSeconds: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getSeconds() + 0;
+},
+
+Primitives_getMilliseconds: function(receiver) {
+  return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCMilliseconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getMilliseconds() + 0;
+},
+
 Primitives_getProperty: function(object, key) {
   if (object == null || typeof object === "boolean" || typeof object === "number" || typeof object === "string")
     throw H.wrapException(new P.ArgumentError(object));
@@ -6073,6 +6107,88 @@ NoSuchMethodError_toString_closure: {"": "Closure;box_0",
 
 Comparable: {"": "Object;"},
 
+DateTime: {"": "Object;millisecondsSinceEpoch<,isUtc",
+  $eq: function(_, other) {
+    var t1;
+    if (other == null)
+      return false;
+    t1 = J.getInterceptor(other);
+    if (typeof other !== "object" || other === null || !t1.$isDateTime)
+      return false;
+    return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && this.isUtc === other.isUtc;
+  },
+  compareTo$1: function(_, other) {
+    return C.JSNumber_methods.compareTo$1(this.millisecondsSinceEpoch, other.get$millisecondsSinceEpoch());
+  },
+  get$hashCode: function(_) {
+    return this.millisecondsSinceEpoch;
+  },
+  toString$0: function(_) {
+    var t1, y, m, d, h, min, sec, ms;
+    t1 = new P.DateTime_toString_twoDigits();
+    y = new P.DateTime_toString_fourDigits().call$1(H.Primitives_getYear(this));
+    m = t1.call$1(H.Primitives_getMonth(this));
+    d = t1.call$1(H.Primitives_getDay(this));
+    h = t1.call$1(H.Primitives_getHours(this));
+    min = t1.call$1(H.Primitives_getMinutes(this));
+    sec = t1.call$1(H.Primitives_getSeconds(this));
+    ms = new P.DateTime_toString_threeDigits().call$1(H.Primitives_getMilliseconds(this));
+    if (this.isUtc)
+      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms) + "Z";
+    else
+      return H.S(y) + "-" + H.S(m) + "-" + H.S(d) + " " + H.S(h) + ":" + H.S(min) + ":" + H.S(sec) + "." + H.S(ms);
+  },
+  DateTime$_now$0: function() {
+    H.Primitives_lazyAsJsDate(this);
+  },
+  $isDateTime: true,
+  static: {
+"": "DateTime_MONDAY,DateTime_TUESDAY,DateTime_WEDNESDAY,DateTime_THURSDAY,DateTime_FRIDAY,DateTime_SATURDAY,DateTime_SUNDAY,DateTime_DAYS_PER_WEEK,DateTime_JANUARY,DateTime_FEBRUARY,DateTime_MARCH,DateTime_APRIL,DateTime_MAY,DateTime_JUNE,DateTime_JULY,DateTime_AUGUST,DateTime_SEPTEMBER,DateTime_OCTOBER,DateTime_NOVEMBER,DateTime_DECEMBER,DateTime_MONTHS_PER_YEAR,DateTime__MAX_MILLISECONDS_SINCE_EPOCH",
+DateTime$_now: function() {
+  var t1 = new P.DateTime(Date.now(), false);
+  t1.DateTime$_now$0();
+  return t1;
+}}
+
+},
+
+DateTime_toString_fourDigits: {"": "Closure;",
+  call$1: function(n) {
+    var absN, sign;
+    absN = J.abs$0$n(n);
+    sign = n < 0 ? "-" : "";
+    if (absN >= 1000)
+      return H.S(n);
+    if (absN >= 100)
+      return sign + "0" + H.S(absN);
+    if (absN >= 10)
+      return sign + "00" + H.S(absN);
+    return sign + "000" + H.S(absN);
+  },
+  $is_args1: true
+},
+
+DateTime_toString_threeDigits: {"": "Closure;",
+  call$1: function(n) {
+    var t1 = J.getInterceptor$n(n);
+    if (t1.$ge(n, 100))
+      return H.S(n);
+    if (t1.$ge(n, 10))
+      return "0" + H.S(n);
+    return "00" + H.S(n);
+  },
+  $is_args1: true
+},
+
+DateTime_toString_twoDigits: {"": "Closure;",
+  call$1: function(n) {
+    if (J.$ge$n(n, 10))
+      return H.S(n);
+    return "0" + H.S(n);
+  },
+  $is_args1: true
+},
+
 Duration: {"": "Object;_duration<",
   $add: function(_, other) {
     return P.Duration$(0, 0, this._duration + other.get$_duration(), 0, 0, 0);
@@ -6508,7 +6624,7 @@ BodyElement: {"": "HtmlElement;",
   "%": "HTMLBodyElement"
 },
 
-CanvasElement: {"": "HtmlElement;height},width}",
+CanvasElement: {"": "HtmlElement;height%,width%",
   get$context2D: function(receiver) {
     return receiver.getContext("2d");
   },
@@ -6533,6 +6649,10 @@ CanvasRenderingContext2D: {"": "CanvasRenderingContext;",
 CharacterData: {"": "Node;length=", "%": "CDATASection|CharacterData|Comment|ProcessingInstruction|Text"},
 
 CssStyleDeclaration: {"": "Interceptor_CssStyleDeclarationBase;length=",
+  getPropertyValue$1: function(receiver, propertyName) {
+    var propValue = receiver.getPropertyValue(propertyName);
+    return propValue != null ? propValue : "";
+  },
   setProperty$3: function(receiver, propertyName, value, priority) {
     var exception;
     try {
@@ -6573,7 +6693,7 @@ Element: {"": "Node;",
   "%": ";Element"
 },
 
-EmbedElement: {"": "HtmlElement;height},src},width}", "%": "HTMLEmbedElement"},
+EmbedElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLEmbedElement"},
 
 ErrorEvent: {"": "Event;error=", "%": "ErrorEvent"},
 
@@ -6597,11 +6717,11 @@ EventTarget: {"": "Interceptor;",
 
 FormElement: {"": "HtmlElement;length=", "%": "HTMLFormElement"},
 
-IFrameElement: {"": "HtmlElement;height},src},width}", "%": "HTMLIFrameElement"},
+IFrameElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLIFrameElement"},
 
-ImageElement: {"": "HtmlElement;height},src},width}", "%": "HTMLImageElement"},
+ImageElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLImageElement"},
 
-InputElement: {"": "HtmlElement;height},src},width}", "%": "HTMLInputElement"},
+InputElement: {"": "HtmlElement;height%,src},width%", "%": "HTMLInputElement"},
 
 MediaElement: {"": "HtmlElement;error=,src}",
   play$0: function(receiver) {
@@ -6628,7 +6748,7 @@ Node: {"": "EventTarget;",
   "%": "Attr|Document|DocumentFragment|DocumentType|Entity|HTMLDocument|Notation|SVGDocument|ShadowRoot;Node"
 },
 
-ObjectElement: {"": "HtmlElement;height},width}", "%": "HTMLObjectElement"},
+ObjectElement: {"": "HtmlElement;height%,width%", "%": "HTMLObjectElement"},
 
 ScriptElement: {"": "HtmlElement;src}", "%": "HTMLScriptElement"},
 
@@ -6729,7 +6849,7 @@ TrackElement: {"": "HtmlElement;src}", "%": "HTMLTrackElement"},
 
 UIEvent: {"": "Event;", "%": "CompositionEvent|FocusEvent|KeyboardEvent|SVGZoomEvent|TextEvent;UIEvent"},
 
-VideoElement: {"": "MediaElement;height},width}", "%": "HTMLVideoElement"},
+VideoElement: {"": "MediaElement;height%,width%", "%": "HTMLVideoElement"},
 
 Window: {"": "EventTarget;status=",
   toString$0: function(receiver) {
@@ -6741,8 +6861,14 @@ Window: {"": "EventTarget;status=",
 Interceptor_CssStyleDeclarationBase: {"": "Interceptor+CssStyleDeclarationBase;"},
 
 CssStyleDeclarationBase: {"": "Object;",
+  get$height: function(receiver) {
+    return this.getPropertyValue$1(receiver, "height");
+  },
   set$height: function(receiver, value) {
     this.setProperty$3(receiver, "height", value, "");
+  },
+  get$width: function(receiver) {
+    return this.getPropertyValue$1(receiver, "width");
   },
   set$width: function(receiver, value) {
     this.setProperty$3(receiver, "width", value, "");
@@ -6847,65 +6973,65 @@ FixedSizeListIterator$: function(array) {
 
 }}],
 ["dart.dom.svg", "dart:svg", , P, {
-FEBlendElement: {"": "SvgElement;x=,y=", "%": "SVGFEBlendElement"},
+FEBlendElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEBlendElement"},
 
-FEColorMatrixElement: {"": "SvgElement;x=,y=", "%": "SVGFEColorMatrixElement"},
+FEColorMatrixElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEColorMatrixElement"},
 
-FEComponentTransferElement: {"": "SvgElement;x=,y=", "%": "SVGFEComponentTransferElement"},
+FEComponentTransferElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEComponentTransferElement"},
 
-FECompositeElement: {"": "SvgElement;x=,y=", "%": "SVGFECompositeElement"},
+FECompositeElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFECompositeElement"},
 
-FEConvolveMatrixElement: {"": "SvgElement;x=,y=", "%": "SVGFEConvolveMatrixElement"},
+FEConvolveMatrixElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEConvolveMatrixElement"},
 
-FEDiffuseLightingElement: {"": "SvgElement;x=,y=", "%": "SVGFEDiffuseLightingElement"},
+FEDiffuseLightingElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEDiffuseLightingElement"},
 
-FEDisplacementMapElement: {"": "SvgElement;x=,y=", "%": "SVGFEDisplacementMapElement"},
+FEDisplacementMapElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEDisplacementMapElement"},
 
-FEFloodElement: {"": "SvgElement;x=,y=", "%": "SVGFEFloodElement"},
+FEFloodElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEFloodElement"},
 
-FEGaussianBlurElement: {"": "SvgElement;x=,y=", "%": "SVGFEGaussianBlurElement"},
+FEGaussianBlurElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEGaussianBlurElement"},
 
-FEImageElement: {"": "SvgElement;x=,y=", "%": "SVGFEImageElement"},
+FEImageElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEImageElement"},
 
-FEMergeElement: {"": "SvgElement;x=,y=", "%": "SVGFEMergeElement"},
+FEMergeElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEMergeElement"},
 
-FEMorphologyElement: {"": "SvgElement;x=,y=", "%": "SVGFEMorphologyElement"},
+FEMorphologyElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEMorphologyElement"},
 
-FEOffsetElement: {"": "SvgElement;x=,y=", "%": "SVGFEOffsetElement"},
+FEOffsetElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFEOffsetElement"},
 
 FEPointLightElement: {"": "SvgElement;x=,y=", "%": "SVGFEPointLightElement"},
 
-FESpecularLightingElement: {"": "SvgElement;x=,y=", "%": "SVGFESpecularLightingElement"},
+FESpecularLightingElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFESpecularLightingElement"},
 
 FESpotLightElement: {"": "SvgElement;x=,y=", "%": "SVGFESpotLightElement"},
 
-FETileElement: {"": "SvgElement;x=,y=", "%": "SVGFETileElement"},
+FETileElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFETileElement"},
 
-FETurbulenceElement: {"": "SvgElement;x=,y=", "%": "SVGFETurbulenceElement"},
+FETurbulenceElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFETurbulenceElement"},
 
-FilterElement: {"": "SvgElement;x=,y=", "%": "SVGFilterElement"},
+FilterElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGFilterElement"},
 
-ForeignObjectElement: {"": "GraphicsElement;x=,y=", "%": "SVGForeignObjectElement"},
+ForeignObjectElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGForeignObjectElement"},
 
 GraphicsElement: {"": "SvgElement;", "%": "SVGAElement|SVGCircleElement|SVGClipPathElement|SVGDefsElement|SVGEllipseElement|SVGGElement|SVGLineElement|SVGPathElement|SVGPolygonElement|SVGPolylineElement|SVGSwitchElement;SVGGraphicsElement"},
 
-ImageElement0: {"": "GraphicsElement;x=,y=", "%": "SVGImageElement"},
+ImageElement0: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGImageElement"},
 
-MaskElement: {"": "SvgElement;x=,y=", "%": "SVGMaskElement"},
+MaskElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGMaskElement"},
 
-PatternElement: {"": "SvgElement;x=,y=", "%": "SVGPatternElement"},
+PatternElement: {"": "SvgElement;height=,width=,x=,y=", "%": "SVGPatternElement"},
 
-RectElement: {"": "GraphicsElement;x=,y=", "%": "SVGRectElement"},
+RectElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGRectElement"},
 
 SvgElement: {"": "Element;", "%": "SVGAltGlyphDefElement|SVGAltGlyphItemElement|SVGAnimateColorElement|SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGComponentTransferFunctionElement|SVGCursorElement|SVGDescElement|SVGFEDistantLightElement|SVGFEDropShadowElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFontElement|SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement|SVGGlyphElement|SVGGlyphRefElement|SVGGradientElement|SVGHKernElement|SVGLinearGradientElement|SVGMPathElement|SVGMarkerElement|SVGMetadataElement|SVGMissingGlyphElement|SVGRadialGradientElement|SVGScriptElement|SVGSetElement|SVGStopElement|SVGStyleElement|SVGSymbolElement|SVGTitleElement|SVGVKernElement|SVGViewElement;SVGElement"},
 
-SvgSvgElement: {"": "GraphicsElement;x=,y=", "%": "SVGSVGElement"},
+SvgSvgElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGSVGElement"},
 
 TextContentElement: {"": "GraphicsElement;", "%": "SVGTextPathElement;SVGTextContentElement"},
 
 TextPositioningElement: {"": "TextContentElement;x=,y=", "%": "SVGAltGlyphElement|SVGTSpanElement|SVGTextElement|SVGTextPositioningElement"},
 
-UseElement: {"": "GraphicsElement;x=,y=", "%": "SVGUseElement"}}],
+UseElement: {"": "GraphicsElement;height=,width=,x=,y=", "%": "SVGUseElement"}}],
 ["dart.isolate", "dart:isolate", , P, {
 ReceivePort: {"": "Object;", $isReceivePort: true}}],
 ["dart.math", "dart:math", , P, {
@@ -7086,7 +7212,7 @@ _RectangleBase: {"": "Object;",
   }
 },
 
-Rectangle: {"": "_RectangleBase;left>,top,width,height", $isRectangle: true, $as_RectangleBase: null}}],
+Rectangle: {"": "_RectangleBase;left>,top,width>,height>", $isRectangle: true, $as_RectangleBase: null}}],
 ["dart.typed_data", "dart:typed_data", , P, {
 TypedData: {"": "Interceptor;",
   _invalidIndex$2: function(receiver, index, $length) {
@@ -7401,7 +7527,7 @@ GObj: {"": "Object;",
   }
 },
 
-GButton: {"": "GObj;x>,y>,width,height,z,onPress,onRelease<,isOn<,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
+GButton: {"": "GObj;x>,y>,width>,height>,z,onPress,onRelease<,isOn<,isPress<,isVisible,isEnable,text,renderer,_isDisposed",
   get$left: function(_) {
     return this.x - this.width / 2;
   },
@@ -8240,6 +8366,12 @@ Sprite: {"": "Object;_x,_y,_w,_h,_rect,_alpha,_scale,offsetx,offsety,rotate,isSh
   get$render: function() {
     return new H.BoundClosure$1(this, B.Sprite.prototype.render$1, null, "render$1");
   },
+  get$width: function(_) {
+    return this._w;
+  },
+  get$height: function(_) {
+    return this._h;
+  },
   get$x: function(_) {
     return this._x;
   },
@@ -8459,7 +8591,13 @@ main_closure: {"": "Closure;",
     t1.put$2("star01", "./img/star01.png");
     t1.put$2("ball01", "./img/ball01.png");
     t1.put$2("gamestart", "./img/gamestart.png");
+    t1 = $.get$geng().imageMap;
+    t1.put$2("p100", "./present/p100.png");
+    t1.put$2("p90", "./present/p90.png");
+    t1.put$2("p80", "./present/p80.png");
+    t1.put$2("p70", "./present/p70.png");
     $.get$geng().soundManager.put$2("bell", "./sound/xmasbell");
+    $.get$geng().soundManager.put$2("bell2", "./sound/xmasbell");
     $.get$geng().soundManager.put$2("fire", "./sound/bag");
     $.get$geng().soundManager.put$2("bomb", "./sound/pyo");
     $.get$geng().hiscoreManager.init$0();
@@ -8761,7 +8899,6 @@ TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender
     t3 = $.tank;
     t2._addObjlist.push(t3);
     t3.onInit$0();
-    $.score = 0;
     $.numberOfHit = 0;
     $.numberOfFire = 0;
     t1.prex_0 = 0;
@@ -8801,7 +8938,7 @@ TankGame: {"": "GScreen;_renderList,btnList,onProcess,onFrontRender,onBackRender
     P.Timer_Timer(P.Duration$(0, 0, 0, 2000, 0, 0), new X.TankGame_onEndOfStage_closure1(t1, _numberOfFire));
     P.Timer_Timer(P.Duration$(0, 0, 0, 3000, 0, 0), new X.TankGame_onEndOfStage_closure2(t1, score, levelText));
     P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure3(t1));
-    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure4(this));
+    P.Timer_Timer(P.Duration$(0, 0, 0, 4000, 0, 0), new X.TankGame_onEndOfStage_closure4(this, score));
     this.onProcess = new X.TankGame_onEndOfStage_closure5();
   }
 },
@@ -8888,7 +9025,7 @@ TankGame_onEndOfStage_closure: {"": "Closure;box_0",
 
 TankGame_onEndOfStage_closure0: {"": "Closure;box_0,_numberOfHit_1,isPerfect_2",
   call$0: function() {
-    this.box_0.drawMeichu_1 = new X.TankGame_onEndOfStage__closure1(this._numberOfHit_1, this.isPerfect_2);
+    this.box_0.drawMeichu_1 = new X.TankGame_onEndOfStage__closure2(this._numberOfHit_1, this.isPerfect_2);
     var t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
     t1 = $.get$geng().soundManager;
@@ -8897,7 +9034,7 @@ TankGame_onEndOfStage_closure0: {"": "Closure;box_0,_numberOfHit_1,isPerfect_2",
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure1: {"": "Closure;_numberOfHit_3,isPerfect_4",
+TankGame_onEndOfStage__closure2: {"": "Closure;_numberOfHit_3,isPerfect_4",
   call$2: function(c, y) {
     c.drawTexts$4($.get$trenScore(), ["\u3081\u3044\u3061\u3085\u3046\u3057\u305f\u304b\u305a: " + H.S(this._numberOfHit_3) + "\u3053"], 285, y);
     if (this.isPerfect_4)
@@ -8912,7 +9049,7 @@ TankGame_onEndOfStage_closure1: {"": "Closure;box_0,_numberOfFire_5",
     var t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
     t1 = $.get$geng().soundManager;
-    t1.play$1(t1, "bell");
+    t1.play$1(t1, "bell2");
   },
   $is_void_: true
 },
@@ -8921,7 +9058,7 @@ TankGame_onEndOfStage_closure2: {"": "Closure;box_0,score_6,levelText_7",
   call$0: function() {
     var t1, t2, t3, exception;
     t1 = this.box_0;
-    t1.drawLevel_3 = new X.TankGame_onEndOfStage__closure0(this.levelText_7);
+    t1.drawLevel_3 = new X.TankGame_onEndOfStage__closure1(this.levelText_7);
     try {
       t2 = $.get$geng().hiscoreManager;
       t3 = $.stageData;
@@ -8938,7 +9075,7 @@ TankGame_onEndOfStage_closure2: {"": "Closure;box_0,score_6,levelText_7",
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure0: {"": "Closure;levelText_8",
+TankGame_onEndOfStage__closure1: {"": "Closure;levelText_8",
   call$2: function(c, y) {
     c.drawTexts$4($.get$trenScore(), ["\u30ad\u30df\u306e\u3046\u3067\u307e\u3048\u306f"], 285, y);
     c.drawTexts$4($.get$trenScore(), ["\u301c " + H.S(this.levelText_8) + " \u30ec\u30d9\u30eb \u301c"], 285, J.$add$ns(y, 30));
@@ -8960,27 +9097,51 @@ TankGame_onEndOfStage_closure3: {"": "Closure;box_0",
   $is_void_: true
 },
 
-TankGame_onEndOfStage_closure4: {"": "Closure;this_9",
+TankGame_onEndOfStage_closure4: {"": "Closure;this_9,score_10",
   call$0: function() {
-    var retBtn, t1;
-    retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
-    retBtn.onPress = new X.TankGame_onEndOfStage__closure();
-    retBtn.text = "\u304a\u3057\u307e\u3044";
-    retBtn.x = 285;
-    retBtn.y = 500;
-    retBtn.width = 100;
-    retBtn.height = 40;
-    $.get$geng().objlist._addObjlist.push(retBtn);
-    retBtn.onInit$0();
-    t1 = this.this_9.btnList;
-    t1.add$1(t1, retBtn);
+    var pscreen, t1, retBtn;
+    pscreen = X.PresentScreen$(this.score_10);
+    t1 = this.this_9;
+    if (pscreen.img != null) {
+      retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+      retBtn.onPress = new X.TankGame_onEndOfStage__closure(pscreen);
+      retBtn.text = "\u3064\u304e\u3078";
+      retBtn.x = 285;
+      retBtn.y = 500;
+      retBtn.width = 150;
+      retBtn.height = 40;
+      $.get$geng().objlist._addObjlist.push(retBtn);
+      retBtn.onInit$0();
+      t1 = t1.btnList;
+      t1.add$1(t1, retBtn);
+    } else {
+      retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+      retBtn.onPress = new X.TankGame_onEndOfStage__closure0();
+      retBtn.text = "\u304a\u3057\u307e\u3044";
+      retBtn.x = 285;
+      retBtn.y = 500;
+      retBtn.width = 150;
+      retBtn.height = 40;
+      $.get$geng().objlist._addObjlist.push(retBtn);
+      retBtn.onInit$0();
+      t1 = t1.btnList;
+      t1.add$1(t1, retBtn);
+    }
     t1 = $.get$geng();
     t1._repaintCount = t1._repaintCount + 1;
   },
   $is_void_: true
 },
 
-TankGame_onEndOfStage__closure: {"": "Closure;",
+TankGame_onEndOfStage__closure: {"": "Closure;pscreen_11",
+  call$0: function() {
+    var t1 = $.get$geng();
+    t1.set$screen(t1, this.pscreen_11);
+  },
+  $is_void_: true
+},
+
+TankGame_onEndOfStage__closure0: {"": "Closure;",
   call$0: function() {
     var t1 = $.get$geng();
     t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
@@ -9004,6 +9165,62 @@ TankGame_onEndOfStage_closure5: {"": "Closure;",
       t1.onDispose$0();
       t1._isDisposed = true;
     }
+  },
+  $is_void_: true
+},
+
+PresentScreen: {"": "GScreen;_score,img,_renderList,btnList,onProcess,onFrontRender,onBackRender,onMoveOut",
+  onStart$0: function() {
+    var now, retBtn, t1;
+    $.get$geng().objlist.disposeAll$0();
+    now = P.DateTime$_now();
+    this.onFrontRender = new X.PresentScreen_onStart_closure(this, ["" + H.Primitives_getYear(now) + "/" + H.Primitives_getMonth(now) + "/" + H.Primitives_getDay(now) + " " + H.Primitives_getHours(now) + ":" + H.Primitives_getMinutes(now) + " " + H.S(X.resultToLevelText(this._score))]);
+    retBtn = new B.GButton(320, 180, 100, 50, 1000, null, null, false, false, true, true, null, $.get$defaultButtonRenderer().get$render(), false);
+    retBtn.onPress = new X.PresentScreen_onStart_closure0();
+    retBtn.text = "\u30bf\u30a4\u30c8\u30eb\u753b\u9762\u306b\u623b\u308b";
+    retBtn.x = 285;
+    retBtn.y = 540;
+    retBtn.width = 250;
+    retBtn.height = 40;
+    $.get$geng().objlist._addObjlist.push(retBtn);
+    retBtn.onInit$0();
+    t1 = this.btnList;
+    t1.add$1(t1, retBtn);
+  },
+  static: {
+PresentScreen$: function(score) {
+  var t1 = $.get$geng().imageMap;
+  t1 = t1.map;
+  return new X.PresentScreen(score, t1.$index(t1, "p" + score), B.RenderList$(), new B.ButtonList(null), null, null, null, null);
+}}
+
+},
+
+PresentScreen_onStart_closure: {"": "Closure;this_0,info_1",
+  call$1: function(c) {
+    var t1, t2, t3, x, y;
+    t1 = this.this_0.img;
+    if (t1 != null) {
+      t2 = J.getInterceptor$x(t1);
+      t3 = t2.get$width(t1);
+      if (typeof t3 !== "number")
+        throw H.iae(t3);
+      x = C.JSNumber_methods.$tdiv(570 - t3, 2);
+      t2 = t2.get$height(t1);
+      if (typeof t2 !== "number")
+        throw H.iae(t2);
+      y = C.JSNumber_methods.$tdiv(570 - t2, 2);
+      c.get$c().drawImage(t1, x, y - 15);
+    }
+    c.drawTexts$4($.get$scoretren(), this.info_1, 5, 5);
+  },
+  $is_args1: true
+},
+
+PresentScreen_onStart_closure0: {"": "Closure;",
+  call$0: function() {
+    var t1 = $.get$geng();
+    t1.set$screen(t1, new X.Title(null, true, B.RenderList$(), new B.ButtonList(null), null, null, null, null));
   },
   $is_void_: true
 },
@@ -9147,7 +9364,7 @@ FireButton_fire_closure: {"": "Closure;this_0",
 FireButton_startCharge_closure: {"": "Closure;this_0",
   call$1: function(t) {
     var t1 = this.this_0;
-    t1.power = t1.power + 0.15;
+    t1.power = t1.power + 0.18;
     if (t1.power >= 1) {
       t1.power = 1;
       t.cancel$0();
@@ -9415,7 +9632,7 @@ Target: {"": "GObj;sp,pos,_width,_hitdx,bombTypes,_isDisposed",
   Target$fromType$1: function(type) {
     switch (type) {
       case "small":
-        this._width = 30;
+        this._width = 40;
         this.sp = B.ImageSprite$(120, null, "targetS", 60);
         this.bombTypes = [0, 1, 3, 4, 3, 4];
         break;
@@ -9543,7 +9760,7 @@ Bomb_onInit_closure: {"": "Closure;this_0",
   $is_void_: true
 },
 
-Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width,height,_isDisposed",
+Ground: {"": "GObj;points01,points02,z,translateX,marginH,marginV,width>,height>,_isDisposed",
   onInit$0: function() {
     var t1 = $.get$geng()._rect.width;
     if (typeof t1 !== "number")
@@ -10119,7 +10336,6 @@ $.Device__isWebKit = null;
 $.itemData = null;
 $.stageData = null;
 $.tank = null;
-$.score = null;
 $.numberOfHit = null;
 $.numberOfFire = null;
 $.offset_x = 0;
@@ -10346,7 +10562,7 @@ Isolate.$lazy($, "geng", "geng", "get$geng", function() {
   return new B.GEng(null, null, new B.GObjList(P.List_List(null, null), P.List_List(null, null)), null, null, new B.ImageMap(P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), Q.SoundManager$(), new B.HiScoreManager(null, 5, [10, 10, 10, 10, 10]), 1, new B.FrameTimer(new P.Stopwatch(null, null), null, null, null), new B.FPSCounter(new P.Stopwatch(null, null), 0, 0, 0, 0, 0, 0), C.C__Random, 0);
 });
 Isolate.$lazy($, "stageList", "stageList", "get$stageList", function() {
-  return [H.fillLiteralMap(["id", "stage0", "speed", 3, "map", [[900, 150, "large"], [500, 150, "large"], [500, 150, "large"], [500, 150, "small"], [500, 150, "small"], [500, 150, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 130, "large"], [250, 150, "small"], [350, 260, "large"], [250, 100, "small"], [250, 270, "large"], [300, 150, "small"], [250, 100, "large"], [200, 150, "small"], [180, 100, "small"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [125, 100, "small"], [150, 100, "small"], [150, 100, "small"], [250, 280, "small"], [180, 240, "small"], [180, 200, "small"], [180, 160, "small"], [180, 120, "small"], [180, 90, "small"], [250, 90, "large"], [180, 280, "small"], [180, 90, "large"], [180, 280, "small"], [180, 90, "large"], [250, 50, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
+  return [H.fillLiteralMap(["id", "stage0", "speed", 3, "map", [[900, 180, "large"], [500, 180, "large"], [500, 180, "large"], [500, 180, "small"], [500, 180, "small"], [500, 180, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), H.fillLiteralMap(["id", "stage1", "speed", 3, "map", [[900, 200, "large"], [400, 270, "small"], [400, 150, "large"], [250, 180, "small"], [350, 260, "large"], [250, 200, "small"], [250, 270, "large"], [300, 180, "small"], [250, 130, "large"], [200, 170, "small"], [180, 130, "large"], [350, 280, "small"], [180, 240, "small"], [180, 200, "small"], [180, 160, "small"], [180, 120, "small"], [300, 90, "large"], [180, 280, "small"], [180, 90, "large"], [180, 280, "small"], [180, 90, "large"], [700, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 280, "large"], [150, 100, "small"], [150, 100, "small"], [150, 100, "small"], [450, 50, "small"], [150, 50, "small"]]], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
 });
 Isolate.$lazy($, "itemList", "itemList", "get$itemList", function() {
   return [H.fillLiteralMap(["id", "nom001", "obtained", true, "price", 0, "cannonSize", 20, "cannonSpeed", 6, "text", "\u307e\u3081\u7832\u5f3e"], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null))];
@@ -10884,8 +11100,14 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   CanvasElement.prototype = $desc;
+  CanvasElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   CanvasElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
+  };
+  CanvasElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   CanvasElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -11130,11 +11352,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   EmbedElement.prototype = $desc;
+  EmbedElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   EmbedElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
   };
   EmbedElement.prototype.set$src = function(receiver, v) {
     return receiver.src = v;
+  };
+  EmbedElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   EmbedElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -11271,11 +11499,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   IFrameElement.prototype = $desc;
+  IFrameElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   IFrameElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
   };
   IFrameElement.prototype.set$src = function(receiver, v) {
     return receiver.src = v;
+  };
+  IFrameElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   IFrameElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -11289,11 +11523,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ImageElement.prototype = $desc;
+  ImageElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   ImageElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
   };
   ImageElement.prototype.set$src = function(receiver, v) {
     return receiver.src = v;
+  };
+  ImageElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   ImageElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -11307,11 +11547,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   InputElement.prototype = $desc;
+  InputElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   InputElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
   };
   InputElement.prototype.set$src = function(receiver, v) {
     return receiver.src = v;
+  };
+  InputElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   InputElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -11583,8 +11829,14 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ObjectElement.prototype = $desc;
+  ObjectElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   ObjectElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
+  };
+  ObjectElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   ObjectElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -12084,8 +12336,14 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   VideoElement.prototype = $desc;
+  VideoElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
   VideoElement.prototype.set$height = function(receiver, v) {
     return receiver.height = v;
+  };
+  VideoElement.prototype.get$width = function(receiver) {
+    return receiver.width;
   };
   VideoElement.prototype.set$width = function(receiver, v) {
     return receiver.width = v;
@@ -12372,6 +12630,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEBlendElement.prototype = $desc;
+  FEBlendElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEBlendElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEBlendElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12387,6 +12651,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEColorMatrixElement.prototype = $desc;
+  FEColorMatrixElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEColorMatrixElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEColorMatrixElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12402,6 +12672,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEComponentTransferElement.prototype = $desc;
+  FEComponentTransferElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEComponentTransferElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEComponentTransferElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12417,6 +12693,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FECompositeElement.prototype = $desc;
+  FECompositeElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FECompositeElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FECompositeElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12432,6 +12714,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEConvolveMatrixElement.prototype = $desc;
+  FEConvolveMatrixElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEConvolveMatrixElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEConvolveMatrixElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12447,6 +12735,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEDiffuseLightingElement.prototype = $desc;
+  FEDiffuseLightingElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEDiffuseLightingElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEDiffuseLightingElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12462,6 +12756,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEDisplacementMapElement.prototype = $desc;
+  FEDisplacementMapElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEDisplacementMapElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEDisplacementMapElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12486,6 +12786,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEFloodElement.prototype = $desc;
+  FEFloodElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEFloodElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEFloodElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12537,6 +12843,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEGaussianBlurElement.prototype = $desc;
+  FEGaussianBlurElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEGaussianBlurElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEGaussianBlurElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12552,6 +12864,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEImageElement.prototype = $desc;
+  FEImageElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEImageElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEImageElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12567,6 +12885,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEMergeElement.prototype = $desc;
+  FEMergeElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEMergeElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEMergeElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12591,6 +12915,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEMorphologyElement.prototype = $desc;
+  FEMorphologyElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEMorphologyElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEMorphologyElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12606,6 +12936,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FEOffsetElement.prototype = $desc;
+  FEOffsetElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FEOffsetElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FEOffsetElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12636,6 +12972,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FESpecularLightingElement.prototype = $desc;
+  FESpecularLightingElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FESpecularLightingElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FESpecularLightingElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12666,6 +13008,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FETileElement.prototype = $desc;
+  FETileElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FETileElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FETileElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12681,6 +13029,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FETurbulenceElement.prototype = $desc;
+  FETurbulenceElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FETurbulenceElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FETurbulenceElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12696,6 +13050,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FilterElement.prototype = $desc;
+  FilterElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  FilterElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   FilterElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12711,6 +13071,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ForeignObjectElement.prototype = $desc;
+  ForeignObjectElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  ForeignObjectElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   ForeignObjectElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12744,6 +13110,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ImageElement0.prototype = $desc;
+  ImageElement0.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  ImageElement0.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   ImageElement0.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12786,6 +13158,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   MaskElement.prototype = $desc;
+  MaskElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  MaskElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   MaskElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12819,6 +13197,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   PatternElement.prototype = $desc;
+  PatternElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  PatternElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   PatternElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12861,6 +13245,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   RectElement.prototype = $desc;
+  RectElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  RectElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   RectElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -12930,6 +13320,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SvgSvgElement.prototype = $desc;
+  SvgSvgElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  SvgSvgElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   SvgSvgElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -13023,6 +13419,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   UseElement.prototype = $desc;
+  UseElement.prototype.get$height = function(receiver) {
+    return receiver.height;
+  };
+  UseElement.prototype.get$width = function(receiver) {
+    return receiver.width;
+  };
   UseElement.prototype.get$x = function(receiver) {
     return receiver.x;
   };
@@ -15209,6 +15611,47 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Comparable.prototype = $desc;
+  function DateTime(millisecondsSinceEpoch, isUtc) {
+    this.millisecondsSinceEpoch = millisecondsSinceEpoch;
+    this.isUtc = isUtc;
+  }
+  DateTime.builtin$cls = "DateTime";
+  if (!"name" in DateTime)
+    DateTime.name = "DateTime";
+  $desc = $collectedClasses.DateTime;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  DateTime.prototype = $desc;
+  DateTime.prototype.get$millisecondsSinceEpoch = function() {
+    return this.millisecondsSinceEpoch;
+  };
+  function DateTime_toString_fourDigits() {
+  }
+  DateTime_toString_fourDigits.builtin$cls = "DateTime_toString_fourDigits";
+  if (!"name" in DateTime_toString_fourDigits)
+    DateTime_toString_fourDigits.name = "DateTime_toString_fourDigits";
+  $desc = $collectedClasses.DateTime_toString_fourDigits;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  DateTime_toString_fourDigits.prototype = $desc;
+  function DateTime_toString_threeDigits() {
+  }
+  DateTime_toString_threeDigits.builtin$cls = "DateTime_toString_threeDigits";
+  if (!"name" in DateTime_toString_threeDigits)
+    DateTime_toString_threeDigits.name = "DateTime_toString_threeDigits";
+  $desc = $collectedClasses.DateTime_toString_threeDigits;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  DateTime_toString_threeDigits.prototype = $desc;
+  function DateTime_toString_twoDigits() {
+  }
+  DateTime_toString_twoDigits.builtin$cls = "DateTime_toString_twoDigits";
+  if (!"name" in DateTime_toString_twoDigits)
+    DateTime_toString_twoDigits.name = "DateTime_toString_twoDigits";
+  $desc = $collectedClasses.DateTime_toString_twoDigits;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  DateTime_toString_twoDigits.prototype = $desc;
   function Duration(_duration) {
     this._duration = _duration;
   }
@@ -15646,6 +16089,12 @@ function dart_precompiled($collectedClasses) {
   Rectangle.prototype.get$left = function(receiver) {
     return this.left;
   };
+  Rectangle.prototype.get$width = function(receiver) {
+    return this.width;
+  };
+  Rectangle.prototype.get$height = function(receiver) {
+    return this.height;
+  };
   function TypedData_ListMixin() {
   }
   TypedData_ListMixin.builtin$cls = "TypedData_ListMixin";
@@ -15840,6 +16289,12 @@ function dart_precompiled($collectedClasses) {
   };
   GButton.prototype.get$y = function(receiver) {
     return this.y;
+  };
+  GButton.prototype.get$width = function(receiver) {
+    return this.width;
+  };
+  GButton.prototype.get$height = function(receiver) {
+    return this.height;
   };
   GButton.prototype.get$onRelease = function() {
     return this.onRelease;
@@ -16625,17 +17080,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage_closure0.prototype = $desc;
-  function TankGame_onEndOfStage__closure1(_numberOfHit_3, isPerfect_4) {
+  function TankGame_onEndOfStage__closure2(_numberOfHit_3, isPerfect_4) {
     this._numberOfHit_3 = _numberOfHit_3;
     this.isPerfect_4 = isPerfect_4;
   }
-  TankGame_onEndOfStage__closure1.builtin$cls = "TankGame_onEndOfStage__closure1";
-  if (!"name" in TankGame_onEndOfStage__closure1)
-    TankGame_onEndOfStage__closure1.name = "TankGame_onEndOfStage__closure1";
-  $desc = $collectedClasses.TankGame_onEndOfStage__closure1;
+  TankGame_onEndOfStage__closure2.builtin$cls = "TankGame_onEndOfStage__closure2";
+  if (!"name" in TankGame_onEndOfStage__closure2)
+    TankGame_onEndOfStage__closure2.name = "TankGame_onEndOfStage__closure2";
+  $desc = $collectedClasses.TankGame_onEndOfStage__closure2;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  TankGame_onEndOfStage__closure1.prototype = $desc;
+  TankGame_onEndOfStage__closure2.prototype = $desc;
   function TankGame_onEndOfStage_closure1(box_0, _numberOfFire_5) {
     this.box_0 = box_0;
     this._numberOfFire_5 = _numberOfFire_5;
@@ -16659,16 +17114,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage_closure2.prototype = $desc;
-  function TankGame_onEndOfStage__closure0(levelText_8) {
+  function TankGame_onEndOfStage__closure1(levelText_8) {
     this.levelText_8 = levelText_8;
   }
-  TankGame_onEndOfStage__closure0.builtin$cls = "TankGame_onEndOfStage__closure0";
-  if (!"name" in TankGame_onEndOfStage__closure0)
-    TankGame_onEndOfStage__closure0.name = "TankGame_onEndOfStage__closure0";
-  $desc = $collectedClasses.TankGame_onEndOfStage__closure0;
+  TankGame_onEndOfStage__closure1.builtin$cls = "TankGame_onEndOfStage__closure1";
+  if (!"name" in TankGame_onEndOfStage__closure1)
+    TankGame_onEndOfStage__closure1.name = "TankGame_onEndOfStage__closure1";
+  $desc = $collectedClasses.TankGame_onEndOfStage__closure1;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  TankGame_onEndOfStage__closure0.prototype = $desc;
+  TankGame_onEndOfStage__closure1.prototype = $desc;
   function TankGame_onEndOfStage_closure3(box_0) {
     this.box_0 = box_0;
   }
@@ -16679,8 +17134,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage_closure3.prototype = $desc;
-  function TankGame_onEndOfStage_closure4(this_9) {
+  function TankGame_onEndOfStage_closure4(this_9, score_10) {
     this.this_9 = this_9;
+    this.score_10 = score_10;
   }
   TankGame_onEndOfStage_closure4.builtin$cls = "TankGame_onEndOfStage_closure4";
   if (!"name" in TankGame_onEndOfStage_closure4)
@@ -16689,7 +17145,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage_closure4.prototype = $desc;
-  function TankGame_onEndOfStage__closure() {
+  function TankGame_onEndOfStage__closure(pscreen_11) {
+    this.pscreen_11 = pscreen_11;
   }
   TankGame_onEndOfStage__closure.builtin$cls = "TankGame_onEndOfStage__closure";
   if (!"name" in TankGame_onEndOfStage__closure)
@@ -16698,6 +17155,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage__closure.prototype = $desc;
+  function TankGame_onEndOfStage__closure0() {
+  }
+  TankGame_onEndOfStage__closure0.builtin$cls = "TankGame_onEndOfStage__closure0";
+  if (!"name" in TankGame_onEndOfStage__closure0)
+    TankGame_onEndOfStage__closure0.name = "TankGame_onEndOfStage__closure0";
+  $desc = $collectedClasses.TankGame_onEndOfStage__closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  TankGame_onEndOfStage__closure0.prototype = $desc;
   function TankGame_onEndOfStage_closure5() {
   }
   TankGame_onEndOfStage_closure5.builtin$cls = "TankGame_onEndOfStage_closure5";
@@ -16707,6 +17173,43 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TankGame_onEndOfStage_closure5.prototype = $desc;
+  function PresentScreen(_score, img, _renderList, btnList, onProcess, onFrontRender, onBackRender, onMoveOut) {
+    this._score = _score;
+    this.img = img;
+    this._renderList = _renderList;
+    this.btnList = btnList;
+    this.onProcess = onProcess;
+    this.onFrontRender = onFrontRender;
+    this.onBackRender = onBackRender;
+    this.onMoveOut = onMoveOut;
+  }
+  PresentScreen.builtin$cls = "PresentScreen";
+  if (!"name" in PresentScreen)
+    PresentScreen.name = "PresentScreen";
+  $desc = $collectedClasses.PresentScreen;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PresentScreen.prototype = $desc;
+  function PresentScreen_onStart_closure(this_0, info_1) {
+    this.this_0 = this_0;
+    this.info_1 = info_1;
+  }
+  PresentScreen_onStart_closure.builtin$cls = "PresentScreen_onStart_closure";
+  if (!"name" in PresentScreen_onStart_closure)
+    PresentScreen_onStart_closure.name = "PresentScreen_onStart_closure";
+  $desc = $collectedClasses.PresentScreen_onStart_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PresentScreen_onStart_closure.prototype = $desc;
+  function PresentScreen_onStart_closure0() {
+  }
+  PresentScreen_onStart_closure0.builtin$cls = "PresentScreen_onStart_closure0";
+  if (!"name" in PresentScreen_onStart_closure0)
+    PresentScreen_onStart_closure0.name = "PresentScreen_onStart_closure0";
+  $desc = $collectedClasses.PresentScreen_onStart_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PresentScreen_onStart_closure0.prototype = $desc;
   function TankGamePracticely(_renderList, btnList, onProcess, onFrontRender, onBackRender, onMoveOut) {
     this._renderList = _renderList;
     this.btnList = btnList;
@@ -16958,6 +17461,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Ground.prototype = $desc;
+  Ground.prototype.get$width = function(receiver) {
+    return this.width;
+  };
+  Ground.prototype.get$height = function(receiver) {
+    return this.height;
+  };
   function Ground_onPrepareRender_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -17071,5 +17580,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Closure$21.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CanvasGradient, CanvasPattern, CanvasRenderingContext, CanvasRenderingContext2D, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DocumentType, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, Storage, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, Touch, TouchEvent, TouchList, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _Entity, _HTMLAppletElement, _HTMLBaseFontElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, TypedData, Uint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _NativeJsSendPort_send__closure, _WorkerSendPort, _WorkerSendPort_send_closure, ReceivePortImpl, BoundClosure$i0, _waitForPendingPorts_closure, _PendingSendPortFinder, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, BoundClosure$1, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, TimerImpl$periodic_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, BoundClosure, CastErrorImplementation, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, FixedLengthListMixin, _AsyncError, Future, Future_wait_handleError, Future_wait_closure, _Completer, _AsyncCompleter, _Future, BoundClosure$2, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_closure, _Future__propagateToListeners_closure0, _Future__propagateToListeners__closure, _Future__propagateToListeners__closure0, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, BoundClosure$0, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _SplayTreeNode, _SplayTreeMapNode, _SplayTree, SplayTreeMap, SplayTreeMap_closure, _SplayTreeIterator, _SplayTreeKeyIterable, _SplayTreeValueIterable, _SplayTreeKeyIterator, _SplayTreeValueIterator, _SplayTreeNodeIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Converter, JsonUnsupportedObjectError, JsonCyclicError, JsonEncoder, JsonDecoder, _JsonStringifier, _JsonStringifier_stringifyJsonValue_closure, NoSuchMethodError_toString_closure, Comparable, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, Iterable, Iterator, Null, Object, StackTrace, Stopwatch, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Storage_keys_closure, Storage_values_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, ReceivePort, _Random, Point, _RectangleBase, Rectangle, TypedData_ListMixin, TypedData_ListMixin_FixedLengthListMixin, TextRender, Color, GCanvas2D, GCanvas2D_drawTexts_closure, GCanvas2D_drawTexts_closure0, GCanvas2D_drawTexts_closure1, GCanvas2D_drawTexts_closure2, DefaultButtonRender, BoundClosure$20, GPInfo, GObj, GButton, GButton_onPrepareRender_closure, ButtonList, ButtonList_onPress_closure, ButtonList_onPress_closure0, ButtonList_onRelease_closure, ButtonList_onRelease_closure0, ButtonList_onMouseMove_closure, ButtonList_onMouseMove_closure0, GScreen, PressEvent, RenderList, RenderList_closure, RenderList_renderAll_closure, ImageMap, ImageMap_put_closure, GObjList, GObjList_gcObj_closure, GObjList_disposeAll_closure, GObjList_processAll_closure, GObjList_prepareRenderAll_closure, GObjList_where_closure, GObjList_where_closure0, GEng, GEng_screen_closure, GEng_initField_closure, GEng_initField_closure0, GEng_initField_closure1, GEng_initField_closure2, GEng_initField_closure3, GEng_initField_closure4, GEng_initField_closure5, GEng_startTimer_closure, HiScoreManager, FrameTimer, FrameTimer_start_closure, FrameTimer_next_closure, FPSCounter, ImageSprite, ImageSprite_closure, Sprite, SoundManager, SoundManager_put_closure, SoundManager_put_closure0, GamePointManager, GamePointManager__updateUnlockSet_closure, main_closure, Title, Title_onStart_closure, Title_onStart_closure0, Title_onStart_closure1, Title_onStart_closure2, StageSelect, StageSelect_onStart_closure, StageSelect_onStart__closure0, StageSelect_onStart_closure0, StageSelect_onStart__closure, StageSelect_onStart_closure1, StageSelect_onStart_closure2, ConfigSetting, ConfigSetting_onStart_closure, ConfigSetting_onStart_closure0, ConfigSetting_onStart_closure1, ConfigSetting_onStart_closure2, TankGame, TankGame_onStart_closure, TankGame_onStart_closure0, TankGame_onStart_closure1, TankGame_onStart_closure2, TankGame_onEndOfStage_closure, TankGame_onEndOfStage_closure0, TankGame_onEndOfStage__closure1, TankGame_onEndOfStage_closure1, TankGame_onEndOfStage_closure2, TankGame_onEndOfStage__closure0, TankGame_onEndOfStage_closure3, TankGame_onEndOfStage_closure4, TankGame_onEndOfStage__closure, TankGame_onEndOfStage_closure5, TankGamePracticely, TankGamePracticely_onEndOfStage_closure, TankGamePracticely_onEndOfStage_closure0, TankGamePracticely_onEndOfStage_closure1, FireButton, FireButton_fire_closure, FireButton_startCharge_closure, FireButton_startCharge__closure, GameStartLogo, GameStartLogo_onPrepareRender_closure, Tank, Tank_onInit_closure, Cannonball, Cannonball_onProcess_closure, Cannonball_onProcess_closure0, Target, Target_onPrepareRender_closure, Bomb, Bomb_onInit_closure, Ground, Ground_onPrepareRender_closure, Ground_onPrepareRender__closure, Ground_onPrepareRender__closure0, Smoke, Vector, Closure$2, Closure$1, Closure$0, Closure$7, Closure$21];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CanvasGradient, CanvasPattern, CanvasRenderingContext, CanvasRenderingContext2D, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DocumentType, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, Storage, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, Touch, TouchEvent, TouchList, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _Entity, _HTMLAppletElement, _HTMLBaseFontElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, TypedData, Uint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _NativeJsSendPort_send__closure, _WorkerSendPort, _WorkerSendPort_send_closure, ReceivePortImpl, BoundClosure$i0, _waitForPendingPorts_closure, _PendingSendPortFinder, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, BoundClosure$1, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, TimerImpl$periodic_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, BoundClosure, CastErrorImplementation, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, FixedLengthListMixin, _AsyncError, Future, Future_wait_handleError, Future_wait_closure, _Completer, _AsyncCompleter, _Future, BoundClosure$2, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_closure, _Future__propagateToListeners_closure0, _Future__propagateToListeners__closure, _Future__propagateToListeners__closure0, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, BoundClosure$0, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _SplayTreeNode, _SplayTreeMapNode, _SplayTree, SplayTreeMap, SplayTreeMap_closure, _SplayTreeIterator, _SplayTreeKeyIterable, _SplayTreeValueIterable, _SplayTreeKeyIterator, _SplayTreeValueIterator, _SplayTreeNodeIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Converter, JsonUnsupportedObjectError, JsonCyclicError, JsonEncoder, JsonDecoder, _JsonStringifier, _JsonStringifier_stringifyJsonValue_closure, NoSuchMethodError_toString_closure, Comparable, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, Iterable, Iterator, Null, Object, StackTrace, Stopwatch, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Storage_keys_closure, Storage_values_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, ReceivePort, _Random, Point, _RectangleBase, Rectangle, TypedData_ListMixin, TypedData_ListMixin_FixedLengthListMixin, TextRender, Color, GCanvas2D, GCanvas2D_drawTexts_closure, GCanvas2D_drawTexts_closure0, GCanvas2D_drawTexts_closure1, GCanvas2D_drawTexts_closure2, DefaultButtonRender, BoundClosure$20, GPInfo, GObj, GButton, GButton_onPrepareRender_closure, ButtonList, ButtonList_onPress_closure, ButtonList_onPress_closure0, ButtonList_onRelease_closure, ButtonList_onRelease_closure0, ButtonList_onMouseMove_closure, ButtonList_onMouseMove_closure0, GScreen, PressEvent, RenderList, RenderList_closure, RenderList_renderAll_closure, ImageMap, ImageMap_put_closure, GObjList, GObjList_gcObj_closure, GObjList_disposeAll_closure, GObjList_processAll_closure, GObjList_prepareRenderAll_closure, GObjList_where_closure, GObjList_where_closure0, GEng, GEng_screen_closure, GEng_initField_closure, GEng_initField_closure0, GEng_initField_closure1, GEng_initField_closure2, GEng_initField_closure3, GEng_initField_closure4, GEng_initField_closure5, GEng_startTimer_closure, HiScoreManager, FrameTimer, FrameTimer_start_closure, FrameTimer_next_closure, FPSCounter, ImageSprite, ImageSprite_closure, Sprite, SoundManager, SoundManager_put_closure, SoundManager_put_closure0, GamePointManager, GamePointManager__updateUnlockSet_closure, main_closure, Title, Title_onStart_closure, Title_onStart_closure0, Title_onStart_closure1, Title_onStart_closure2, StageSelect, StageSelect_onStart_closure, StageSelect_onStart__closure0, StageSelect_onStart_closure0, StageSelect_onStart__closure, StageSelect_onStart_closure1, StageSelect_onStart_closure2, ConfigSetting, ConfigSetting_onStart_closure, ConfigSetting_onStart_closure0, ConfigSetting_onStart_closure1, ConfigSetting_onStart_closure2, TankGame, TankGame_onStart_closure, TankGame_onStart_closure0, TankGame_onStart_closure1, TankGame_onStart_closure2, TankGame_onEndOfStage_closure, TankGame_onEndOfStage_closure0, TankGame_onEndOfStage__closure2, TankGame_onEndOfStage_closure1, TankGame_onEndOfStage_closure2, TankGame_onEndOfStage__closure1, TankGame_onEndOfStage_closure3, TankGame_onEndOfStage_closure4, TankGame_onEndOfStage__closure, TankGame_onEndOfStage__closure0, TankGame_onEndOfStage_closure5, PresentScreen, PresentScreen_onStart_closure, PresentScreen_onStart_closure0, TankGamePracticely, TankGamePracticely_onEndOfStage_closure, TankGamePracticely_onEndOfStage_closure0, TankGamePracticely_onEndOfStage_closure1, FireButton, FireButton_fire_closure, FireButton_startCharge_closure, FireButton_startCharge__closure, GameStartLogo, GameStartLogo_onPrepareRender_closure, Tank, Tank_onInit_closure, Cannonball, Cannonball_onProcess_closure, Cannonball_onProcess_closure0, Target, Target_onPrepareRender_closure, Bomb, Bomb_onInit_closure, Ground, Ground_onPrepareRender_closure, Ground_onPrepareRender__closure, Ground_onPrepareRender__closure0, Smoke, Vector, Closure$2, Closure$1, Closure$0, Closure$7, Closure$21];
 }

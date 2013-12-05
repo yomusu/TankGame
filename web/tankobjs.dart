@@ -42,7 +42,7 @@ class Tank extends GObj {
     
     var imgs = [ geng.imageMap["tank01"], geng.imageMap["tank02"] ];
     
-    sp2 = new ImageSprite( img:imgs[0], width:130, height:130 );
+    sp2 = new ImageSprite( img:imgs[0], width:130, height:133 );
     sp2.offsety = 0;
     
     // アニメのセット

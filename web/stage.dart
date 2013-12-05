@@ -129,14 +129,15 @@ class XMasSaveData {
     // ハイスコアに登録
     hiscores.add(score);
     hiscores.sort( (l,r) {
-      var chit = l.hit.compareTo(r.hit) * -1;
-      var cfire= l._fire.compareTo(r._fire);
-      var cdate= l._datetime.compareTo(r._datetime) * -1;
+      var chit = l.hit.compareTo(r.hit) * -1; // 大きい順
+      var cfire= l._fire.compareTo(r._fire);  // 小さい順
+      var cdate= l._datetime.compareTo(r._datetime) * -1; // 大きい順
       if( chit!=0 ) return chit;
       if( cfire!=0 ) return cfire;
       return cdate;
     });
-    hiscores = hiscores.sublist(0, 10);
+    // 保存するのは最大10個
+    hiscores = hiscores.take(10).toList(growable:true);
     // 書き込み
     window.localStorage[_HiScoreKey] = JSON.encode(hiscores);
     

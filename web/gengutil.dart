@@ -31,9 +31,9 @@ class FrameTimer {
     var wait = targetTime - now;
     
     // 処理落ちした場合は、もろもろ補正
-    if( wait < 1000 ) {
-      wait = 1000;
-      targetTime = now + 1000;
+    if( wait < 100 ) {
+      wait = 100;
+      targetTime = now + 100;
 //      print("wait=$wait  on ${_watch.elapsedMicroseconds}");
     }
     

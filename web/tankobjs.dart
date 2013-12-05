@@ -237,14 +237,16 @@ class Target extends GObj {
     sp.y = pos.y;
   }
   void onPrepareRender( RenderList renderList ) {
+    if( sp.x < -60 || (570+60) < sp.x )
+      return;
     renderList.add( 5, (canvas) {
       sp.render(canvas);
       // Hit mark
-      if( _hitdx!=null ) {
-        var hx = sp.x + _hitdx;
-        canvas.c.setFillColorRgb(255, 0, 0,1);
-        canvas.c.fillRect(hx-5, sp.y-5, 10, 10);
-      }
+//      if( _hitdx!=null ) {
+//        var hx = sp.x + _hitdx;
+//        canvas.c.setFillColorRgb(255, 0, 0,1);
+//        canvas.c.fillRect(hx-5, sp.y-5, 10, 10);
+//      }
     } );
   }
   

@@ -10,14 +10,13 @@ import 'vector.dart';
 
 import 'geng.dart';
 
+part 'title.dart';
 part 'tankobjs.dart';
 part 'tankobjs2.dart';
 part 'stage.dart';
 
 
 final String  scoreFont = "'Press Start 2P', cursive";
-
-GamePointManager  gamePointManager = new GamePointManager();
 
 void main() {
   
@@ -44,10 +43,10 @@ void main() {
       ;
     // ご褒美画面用の画像
     geng.imageMap
-      ..put("p100", "./present/p100.png")
-      ..put("p90", "./present/p90.png")
-      ..put("p80", "./present/p80.png")
-      ..put("p70", "./present/p70.png")
+      ..put("rank01", "./present/rank01.png")
+      ..put("rank02", "./present/rank02.png")
+      ..put("rank03", "./present/rank03.png")
+      ..put("rank04", "./present/rank04.png")
       ;
     
     // サウンド読み込み
@@ -57,10 +56,7 @@ void main() {
     geng.soundManager.put("bomb","./sound/pyo");
     
     // ハイスコアデータ読み込み
-    geng.hiscoreManager.init();
-    
-    // ゲームポイントマネージャー
-    gamePointManager.init();
+    xmasSavedata.build();
     
     // SoundのOn/Off
     bool sound = window.localStorage.containsKey("sound") ? window.localStorage["sound"]=="true" : true;
@@ -85,136 +81,16 @@ int numberOfHit;
 int numberOfFire;
 double  offset_x = 0.0;
 
+XMasSaveData  xmasSavedata = new XMasSaveData();
+
 clearGameData() {
 
   // ハイスコア
-  geng.hiscoreManager.allClear();
+  xmasSavedata.allClear();
   // サウンドのON/OFF
 //  window.localStorage;
-  // 取得ポイント
-  gamePointManager.clearPoint();
 }
 
-
-/***********
- * 
- * タイトル画面の表示
- * 
- */
-class Title extends GScreen {
-  
-  Timer timer;
-  bool isBtnVisible = true;
-  
-  void onStart() {
-    geng.objlist.disposeAll();
-    
-    //---------------------
-    // 練習ボタン配置
-    var practicebtn = new GButton(width:570,height:570)
-    ..renderer = null
-    ..onPress = (){
-      timer.cancel();
-      geng.screen = new StageSelect();
-    }
-    ..x = 285
-    ..y = 300;
-    
-    geng.objlist.add( practicebtn );
-    btnList.add( practicebtn );
-    
-    //---------------------
-    // 最前面描画処理
-    onBackRender = ( GCanvas2D canvas ) {
-      var img = geng.imageMap["title"];
-      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
-    };
-    // クリックでスタート表示
-    onFrontRender = ( GCanvas2D canvas ) {
-      if( isBtnVisible ) {
-        const width = 134*1.2;
-        const height= 46*1.2;
-        var img = geng.imageMap["starttext"];
-        canvas.c.drawImageScaled(img, 250, 420, width, height );
-      }
-    };
-    
-    // 点滅
-    timer = new Timer.periodic( const Duration(milliseconds:500), (t){
-      geng.repaint();
-      isBtnVisible = (isBtnVisible==false);
-    });
-  }
-}
-
-class StageSelect extends GScreen {
-  
-  void onStart() {
-    geng.objlist.disposeAll();
-    
-    //---------------------
-    // 練習ボタン配置
-    var practicebtn = new GButton(text:"れんしゅう",width:300,height:60)
-    ..onPress = (){
-      geng.soundManager.play("bell");
-      new Timer( const Duration(milliseconds:500), () {
-        stageData = stageList[0];
-        itemData = itemList[0];
-        geng.screen = new TankGamePracticely();
-      });
-    }
-    ..x = 285
-    ..y = 220;
-    
-    geng.objlist.add( practicebtn );
-    btnList.add( practicebtn );
-    
-    //---------------------
-    // StartGameボタン配置
-    var playbtn = new GButton(text:"ゲームスタート", width:300,height:60)
-    ..onPress = (){
-      geng.soundManager.play("bell");
-      new Timer( const Duration(milliseconds:500), () {
-        stageData = stageList[1];
-        itemData = itemList[0];
-        geng.screen = new TankGame();
-      });
-    }
-    ..x = 285
-    ..y = practicebtn.y + 110;
-    geng.objlist.add( playbtn );
-    btnList.add( playbtn );
-    
-    //---------------------
-    // Configボタンの配置
-    var configbtn = new GButton(text:"せってい",width:300,height:60)
-    ..onPress = (){ geng.screen = new ConfigSetting(); }
-    ..x = 285
-    ..y = practicebtn.y + (110 * 2);
-    geng.objlist.add( configbtn );
-    btnList.add( configbtn );
-    
-    //---------------------
-    // 最前面描画処理
-    Color bgColor = new Color.fromString("#ffffff");
-    Color borderColor = new Color.fromString("#A2896F");
-    onBackRender = ( GCanvas2D canvas ) {
-      var img = geng.imageMap["title"];
-      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
-      
-      canvas.c.beginPath();
-      // 背景
-      canvas.roundRect( 100, 150, 370, 360, 18 );
-      canvas.c.closePath();
-      canvas.fillColor = bgColor;
-      canvas.c.fill();
-      // ボーダー
-      canvas.strokeColor = borderColor;
-      canvas.c.lineWidth = 4;
-      canvas.c.stroke();
-    };
-  }
-}
 
 TextRender  trenTitle = new TextRender()
 ..fontFamily = fontFamily
@@ -269,11 +145,14 @@ TextRender  trenHiscore = new TextRender.from(scoretren)
 TextRender  trenHiscoreS = new TextRender.from(trenHiscore)
 ..fillColor = Color.Red;
 
-final titles = <String>["1ばん","2ばん","3ばん","4ばん","5ばん"];
-
-// ハイスコアの表示
-void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
+/**
+ * ハイスコアの表示
+ */
+void drawHiScore( GCanvas2D canvas, int y, { XMasScore mark:null } ) {
   
+  final List titles = <String>["1ばん","2ばん","3ばん","4ばん","5ばん"];
+  
+  var scoreList = xmasSavedata.getHiScores();
   const line = 20;
   
   trenHiscore.textAlign = "center";
@@ -282,83 +161,21 @@ void drawHiScore( GCanvas2D canvas, var scoreList, int y, { int mark:-1 } ) {
   y += line*2;
   var tren = new TextRender.from(trenHiscore);
   tren.textAlign = "right";
-  for( int i=0; i<scoreList.length; i++ ) {
-    tren.fillColor = ( mark==i ) ? Color.Red : Color.Black;
-    canvas.drawTexts( tren, [titles[i]], 215, y, maxWidth:100 );
-    canvas.drawTexts( tren, [resultToLevelText(scoreList[i])], 415, y, maxWidth:300 );
+  
+  for( int i=0; i<titles.length; i++ ) {
+    
+    if( i >= scoreList.length )
+      break;
+    
+    var s = scoreList[i] as XMasScore;
+    
+    tren.fillColor = ( mark==s ) ? Color.Red : Color.Black;
+    
+    canvas.drawTexts( tren, [titles[i]], 200, y, maxWidth:100 );
+    canvas.drawTexts( tren, ["${s.hit}こ"], 280, y, maxWidth:200 );
+    canvas.drawTexts( tren, ["${s.rankText}レベル"], 430, y, maxWidth:300 );
+    
     y += line;
-  }
-}
-
-/**
- * 設定画面
- */
-class ConfigSetting extends GScreen {
-  
-  static const TextSoundOff = "サウンドをOFFにする";
-  static const TextSoundOn  = "サウンドをONにする";
-  
-  void onStart() {
-    geng.objlist.disposeAll();
-    
-    // サウンドボタン
-    var sound = new GButton(width:300,height:60)
-    ..text = geng.soundManager.soundOn ? TextSoundOff : TextSoundOn
-    ..x = 285
-    ..y = 220;
-    sound.onRelease = () {
-      if( geng.soundManager.soundOn ) {
-        geng.soundManager.soundOn = false;
-        sound.text = TextSoundOn;
-        window.localStorage["sound"] = "false";
-      } else {
-        geng.soundManager.soundOn = true;
-        sound.text = TextSoundOff;
-        window.localStorage["sound"] = "true";
-      }
-    };
-    geng.objlist.add( sound );
-    btnList.add( sound );
-    if( geng.soundManager.isSupport ==false ) {
-      sound.text = "サウンド非対応ブラウザ";
-      sound.isEnable = false;
-    }
-    
-    // データクリアボタン
-    var clearData = new GButton(text:"データをすべてクリアする",width:300,height:60)
-    ..x = 285
-    ..y = sound.y + 110
-    ..onRelease = () { clearGameData(); };
-    geng.objlist.add( clearData );
-    btnList.add( clearData );
-    
-    // 戻るボタン配置
-    var retbtn = new GButton(text:"戻る",width:300,height:60)
-    ..onRelease = () { geng.screen = new Title(); }
-    ..x = 285
-    ..y = sound.y + (110*2);
-    geng.objlist.add( retbtn );
-    btnList.add( retbtn );
-    
-    //---------------------
-    // 最前面描画処理
-    Color bgColor = new Color.fromString("#ffffff");
-    Color borderColor = new Color.fromString("#A2896F");
-    onBackRender = ( GCanvas2D canvas ) {
-      var img = geng.imageMap["title"];
-      canvas.c.drawImageScaled(img, 0, 0, 570, 570);
-      
-      canvas.c.beginPath();
-      // 背景
-      canvas.roundRect( 100, 150, 370, 360, 18 );
-      canvas.c.closePath();
-      canvas.fillColor = bgColor;
-      canvas.c.fill();
-      // ボーダー
-      canvas.strokeColor = borderColor;
-      canvas.c.lineWidth = 4;
-      canvas.c.stroke();
-    };
   }
 }
 
@@ -457,16 +274,13 @@ class TankGame extends GScreen {
     // この時点での得点をバックアップ
     final _numberOfHit = numberOfHit;
     final _numberOfFire = numberOfFire;
-    final score = resultToScore( numberOfHit, numberOfFire, stageData);
-    final isPerfect = score==100;
-    final levelText = resultToLevelText(score);
+    final score = new XMasScore.create( numberOfHit, numberOfFire, stageData);
     
     // Hi-Score登録
-    int rank = -1;
     var drawMeichu = null;
     var text02 = null;
     var drawLevel = null;
-    var scoreList = null;
+    bool showHiScore = false;
     
     // 結果表示の描画部分
     onFrontRender = ( GCanvas2D c ) {
@@ -477,15 +291,15 @@ class TankGame extends GScreen {
         c.drawTexts( trenScore, text02, 285, 185);
       if( drawLevel!=null )
         drawLevel( c, 240 );
-      if( scoreList!=null )
-        drawHiScore( c, scoreList, 330, mark:rank );
+      if( showHiScore )
+        drawHiScore( c, 330, mark:score );
     };
     
     // 結果表示の進行
     delay( 1000, (){
       drawMeichu = (GCanvas2D c, int y) {
         c.drawTexts( trenScore, ["めいちゅうしたかず: ${_numberOfHit}こ"], 285, y);
-        if( isPerfect ) {
+        if( score.isPerfect ) {
           c.drawTexts( trenScore, ["パーフェクト！"], 285, y+25);
         }
       };
@@ -500,19 +314,17 @@ class TankGame extends GScreen {
     delay( 3000, (){
       drawLevel = ( GCanvas2D c, int  y ) {
         c.drawTexts( trenScore, ["キミのうでまえは"], 285, y);
-        c.drawTexts( trenScore, ["〜 ${levelText} レベル 〜"], 285, y+30);
+        c.drawTexts( trenScore, ["〜 ${score.rankText} レベル 〜"], 285, y+30);
       };
-      // hit数とFire数を保存
-      try {
-        rank = geng.hiscoreManager.addNewRecord(stageData['id'], score );
-      } catch(e){}
+      // ハイスコアに登録
+      xmasSavedata.putAndWrite( score );
       
       geng.repaint();
       geng.soundManager.play("bell");
     } );
     delay( 4000, (){
       // ハイスコア
-      scoreList = geng.hiscoreManager.getScores(stageData['id']);
+      showHiScore = true;
       geng.repaint();
     } );
     
@@ -559,22 +371,22 @@ const ScreenHeight= 570;
  */
 class PresentScreen extends GScreen {
   
-  final int _score;
+  final XMasScore _score;
   final ImageElement  img;
   
-  PresentScreen( int score ) :
+  PresentScreen( XMasScore score ) :
     _score = score,
-    img = geng.imageMap["p$score"]
+    img = geng.imageMap[score.rank]
   ;
   
   void onStart() {
     geng.objlist.disposeAll();
     
     // 表示すべき日付を求める
-    var now = new DateTime.now();
+    var now = _score.datetime;
     String  nowText = "${now.year}/${now.month}/${now.day} ${now.hour}:${now.minute}";
     
-    List  info = ["$nowText ${resultToLevelText(_score)}"];
+    List  info = ["$nowText ${_score.rankText}"];
 
     // ご褒美画像の描画部分
     onFrontRender = ( GCanvas2D c ) {
@@ -608,11 +420,9 @@ class TankGamePracticely extends TankGame {
   
   void onEndOfStage() {
     
-    var score = resultToScore( numberOfHit, numberOfFire, stageData );
-    
     // メッセージ表示
     var message;
-    if( score <= 70 ) {
+    if( numberOfHit <= 3 ) {
       message = ["まだまだ かな？",
                  "もうちょっと れんしゅうしてみよう！"];
     } else {
